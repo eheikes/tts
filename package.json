@@ -1,0 +1,43 @@
+{
+  "name": "aws-tts",
+  "version": "1.0.0",
+  "description": "Convert text to speech using AWS Polly",
+  "main": "index.js",
+  "bin": {
+    "aws-tts": "./tts.js"
+  },
+  "scripts": {
+    "lint": "ux-lint index.js lib.js --extend .lintrc",
+    "test": "echo \"No tests :( Create a PR maybe?\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eheikes/aws-tts.git"
+  },
+  "keywords": [
+    "aws",
+    "amazon",
+    "polly",
+    "text",
+    "speech",
+    "tts"
+  ],
+  "author": "Eric Heikes <eheikes@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/eheikes/aws-tts/issues"
+  },
+  "homepage": "https://github.com/eheikes/aws-tts#readme",
+  "devDependencies": {
+    "ux-lint": "^1.4.0"
+  },
+  "dependencies": {
+    "async": "^2.1.4",
+    "aws-sdk": "^2.7.27",
+    "fs-extra": "^2.0.0",
+    "got": "^6.7.1",
+    "minimist": "^1.2.0",
+    "tempfile": "^1.1.1",
+    "textchunk": "^1.1.0"
+  }
+}
