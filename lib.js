@@ -3,12 +3,24 @@
 const async = require('async');
 const fs = require('fs-extra');
 const got = require('got');
+const ora = require('ora');
 const path = require('path');
 const Polly = require('aws-sdk/clients/polly').Presigner;
 const spawn = require('child_process').spawn;
 const tempfile = require('tempfile');
 
+// Set up the spinner.
+let spinner = ora().start();
+spinner.begin = text => {
+  spinner.text = text;
+  spinner.start();
+};
+spinner.end = () => {
+  spinner.succeed();
+};
+
 exports.checkUsage = args => {
+  spinner.stop();
   const minNumArgs = 2;
   const script = path.basename(process.argv[1]);
   const usageStatement = `Usage: ${script} inputfile outputfile
@@ -52,7 +64,8 @@ exports.generateSpeech = (strParts, opts) => {
   });
 
   // Calls AWS Polly with the given info.
-  let callAws = (info, callback) => {
+  let callAws = (info, i, callback) => {
+    spinner.text = spinner.text.replace(/\d+\//, `${i}/`);
     let url = polly.getSynthesizeSpeechUrl({
       OutputFormat: opts.format,
       Text: info.text,
@@ -66,13 +79,19 @@ exports.generateSpeech = (strParts, opts) => {
 
   // Calls the API for each text part (throttled). Returns a Promise.
   let generateAll = parts => {
+    let count = parts.length;
+    spinner.begin(`Convert to audio (0/${count})`);
     return (new Promise((resolve, reject) => {
-      async.eachLimit(
+      async.eachOfLimit(
         parts,
         opts.limit,
         callAws,
         err => {
-          if (err) { return reject(err); }
+          if (err) {
+            spinner.fail();
+            return reject(err);
+          }
+          spinner.end();
           resolve(parts);
         }
       );
@@ -104,6 +123,7 @@ exports.generateSpeech = (strParts, opts) => {
   // Combines all the parts into one file.
   // Resolves with the new filename.
   let combine = manifestFile => {
+    spinner.begin('Combine audio');
     let newFile = tempfile(`.${opts.format}`);
     let args = [
       '-f', 'concat',
@@ -118,11 +138,17 @@ exports.generateSpeech = (strParts, opts) => {
         reject(new Error('Could not start ffmpeg process'));
       });
       ffmpeg.on('close', code => {
-        if (code > 0) { return reject(new Error(`ffmpeg returned an error (${code})`)); }
+        if (code > 0) {
+          spinner.fail();
+          return reject(new Error(`ffmpeg returned an error (${code})`));
+        }
+        spinner.end();
         resolve(newFile);
       });
     })).then(audioFile => {
+      spinner.begin('Clean up');
       cleanup(manifestFile);
+      spinner.end();
       return audioFile;
     });
   };
@@ -133,6 +159,10 @@ exports.generateSpeech = (strParts, opts) => {
   return generateAll(parts)
     .then(createManifest)
     .then(combine);
+};
+
+exports.getSpinner = () => {
+  return spinner;
 };
 
 exports.trim = str => {
