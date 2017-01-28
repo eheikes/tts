@@ -31,7 +31,7 @@ parts = parts.map(compressSpace).map(trim); // compress the white space
 spinner.end();
 
 // Generate the audio file.
-generateSpeech(parts, { limit: 5 }).then(tempFile => {
+generateSpeech(parts, args).then(tempFile => {
   fs.move(tempFile, outputFilename, { overwrite: true }, () => {
     spinner.succeed(`Done. Saved to ${outputFilename}`);
   });

@@ -16,11 +16,20 @@ $ npm install aws-tts -g
 ## Usage
 
 ```
-$ tts.js inputfile outputfile
+$ tts.js inputfile outputfile [options]
 ```
+
+Required arguments:
 
 * `inputfile` should be the text file you want to convert to speech.
 * `outfile` is the filename to save the audio to.
+
+Options:
+
+* `--format FORMAT` -- Target audio format (`mp3`, `ogg_vorbis`, or `pcm`) (default `mp3`)
+* `--region REGION` -- AWS region to send requests to (default `us-east-1`)
+* `--throttle SIZE` -- Number of simultaneous requests allowed against the AWS API (default `5`)
+* `--voice VOICE` -- Voice to use for the speech (default `Joanna`)
 
 ## What It Does
 

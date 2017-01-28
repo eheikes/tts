@@ -23,7 +23,17 @@ exports.checkUsage = args => {
   spinner.stop();
   const minNumArgs = 2;
   const script = path.basename(process.argv[1]);
-  const usageStatement = `Usage: ${script} inputfile outputfile
+  const usageStatement = `Converts a text file to speech using the AWS Polly API.
+Usage:
+  ${script} INPUTFILE OUTPUTFILE [OPTIONS]
+Required:
+  INPUTFILE           The text file to convert
+  OUTPUTFILE          The filename to save the audio to
+Options:
+  --format FORMAT     Target audio format ("mp3", "ogg_vorbis", or "pcm") (default "mp3")
+  --region REGION     AWS region to send requests to (default "us-east-1")
+  --throttle SIZE     Number of simultaneous requests allowed against the AWS API (default 5)
+  --voice VOICE       Voice to use for the speech (default "Joanna")
 `;
   if (args._.length < minNumArgs) {
     process.stderr.write(usageStatement);
@@ -39,10 +49,10 @@ exports.compressSpace = str => {
 exports.generateSpeech = (strParts, opts) => {
   // Add in the default options.
   opts = Object.assign({}, {
-    format: 'mp3',
-    limit: 5,
-    region: 'us-east-1',
-    voice: 'Joanna'
+    format: opts.format || 'mp3',
+    limit: Number(opts.throttle) || 5, // eslint-disable-line no-magic-numbers
+    region: opts.region || 'us-east-1',
+    voice: opts.voice || 'Joanna'
   }, opts);
 
   const secsPerMin = 60;
