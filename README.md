@@ -16,7 +16,7 @@ $ npm install aws-tts -g
 ## Usage
 
 ```
-$ tts.js inputfile outputfile [options]
+$ aws-tts inputfile outputfile [options]
 ```
 
 Required arguments:
