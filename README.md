@@ -35,6 +35,6 @@ Options:
 
 * Splits the text into the maximum size allowed by the AWS API (1500 characters).
 * Compresses the white space inside the text to minimize the AWS cost.
-* Uses your AWS credentials in `.aws/credentials`.
+* Uses your AWS credentials in `~/.aws/credentials`.
 * Calls the AWS API (in a throttled manner) to get each text part converted to audio.
 * Combines the audio together into a single file.
