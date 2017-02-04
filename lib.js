@@ -101,6 +101,7 @@ exports.generateSpeech = (strParts, opts) => {
             spinner.fail();
             return reject(err);
           }
+          spinner.text = spinner.text.replace(/\d+\//, `${count}/`);
           spinner.end();
           resolve(parts);
         }
