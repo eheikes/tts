@@ -35,4 +35,6 @@ generateSpeech(parts, args).then(tempFile => {
   fs.move(tempFile, outputFilename, { overwrite: true }, () => {
     spinner.succeed(`Done. Saved to ${outputFilename}`);
   });
+}).catch(err => {
+  process.stderr.write(err.stack);
 });
