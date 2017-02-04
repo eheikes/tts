@@ -9,6 +9,12 @@ const Polly = require('aws-sdk/clients/polly').Presigner;
 const spawn = require('child_process').spawn;
 const tempfile = require('tempfile');
 
+const fileExtensions = {
+  mp3: 'mp3',
+  ogg_vorbis: 'ogg',
+  pcm: 'pcm',
+};
+
 // Set up the spinner.
 let spinner = ora().start();
 spinner.begin = text => {
@@ -62,7 +68,7 @@ exports.generateSpeech = (strParts, opts) => {
   // Creates an object containing all the data.
   let buildInfo = text => {
     return {
-      tempfile: tempfile(`.${opts.format}`),
+      tempfile: tempfile(`.${fileExtensions[opts.format]}`),
       text: text
     };
   };
@@ -135,7 +141,7 @@ exports.generateSpeech = (strParts, opts) => {
   // Resolves with the new filename.
   let combine = manifestFile => {
     spinner.begin('Combine audio');
-    let newFile = tempfile(`.${opts.format}`);
+    let newFile = tempfile(`.${fileExtensions[opts.format]}`);
     let args = [
       '-f', 'concat',
       '-safe', '0',
