@@ -2,6 +2,8 @@
 
 Command-line tool to convert a text file of any size to speech using the AWS Polly API.
 
+![Animation of the tool in action](docs/aws-tts.gif)
+
 ## Requirements / Installation
 
 * [Node.js/npm](https://nodejs.org) v4+
