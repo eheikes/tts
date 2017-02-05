@@ -1,6 +1,6 @@
 # AWS Text-To-Speech
 
-Converts a text file of any size to speech using the AWS Polly API.
+Command-line tool to convert a text file of any size to speech using the AWS Polly API.
 
 ## Requirements / Installation
 

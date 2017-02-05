@@ -1,7 +1,7 @@
 {
   "name": "aws-tts",
   "version": "1.0.0",
-  "description": "Convert text to speech using AWS Polly",
+  "description": "CLI tool to convert text to speech using AWS Polly",
   "main": "index.js",
   "bin": {
     "aws-tts": "./tts.js"
