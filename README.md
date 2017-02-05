@@ -6,12 +6,15 @@ Converts a text file of any size to speech using the AWS Polly API.
 
 * [Node.js/npm](https://nodejs.org) v4+
 * [ffmpeg](https://ffmpeg.org/)
+* An Amazon/AWS account
 
 You can then install the package globally:
 
 ```
 $ npm install aws-tts -g
 ```
+
+You'll also need to [get your AWS access keys](http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-your-credentials.html) and [configure your machine with your credentials](http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).
 
 ## Usage
 
