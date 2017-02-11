@@ -6,7 +6,7 @@ Command-line tool to convert a text file of any size to speech using the AWS Pol
 
 ## Requirements / Installation
 
-* [Node.js/npm](https://nodejs.org) v4+
+* [Node.js/npm](https://nodejs.org) v6+
 * [ffmpeg](https://ffmpeg.org/)
 * An Amazon/AWS account
 

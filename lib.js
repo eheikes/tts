@@ -43,7 +43,7 @@ Options:
 `;
   if (args._.length < minNumArgs) {
     process.stderr.write(usageStatement);
-    process.exit(1);
+    process.exit();
   }
 };
 

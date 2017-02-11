@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "ux-lint index.js lib.js --extend .lintrc",
-    "test": "echo \"No tests :( Create a PR maybe?\" && exit 1"
+    "test": "npm run lint && ./tts.js"
   },
   "repository": {
     "type": "git",
