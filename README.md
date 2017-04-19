@@ -46,7 +46,9 @@ Options:
 
 ## Contributing
 
-Run `npm run lint` to lint the code.
+Pull requests and suggestions are welcome. [Create a new issue](https://github.com/eheikes/aws-tts/issues/new) to report a bug or suggest a new feature.
+
+Please add tests and maintain the existing styling when adding and updating the code. Run `npm run lint` to lint the code.
 
 ## Small Print
 
