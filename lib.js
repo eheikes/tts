@@ -120,7 +120,7 @@ exports.generateSpeech = (strParts, opts) => {
   let createManifest = parts => {
     let txtFile = tempfile('.txt');
     let contents = parts.map(info => {
-      return `file ${info.tempfile}`;
+      return `file '${info.tempfile}'`;
     }).join('\n');
     fs.writeFileSync(txtFile, contents, 'utf8');
     return txtFile;
