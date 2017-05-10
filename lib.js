@@ -151,13 +151,17 @@ exports.generateSpeech = (strParts, opts) => {
     ];
     return (new Promise((resolve, reject) => {
       let ffmpeg = spawn('ffmpeg', args);
+      let stderr = '';
+      ffmpeg.stderr.on('data', (data) => {
+        stderr += `\n${data}`;
+      });
       ffmpeg.on('error', err => {
         reject(new Error('Could not start ffmpeg process'));
       });
       ffmpeg.on('close', code => {
         if (code > 0) {
           spinner.fail();
-          return reject(new Error(`ffmpeg returned an error (${code})`));
+          return reject(new Error(`ffmpeg returned an error (${code}): ${stderr}`));
         }
         spinner.end();
         resolve(newFile);
