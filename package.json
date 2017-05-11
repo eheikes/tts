@@ -7,7 +7,7 @@
   },
   "scripts": {
     "lint": "ux-lint index.js lib.js --extend .lintrc",
-    "test": "npm run lint && ./tts.js"
+    "test": "npm run lint && ./tts.js --help"
   },
   "repository": {
     "type": "git",

@@ -36,14 +36,19 @@ Required:
   INPUTFILE           The text file to convert
   OUTPUTFILE          The filename to save the audio to
 Options:
+  --help              Displays this info and exits
   --format FORMAT     Target audio format ("mp3", "ogg_vorbis", or "pcm") (default "mp3")
   --region REGION     AWS region to send requests to (default "us-east-1")
   --throttle SIZE     Number of simultaneous requests allowed against the AWS API (default 5)
   --voice VOICE       Voice to use for the speech (default "Joanna")
 `;
+  if (args.help) {
+    process.stderr.write(usageStatement);
+    process.exit(0);
+  }
   if (args._.length < minNumArgs) {
     process.stderr.write(usageStatement);
-    process.exit();
+    process.exit(1);
   }
 };
 
