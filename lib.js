@@ -92,10 +92,10 @@ exports.generateSpeech = (strParts, opts) => {
       Text: info.text,
       VoiceId: opts.voice
     }, halfHour);
+    let error;
     let outputStream = fs.createWriteStream(info.tempfile);
-    outputStream.on('error', callback);
-    outputStream.on('finish', callback);
-    got.stream(url).pipe(outputStream);
+    outputStream.on('close', () => { callback(error); });
+    got.stream(url).on('error', err => { error = err; }).pipe(outputStream);
   };
 
   // Calls the API for each text part (throttled). Returns a Promise.
