@@ -31,8 +31,10 @@ Required arguments:
 
 Options:
 
+* `--access-key KEY` -- AWS access key ID
 * `--format FORMAT` -- Target audio format (`mp3`, `ogg_vorbis`, or `pcm`) (default `mp3`)
 * `--region REGION` -- AWS region to send requests to (default `us-east-1`)
+* `--secret-key KEY` -- AWS secret access key
 * `--throttle SIZE` -- Number of simultaneous requests allowed against the AWS API (default `5`)
 * `--voice VOICE` -- Voice to use for the speech (default `Joanna`). See the [API docs](http://docs.aws.amazon.com/polly/latest/dg/API_SynthesizeSpeech.html) for the full list of voices. You can also [test out the voices](https://console.aws.amazon.com/polly/home/SynthesizeSpeech) in the AWS console.
 

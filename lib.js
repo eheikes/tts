@@ -37,8 +37,10 @@ Required:
   OUTPUTFILE          The filename to save the audio to
 Options:
   --help              Displays this info and exits
+  --access-key KEY    AWS access key ID
   --format FORMAT     Target audio format ("mp3", "ogg_vorbis", or "pcm") (default "mp3")
   --region REGION     AWS region to send requests to (default "us-east-1")
+  --secret-key KEY    AWS secret access key
   --throttle SIZE     Number of simultaneous requests allowed against the AWS API (default 5)
   --voice VOICE       Voice to use for the speech (default "Joanna")
 `;
@@ -60,9 +62,11 @@ exports.compressSpace = str => {
 exports.generateSpeech = (strParts, opts) => {
   // Add in the default options.
   opts = Object.assign({}, {
+    'access-key': opts.accessKey,
     format: opts.format || 'mp3',
     limit: Number(opts.throttle) || 5, // eslint-disable-line no-magic-numbers
     region: opts.region || 'us-east-1',
+    'secret-key': opts.secretKey,
     voice: opts.voice || 'Joanna'
   }, opts);
 
@@ -81,7 +85,9 @@ exports.generateSpeech = (strParts, opts) => {
   // Create an AWS Polly instance.
   let polly = new Polly({
     apiVersion: '2016-06-10',
-    region: opts.region
+    region: opts.region,
+    accessKeyId: opts['access-key'],
+    secretAccessKey: opts['secret-key'],
   });
 
   // Calls AWS Polly with the given info.
