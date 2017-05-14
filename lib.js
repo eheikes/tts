@@ -38,6 +38,7 @@ Required:
 Options:
   --help              Displays this info and exits
   --access-key KEY    AWS access key ID
+  --ffmpeg BINARY     Path to the ffmpeg binary (defaults to the one in PATH)
   --format FORMAT     Target audio format ("mp3", "ogg_vorbis", or "pcm") (default "mp3")
   --region REGION     AWS region to send requests to (default "us-east-1")
   --secret-key KEY    AWS secret access key
@@ -63,6 +64,7 @@ exports.generateSpeech = (strParts, opts) => {
   // Add in the default options.
   opts = Object.assign({}, {
     'access-key': opts.accessKey,
+    ffmpeg: opts.ffmpeg || 'ffmpeg',
     format: opts.format || 'mp3',
     limit: Number(opts.throttle) || 5, // eslint-disable-line no-magic-numbers
     region: opts.region || 'us-east-1',
@@ -161,7 +163,7 @@ exports.generateSpeech = (strParts, opts) => {
       newFile
     ];
     return (new Promise((resolve, reject) => {
-      let ffmpeg = spawn('ffmpeg', args);
+      let ffmpeg = spawn(opts.ffmpeg, args);
       let stderr = '';
       ffmpeg.stderr.on('data', (data) => {
         stderr += `\n${data}`;

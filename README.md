@@ -32,6 +32,7 @@ Required arguments:
 Options:
 
 * `--access-key KEY` -- AWS access key ID
+* `--ffmpeg BINARY` -- Path to the ffmpeg binary (defaults to the one in PATH)
 * `--format FORMAT` -- Target audio format (`mp3`, `ogg_vorbis`, or `pcm`) (default `mp3`)
 * `--region REGION` -- AWS region to send requests to (default `us-east-1`)
 * `--secret-key KEY` -- AWS secret access key
