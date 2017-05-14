@@ -134,7 +134,7 @@ exports.generateSpeech = (strParts, opts) => {
   // Deletes the manifest and its files.
   let cleanup = manifestFile => {
     let manifest = fs.readFileSync(manifestFile, 'utf8');
-    let regexpState = /^file\s+(.*)$/gm;
+    let regexpState = /^file\s+'(.*)'$/gm;
     let match;
     while ((match = regexpState.exec(manifest)) !== null) {
       fs.removeSync(match[1]);
