@@ -176,6 +176,9 @@ exports.generateSpeech = (strParts, opts) => {
       cleanup(manifestFile);
       spinner.end();
       return audioFile;
+    }).catch(err => {
+      cleanup(manifestFile);
+      throw err;
     });
   };
 
