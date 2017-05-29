@@ -41,6 +41,7 @@ Options:
   --ffmpeg BINARY     Path to the ffmpeg binary (defaults to the one in PATH)
   --format FORMAT     Target audio format ("mp3", "ogg_vorbis", or "pcm") (default "mp3")
   --region REGION     AWS region to send requests to (default "us-east-1")
+  --sample-rate RATE  Audio frequency, in hertz.
   --secret-key KEY    AWS secret access key
   --throttle SIZE     Number of simultaneous requests allowed against the AWS API (default 5)
   --voice VOICE       Voice to use for the speech (default "Joanna")
@@ -68,6 +69,7 @@ exports.generateSpeech = (strParts, opts) => {
     format: opts.format || 'mp3',
     limit: Number(opts.throttle) || 5, // eslint-disable-line no-magic-numbers
     region: opts.region || 'us-east-1',
+    'sample-rate': opts.sampleRate,
     'secret-key': opts.secretKey,
     voice: opts.voice || 'Joanna'
   }, opts);
@@ -97,6 +99,7 @@ exports.generateSpeech = (strParts, opts) => {
     spinner.text = spinner.text.replace(/\d+\//, `${i}/`);
     let url = polly.getSynthesizeSpeechUrl({
       OutputFormat: opts.format,
+      SampleRate: String(opts['sample-rate']),
       Text: info.text,
       VoiceId: opts.voice
     }, halfHour);
