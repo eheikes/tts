@@ -98,7 +98,7 @@ exports.generateSpeech = (strParts, opts) => {
     spinner.text = spinner.text.replace(/\d+\//, `${i}/`);
     let url = polly.getSynthesizeSpeechUrl({
       OutputFormat: opts.format,
-      SampleRate: String(opts['sample-rate']),
+      SampleRate: opts['sample-rate'] ? String(opts['sample-rate']) : undefined,
       Text: info.text,
       VoiceId: opts.voice
     }, halfHour);
