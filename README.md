@@ -21,18 +21,22 @@ You'll also need to [get your AWS access keys](http://docs.aws.amazon.com/sdk-fo
 ## Usage
 
 ```
-$ aws-tts inputfile outputfile [options]
+$ aws-tts [inputfile] outputfile [options]
 ```
 
 Example:
 
 ```
+# Using a text file as the input, changing the default voice, and specifying the AWS keys.
 $ aws-tts test.txt test.mp3 --voice Brian --access-key ABCDEFG --secret-key hwl500CZygitV91n
+
+# Passing a string of text as the input.
+$ echo "Hello world! How are you?" | aws-tts test.mp3
 ```
 
-Required arguments:
+Standard arguments:
 
-* `inputfile` should be the text file you want to convert to speech.
+* `inputfile` is the text file you want to convert to speech. If excluded, aws-tts will read in the text from `stdin`.
 * `outfile` is the filename to save the audio to.
 
 Options:

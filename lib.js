@@ -8,6 +8,9 @@ const path = require('path');
 const Polly = require('aws-sdk/clients/polly').Presigner;
 const spawn = require('child_process').spawn;
 const tempfile = require('tempfile');
+const textchunk = require('textchunk');
+
+const maxCharacterCount = 1500;
 
 const fileExtensions = {
   mp3: 'mp3',
@@ -27,13 +30,13 @@ spinner.end = () => {
 
 exports.checkUsage = args => {
   spinner.stop();
-  const minNumArgs = 2;
+  const minNumArgs = 1;
   const script = path.basename(process.argv[1]);
   const usageStatement = `Converts a text file to speech using the AWS Polly API.
 Usage:
-  ${script} INPUTFILE OUTPUTFILE [OPTIONS]
-Required:
-  INPUTFILE           The text file to convert
+  ${script} [INPUTFILE] OUTPUTFILE [OPTIONS]
+Standard:
+  INPUTFILE           The text file to convert (reads from stdin if not specified)
   OUTPUTFILE          The filename to save the audio to
 Options:
   --help              Displays this info and exits
@@ -54,10 +57,6 @@ Options:
     process.stderr.write(usageStatement);
     process.exit(1);
   }
-};
-
-exports.compressSpace = str => {
-  return str.replace(/\s+/g, ' ');
 };
 
 // Returns a Promise with the temporary audio file.
@@ -205,6 +204,46 @@ exports.getSpinner = () => {
   return spinner;
 };
 
-exports.trim = str => {
-  return str.trim();
+// Read in the text from a file.
+// If no file is specified, read from stdin.
+exports.readText = inputFilename => {
+  spinner.begin('Reading text');
+  return new Promise((resolve, reject) => {
+    if (inputFilename) {
+      // Read from a file.
+      fs.readFile(inputFilename, 'utf8', (err, data) => {
+        if (err) { return reject(err); }
+        resolve(data);
+      });
+    } else {
+      // Read from stdin.
+      let data = '';
+      process.stdin.setEncoding('utf8');
+      process.stdin.on('readable', () => {
+        let chunk = process.stdin.read();
+        if (chunk !== null) { data += chunk; }
+      });
+      process.stdin.on('end', () => {
+        resolve(data);
+      });
+    }
+  }).then(text => {
+    spinner.end();
+    return text;
+  });
+};
+
+// Splits a string of text into chunks.
+exports.splitText = text => {
+  spinner.begin('Splitting text');
+  let parts = textchunk.chunk(text, maxCharacterCount);
+  parts = parts.map(str => {
+    // Compress whitespace.
+    return str.replace(/\s+/g, ' ');
+  }).map(str => {
+    // Trim whitespace from the ends.
+    return str.trim();
+  });
+  spinner.end();
+  return Promise.resolve(parts);
 };
