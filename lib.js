@@ -152,19 +152,16 @@ exports.generateSpeech = (strParts, opts) => {
     fs.removeSync(manifestFile);
   };
 
-  // Combines all the parts into one file.
-  // Resolves with the new filename.
-  let combine = manifestFile => {
-    spinner.begin('Combine audio');
-    let newFile = tempfile(`.${fileExtensions[opts.format]}`);
+  // Combines MP3 or OGG files into one file.
+  let combineEncodedAudio = (manifestFile, outputFile) => {
     let args = [
       '-f', 'concat',
       '-safe', '0',
       '-i', manifestFile,
       '-c', 'copy',
-      newFile
+      outputFile
     ];
-    return (new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let ffmpeg = spawn(opts.ffmpeg, args);
       let stderr = '';
       ffmpeg.stderr.on('data', (data) => {
@@ -179,13 +176,38 @@ exports.generateSpeech = (strParts, opts) => {
           return reject(new Error(`ffmpeg returned an error (${code}): ${stderr}`));
         }
         spinner.end();
-        resolve(newFile);
+        resolve();
       });
-    })).then(audioFile => {
+    });
+  };
+
+  // Concatenates raw PCM audio into one file.
+  let combineRawAudio = (manifestFile, outputFile) => {
+    let manifest = fs.readFileSync(manifestFile, 'utf8');
+    let regexpState = /^file\s+'(.*)'$/gm;
+    fs.createFileSync(outputFile);
+    fs.truncateSync(outputFile);
+    let match;
+    while ((match = regexpState.exec(manifest)) !== null) {
+      let dataBuffer = fs.readFileSync(match[1]);
+      fs.appendFileSync(outputFile, dataBuffer);
+    }
+    return Promise.resolve();
+  };
+
+  // Combines all the parts into one file.
+  // Resolves with the new filename.
+  let combine = manifestFile => {
+    spinner.begin('Combine audio');
+    let newFile = tempfile(`.${fileExtensions[opts.format]}`);
+    let combiner = opts.format === 'pcm' ?
+      combineRawAudio(manifestFile, newFile) :
+      combineEncodedAudio(manifestFile, newFile);
+    return combiner.then(() => {
       spinner.begin('Clean up');
       cleanup(manifestFile);
       spinner.end();
-      return audioFile;
+      return newFile;
     }).catch(err => {
       cleanup(manifestFile);
       throw err;
