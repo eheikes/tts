@@ -27,10 +27,10 @@ if (!outputFilename) {
 let spinner = getSpinner();
 
 // Check the usage.
-checkUsage(args);
+checkUsage(args, process);
 
 // Generate the audio file.
-readText(input).then(text => {
+readText(input, process).then(text => {
   return splitText(text);
 }).then(parts => {
   return generateSpeech(parts, args);

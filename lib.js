@@ -28,10 +28,10 @@ spinner.end = () => {
   spinner.succeed();
 };
 
-exports.checkUsage = args => {
+exports.checkUsage = (args, proc) => {
   spinner.stop();
   const minNumArgs = 1;
-  const script = path.basename(process.argv[1]);
+  const script = path.basename(proc.argv[1]);
   const usageStatement = `Converts a text file to speech using the AWS Polly API.
 Usage:
   ${script} [INPUTFILE] OUTPUTFILE [OPTIONS]
@@ -50,12 +50,12 @@ Options:
   --voice VOICE       Voice to use for the speech (default "Joanna")
 `;
   if (args.help) {
-    process.stderr.write(usageStatement);
-    process.exit(0);
+    proc.stderr.write(usageStatement);
+    proc.exit(0);
   }
   if (args._.length < minNumArgs) {
-    process.stderr.write(usageStatement);
-    process.exit(1);
+    proc.stderr.write(usageStatement);
+    proc.exit(1);
   }
 };
 
@@ -228,7 +228,7 @@ exports.getSpinner = () => {
 
 // Read in the text from a file.
 // If no file is specified, read from stdin.
-exports.readText = inputFilename => {
+exports.readText = (inputFilename, proc) => {
   spinner.begin('Reading text');
   return new Promise((resolve, reject) => {
     if (inputFilename) {
@@ -240,12 +240,12 @@ exports.readText = inputFilename => {
     } else {
       // Read from stdin.
       let data = '';
-      process.stdin.setEncoding('utf8');
-      process.stdin.on('readable', () => {
-        let chunk = process.stdin.read();
+      proc.stdin.setEncoding('utf8');
+      proc.stdin.on('readable', () => {
+        let chunk = proc.stdin.read();
         if (chunk !== null) { data += chunk; }
       });
-      process.stdin.on('end', () => {
+      proc.stdin.on('end', () => {
         resolve(data);
       });
     }

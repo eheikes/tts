@@ -7,7 +7,7 @@
   },
   "scripts": {
     "lint": "ux-lint index.js lib.js --extend .lintrc",
-    "test": "npm run lint && ./tts.js --help"
+    "test": "npm run lint && jasmine JASMINE_CONFIG_PATH=test/jasmine.json"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,8 @@
   },
   "homepage": "https://github.com/eheikes/aws-tts#readme",
   "devDependencies": {
+    "jasmine": "^2.6.0",
+    "proxyquire": "^1.8.0",
     "ux-lint": "^1.4.0"
   },
   "dependencies": {
