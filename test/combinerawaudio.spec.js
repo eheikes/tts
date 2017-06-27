@@ -1,3 +1,4 @@
+'use strict';
 describe('combineRawAudio()', () => {
   const manifestFilename = 'manifest.txt';
   const outputFilename = 'foobar.mp3';

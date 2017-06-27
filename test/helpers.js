@@ -1,3 +1,5 @@
+'use strict';
+
 const async = require('async');
 const proxyquire = require('proxyquire');
 const { Readable } = require('stream');
@@ -7,7 +9,7 @@ exports.loadLib = () => {
   spyOn(async, 'eachOfLimit').and.callThrough();
 
   // Stub out the fs(-extra) module with spies.
-  fs = jasmine.createSpyObj('fs', [
+  let fs = jasmine.createSpyObj('fs', [
     'appendFileSync',
     'createFileSync',
     'readFile',
@@ -18,7 +20,7 @@ exports.loadLib = () => {
   ]);
 
   // Stub out the got module with a spy.
-  got = jasmine.createSpyObj('got', ['stream']);
+  let got = jasmine.createSpyObj('got', ['stream']);
   got.stream.and.callFake(url => {
     return new Readable({
       read() {
@@ -56,7 +58,7 @@ exports.loadLib = () => {
     if (type === 'close') { callback(); }
   });
   let spawnStderrOn = jasmine.createSpy('spawn.stderr.on');
-  spawn = jasmine.createSpy('spawn').and.callFake(() => {
+  let spawn = jasmine.createSpy('spawn').and.callFake(() => {
     return {
       on: spawnOnSpy,
       stderr: {
@@ -69,7 +71,7 @@ exports.loadLib = () => {
   let lib = proxyquire('../lib', {
     async: async,
     'aws-sdk/clients/polly': pollyStub,
-    'child_process': { spawn },
+    child_process: { spawn }, // eslint-disable-line camelcase
     'fs-extra': fs,
     got: got,
     ora: oraStub,

@@ -1,3 +1,4 @@
+'use strict';
 describe('combineEncodedAudio()', () => {
   const binary = 'ffmpeg';
   const manifestFilename = 'manifest.txt';
@@ -78,8 +79,8 @@ describe('combineEncodedAudio()', () => {
 
     it('should return a rejected promise with the stderr output', done => {
       combineEncodedAudio(binary, manifestFilename, tempFilename).catch(err => {
-        expect(err.message).toMatch(`\(${errorCode}\)`);
-        expect(err.message).toMatch(`\(${errorOutput}\)`);
+        expect(err.message).toMatch(`(${errorCode})`);
+        expect(err.message).toMatch(`(${errorOutput})`);
       }).then(done);
     });
   });

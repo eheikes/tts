@@ -1,3 +1,4 @@
+'use strict';
 describe('combine()', () => {
   const testManifest = 'manifest.txt';
 

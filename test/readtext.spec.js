@@ -1,11 +1,12 @@
+'use strict';
 describe('readText()', () => {
   const testData = 'hello world';
 
-  let readText, ora;
+  let readText, fs, ora;
   let proc, stdin;
 
   beforeEach(() => {
-    ({ readText, ora } = require('./helpers').loadLib());
+    ({ readText, fs, ora } = require('./helpers').loadLib());
   });
 
 
@@ -17,7 +18,7 @@ describe('readText()', () => {
       let response = sentData ? null : testData;
       sentData = true;
       return response;
-    })
+    });
     proc = {
       stdin: stdin
     };

@@ -1,3 +1,4 @@
+'use strict';
 describe('createManifest()', () => {
   const testParts = [
     { tempfile: 'foo.mp3' },

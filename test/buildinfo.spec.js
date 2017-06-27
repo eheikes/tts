@@ -1,3 +1,4 @@
+'use strict';
 describe('buildInfo()', () => {
   const text = 'foobar';
   const format = 'mp3';

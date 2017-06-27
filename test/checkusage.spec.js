@@ -1,5 +1,6 @@
+'use strict';
 describe('checkUsage()', () => {
-  let callAws, ora;
+  let checkUsage, ora;
   let proc, exit, write;
 
   beforeEach(() => {

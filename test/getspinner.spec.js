@@ -1,3 +1,4 @@
+'use strict';
 describe('getSpinner()', () => {
   let getSpinner, ora;
 

@@ -1,3 +1,4 @@
+'use strict';
 describe('callAws()', () => {
   const tempfile = require('tempfile');
 
@@ -7,7 +8,7 @@ describe('callAws()', () => {
   beforeEach(() => {
     testData = {
       filename: tempfile(),
-      index:6,
+      index: 6,
       opts: {
         format: 'ogg',
         'sample-rate': 16000,
@@ -15,7 +16,7 @@ describe('callAws()', () => {
       },
       text: 'hello world',
       url: 'http://example.com/',
-    }
+    };
     urlCreator = jasmine.createSpy('urlcreator').and.returnValue(testData.url);
     info = {
       opts: testData.opts,
@@ -81,7 +82,7 @@ describe('callAws()', () => {
   it('should time-limit the request to 30mins', done => {
     callAws(info, 0, () => {
       let ttl = urlCreator.calls.mostRecent().args[1];
-      expect(ttl).toBe(60 * 30);
+      expect(ttl).toBe(60 * 30); // eslint-disable-line no-magic-numbers
       done();
     });
   });

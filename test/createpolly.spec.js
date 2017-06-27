@@ -1,3 +1,4 @@
+'use strict';
 describe('createPolly()', () => {
   const opts = {
     'access-key': 'accesskey',

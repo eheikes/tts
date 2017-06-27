@@ -1,3 +1,4 @@
+'use strict';
 describe('cleanup()', () => {
   const manifestFilename = 'manifest.txt';
   const tempFilenames = ['foo.mp3', 'bar.mp3'];
