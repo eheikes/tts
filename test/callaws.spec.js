@@ -1,5 +1,6 @@
 'use strict';
 describe('callAws()', () => {
+  const fs = require('fs');
   const tempfile = require('tempfile');
 
   let callAws, got, ora;
@@ -29,6 +30,10 @@ describe('callAws()', () => {
 
   beforeEach(() => {
     ora.text = 'Convert to audio (0/42)';
+  });
+
+  afterEach(done => {
+    fs.unlink(testData.filename, done);
   });
 
   it('should update the spinner', done => {
