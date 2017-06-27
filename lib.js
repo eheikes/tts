@@ -1,5 +1,4 @@
 'use strict';
-/* eslint-disable no-console */
 
 const async = require('async');
 const fs = require('fs-extra');
