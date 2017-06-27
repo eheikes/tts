@@ -223,7 +223,7 @@ exports.generateSpeech = (strParts, opts) => {
   let polly = createPolly(opts);
 
   // Compile the text parts and options together in a packet.
-  let parts = strParts.map(part => buildInfo(part, polly.getSynthesizeSpeechUrl, opts));
+  let parts = strParts.map(part => buildInfo(part, polly.getSynthesizeSpeechUrl.bind(polly), opts));
 
   return generateAll(parts, opts, callAws)
     .then(createManifest)
