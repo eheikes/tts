@@ -59,6 +59,153 @@ Options:
   }
 };
 
+// Creates an object containing all the data.
+let buildInfo = (text, urlCreator, opts) => {
+  return {
+    opts: opts,
+    tempfile: tempfile(`.${fileExtensions[opts.format]}`),
+    text: text,
+    urlcreator: urlCreator,
+  };
+};
+
+// Calls AWS Polly with the given info.
+let callAws = (info, i, callback) => {
+  const secsPerMin = 60;
+  const minsInHalfHour = 30;
+  const halfHour = secsPerMin * minsInHalfHour;
+
+  spinner.text = spinner.text.replace(/\d+\//, `${i}/`);
+
+  let url = info.urlcreator({
+    OutputFormat: info.opts.format,
+    SampleRate: info.opts['sample-rate'] ? String(info.opts['sample-rate']) : undefined,
+    Text: info.text,
+    VoiceId: info.opts.voice
+  }, halfHour);
+
+  let error;
+  let outputStream = fs.createWriteStream(info.tempfile);
+  outputStream.on('close', () => { callback(error); });
+  got.stream(url).on('error', err => { error = err; }).pipe(outputStream);
+};
+
+// Deletes the manifest and its files.
+let cleanup = manifestFile => {
+  let manifest = fs.readFileSync(manifestFile, 'utf8');
+  let regexpState = /^file\s+'(.*)'$/gm;
+  let match;
+  while ((match = regexpState.exec(manifest)) !== null) {
+    fs.removeSync(match[1]);
+  }
+  fs.removeSync(manifestFile);
+};
+
+// Combines MP3 or OGG files into one file.
+let combineEncodedAudio = (binary, manifestFile, outputFile) => {
+  let args = [
+    '-f', 'concat',
+    '-safe', '0',
+    '-i', manifestFile,
+    '-c', 'copy',
+    outputFile
+  ];
+  return new Promise((resolve, reject) => {
+    let ffmpeg = spawn(binary, args);
+    let stderr = '';
+    ffmpeg.stderr.on('data', (data) => {
+      stderr += `\n${data}`;
+    });
+    ffmpeg.on('error', err => {
+      reject(new Error('Could not start ffmpeg process'));
+    });
+    ffmpeg.on('close', code => {
+      if (code > 0) {
+        spinner.fail();
+        return reject(new Error(`ffmpeg returned an error (${code}): ${stderr}`));
+      }
+      spinner.end();
+      resolve();
+    });
+  });
+};
+
+// Concatenates raw PCM audio into one file.
+let combineRawAudio = (manifestFile, outputFile) => {
+  let manifest = fs.readFileSync(manifestFile, 'utf8');
+  let regexpState = /^file\s+'(.*)'$/gm;
+  fs.createFileSync(outputFile);
+  fs.truncateSync(outputFile);
+  let match;
+  while ((match = regexpState.exec(manifest)) !== null) {
+    let dataBuffer = fs.readFileSync(match[1]);
+    fs.appendFileSync(outputFile, dataBuffer);
+  }
+  return Promise.resolve();
+};
+
+// Combines all the parts into one file.
+// Resolves with the new filename.
+let combine = (manifestFile, opts) => {
+  spinner.begin('Combine audio');
+  let newFile = tempfile(`.${fileExtensions[opts.format]}`);
+  let combiner = opts.format === 'pcm' ?
+    combineRawAudio(manifestFile, newFile) :
+    combineEncodedAudio(opts.ffmpeg, manifestFile, newFile);
+  return combiner.then(() => {
+    spinner.begin('Clean up');
+    cleanup(manifestFile);
+    spinner.end();
+    return newFile;
+  }).catch(err => {
+    cleanup(manifestFile);
+    throw err;
+  });
+};
+
+// Writes down all the temp files for ffmpeg to read in.
+// Returns the text filename.
+let createManifest = parts => {
+  let txtFile = tempfile('.txt');
+  let contents = parts.map(info => {
+    return `file '${info.tempfile}'`;
+  }).join('\n');
+  fs.writeFileSync(txtFile, contents, 'utf8');
+  return txtFile;
+};
+
+// Create an AWS Polly instance.
+let createPolly = opts => {
+  return new Polly({
+    apiVersion: '2016-06-10',
+    region: opts.region,
+    accessKeyId: opts['access-key'],
+    secretAccessKey: opts['secret-key'],
+  });
+};
+
+// Calls the API for each text part (throttled). Returns a Promise.
+let generateAll = (parts, opts, func) => {
+  let count = parts.length;
+  spinner.begin(`Convert to audio (0/${count})`);
+  return (new Promise((resolve, reject) => {
+    async.eachOfLimit(
+      parts,
+      opts.limit,
+      func,
+      err => {
+        if (err) {
+          spinner.fail();
+          return reject(err);
+        }
+        spinner.text = spinner.text.replace(/\d+\//, `${count}/`);
+        spinner.end();
+        resolve(parts);
+      }
+    );
+  }));
+};
+
 // Returns a Promise with the temporary audio file.
 exports.generateSpeech = (strParts, opts) => {
   // Add in the default options.
@@ -73,153 +220,16 @@ exports.generateSpeech = (strParts, opts) => {
     voice: opts.voice || 'Joanna'
   }, opts);
 
-  const secsPerMin = 60;
-  const minsInHalfHour = 30;
-  const halfHour = secsPerMin * minsInHalfHour;
-
-  // Creates an object containing all the data.
-  let buildInfo = text => {
-    return {
-      tempfile: tempfile(`.${fileExtensions[opts.format]}`),
-      text: text
-    };
-  };
-
-  // Create an AWS Polly instance.
-  let polly = new Polly({
-    apiVersion: '2016-06-10',
-    region: opts.region,
-    accessKeyId: opts['access-key'],
-    secretAccessKey: opts['secret-key'],
-  });
-
-  // Calls AWS Polly with the given info.
-  let callAws = (info, i, callback) => {
-    spinner.text = spinner.text.replace(/\d+\//, `${i}/`);
-    let url = polly.getSynthesizeSpeechUrl({
-      OutputFormat: opts.format,
-      SampleRate: opts['sample-rate'] ? String(opts['sample-rate']) : undefined,
-      Text: info.text,
-      VoiceId: opts.voice
-    }, halfHour);
-    let error;
-    let outputStream = fs.createWriteStream(info.tempfile);
-    outputStream.on('close', () => { callback(error); });
-    got.stream(url).on('error', err => { error = err; }).pipe(outputStream);
-  };
-
-  // Calls the API for each text part (throttled). Returns a Promise.
-  let generateAll = parts => {
-    let count = parts.length;
-    spinner.begin(`Convert to audio (0/${count})`);
-    return (new Promise((resolve, reject) => {
-      async.eachOfLimit(
-        parts,
-        opts.limit,
-        callAws,
-        err => {
-          if (err) {
-            spinner.fail();
-            return reject(err);
-          }
-          spinner.text = spinner.text.replace(/\d+\//, `${count}/`);
-          spinner.end();
-          resolve(parts);
-        }
-      );
-    }));
-  };
-
-  // Writes down all the temp files for ffmpeg to read in.
-  // Returns the text filename.
-  let createManifest = parts => {
-    let txtFile = tempfile('.txt');
-    let contents = parts.map(info => {
-      return `file '${info.tempfile}'`;
-    }).join('\n');
-    fs.writeFileSync(txtFile, contents, 'utf8');
-    return txtFile;
-  };
-
-  // Deletes the manifest and its files.
-  let cleanup = manifestFile => {
-    let manifest = fs.readFileSync(manifestFile, 'utf8');
-    let regexpState = /^file\s+'(.*)'$/gm;
-    let match;
-    while ((match = regexpState.exec(manifest)) !== null) {
-      fs.removeSync(match[1]);
-    }
-    fs.removeSync(manifestFile);
-  };
-
-  // Combines MP3 or OGG files into one file.
-  let combineEncodedAudio = (manifestFile, outputFile) => {
-    let args = [
-      '-f', 'concat',
-      '-safe', '0',
-      '-i', manifestFile,
-      '-c', 'copy',
-      outputFile
-    ];
-    return new Promise((resolve, reject) => {
-      let ffmpeg = spawn(opts.ffmpeg, args);
-      let stderr = '';
-      ffmpeg.stderr.on('data', (data) => {
-        stderr += `\n${data}`;
-      });
-      ffmpeg.on('error', err => {
-        reject(new Error('Could not start ffmpeg process'));
-      });
-      ffmpeg.on('close', code => {
-        if (code > 0) {
-          spinner.fail();
-          return reject(new Error(`ffmpeg returned an error (${code}): ${stderr}`));
-        }
-        spinner.end();
-        resolve();
-      });
-    });
-  };
-
-  // Concatenates raw PCM audio into one file.
-  let combineRawAudio = (manifestFile, outputFile) => {
-    let manifest = fs.readFileSync(manifestFile, 'utf8');
-    let regexpState = /^file\s+'(.*)'$/gm;
-    fs.createFileSync(outputFile);
-    fs.truncateSync(outputFile);
-    let match;
-    while ((match = regexpState.exec(manifest)) !== null) {
-      let dataBuffer = fs.readFileSync(match[1]);
-      fs.appendFileSync(outputFile, dataBuffer);
-    }
-    return Promise.resolve();
-  };
-
-  // Combines all the parts into one file.
-  // Resolves with the new filename.
-  let combine = manifestFile => {
-    spinner.begin('Combine audio');
-    let newFile = tempfile(`.${fileExtensions[opts.format]}`);
-    let combiner = opts.format === 'pcm' ?
-      combineRawAudio(manifestFile, newFile) :
-      combineEncodedAudio(manifestFile, newFile);
-    return combiner.then(() => {
-      spinner.begin('Clean up');
-      cleanup(manifestFile);
-      spinner.end();
-      return newFile;
-    }).catch(err => {
-      cleanup(manifestFile);
-      throw err;
-    });
-  };
+  let polly = createPolly(opts);
 
   // Compile the text parts and options together in a packet.
-  let parts = strParts.map(buildInfo);
+  let parts = strParts.map(part => buildInfo(part, polly.getSynthesizeSpeechUrl.bind(polly), opts));
 
-  return generateAll(parts)
+  return generateAll(parts, opts, callAws)
     .then(createManifest)
-    .then(combine);
+    .then(manifest => {
+      return combine(manifest, opts);
+    });
 };
 
 exports.getSpinner = () => {
@@ -269,3 +279,16 @@ exports.splitText = text => {
   spinner.end();
   return Promise.resolve(parts);
 };
+
+// Expose the internal functions when testing.
+if (process.env.JASMINE_CONFIG_PATH) {
+  exports.buildInfo = buildInfo;
+  exports.callAws = callAws;
+  exports.cleanup = cleanup;
+  exports.combine = combine;
+  exports.combineEncodedAudio = combineEncodedAudio;
+  exports.combineRawAudio = combineRawAudio;
+  exports.createManifest = createManifest;
+  exports.createPolly = createPolly;
+  exports.generateAll = generateAll;
+}
