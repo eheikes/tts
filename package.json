@@ -7,7 +7,7 @@
   },
   "scripts": {
     "lint": "ux-lint index.js lib.js test/*.js --extend .lintrc",
-    "test": "npm run lint && jasmine JASMINE_CONFIG_PATH=test/jasmine.json"
+    "test": "jasmine JASMINE_CONFIG_PATH=test/jasmine.json"
   },
   "repository": {
     "type": "git",
