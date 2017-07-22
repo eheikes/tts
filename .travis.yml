@@ -4,4 +4,4 @@ node_js:
   - "8"
   - "7"
   - "6"
-script: npm install && npm run lint && npm test
+script: npm run lint && npm test
