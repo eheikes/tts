@@ -12,7 +12,9 @@ describe('callAws()', () => {
       index: 6,
       opts: {
         format: 'ogg',
+        lexicon: ['lexicon1', 'lexicon2'],
         'sample-rate': 16000,
+        type: 'ssml',
         voice: 'John',
       },
       text: 'hello world',
@@ -64,6 +66,31 @@ describe('callAws()', () => {
     callAws(info, 0, () => {
       let opts = urlCreator.calls.mostRecent().args[0];
       expect(opts.SampleRate).toBe(String(testData.opts['sample-rate']));
+      done();
+    });
+  });
+
+  it('should not use lexicon names if not specified', done => {
+    delete info.opts.lexicon;
+    callAws(info, 0, () => {
+      let opts = urlCreator.calls.mostRecent().args[0];
+      expect(opts.LexiconNames).toBeUndefined();
+      done();
+    });
+  });
+
+  it('should use the lexicon names, when specified', done => {
+    callAws(info, 0, () => {
+      let opts = urlCreator.calls.mostRecent().args[0];
+      expect(opts.LexiconNames).toEqual(testData.opts.lexicon);
+      done();
+    });
+  });
+
+  it('should use the given text type', done => {
+    callAws(info, 0, () => {
+      let opts = urlCreator.calls.mostRecent().args[0];
+      expect(opts.TextType).toBe(testData.opts.type);
       done();
     });
   });

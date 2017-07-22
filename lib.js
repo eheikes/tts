@@ -43,10 +43,12 @@ Options:
   --access-key KEY    AWS access key ID
   --ffmpeg BINARY     Path to the ffmpeg binary (defaults to the one in PATH)
   --format FORMAT     Target audio format ("mp3", "ogg_vorbis", or "pcm") (default "mp3")
+  --lexicon NAME      Apply a stored pronunciation lexicon. Can be specified multiple times.
   --region REGION     AWS region to send requests to (default "us-east-1")
   --sample-rate RATE  Audio frequency, in hertz.
   --secret-key KEY    AWS secret access key
   --throttle SIZE     Number of simultaneous requests allowed against the AWS API (default 5)
+  --type TYPE         Type of input text ("text" or "ssml") (default "text")
   --voice VOICE       Voice to use for the speech (default "Joanna")
 `;
   if (args.help) {
@@ -78,9 +80,11 @@ let callAws = (info, i, callback) => {
   spinner.text = spinner.text.replace(/\d+\//, `${i}/`);
 
   let url = info.urlcreator({
+    LexiconNames: info.opts.lexicon,
     OutputFormat: info.opts.format,
     SampleRate: info.opts['sample-rate'] ? String(info.opts['sample-rate']) : undefined,
     Text: info.text,
+    TextType: info.opts.type,
     VoiceId: info.opts.voice
   }, halfHour);
 
@@ -213,12 +217,17 @@ exports.generateSpeech = (strParts, opts) => {
     'access-key': opts.accessKey,
     ffmpeg: opts.ffmpeg || 'ffmpeg',
     format: opts.format || 'mp3',
+    lexicon: opts.lexicon,
     limit: Number(opts.throttle) || 5, // eslint-disable-line no-magic-numbers
     region: opts.region || 'us-east-1',
     'sample-rate': opts.sampleRate,
     'secret-key': opts.secretKey,
+    type: opts.type || 'text',
     voice: opts.voice || 'Joanna'
   }, opts);
+  if (typeof opts.lexicon !== 'undefined' && !Array.isArray(opts.lexicon)) {
+    opts.lexicon = [opts.lexicon];
+  }
 
   let polly = createPolly(opts);
 
