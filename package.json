@@ -30,7 +30,7 @@
   "devDependencies": {
     "jasmine": "^2.6.0",
     "proxyquire": "^1.8.0",
-    "ux-lint": "^1.4.0"
+    "ux-lint": "^1.7.1"
   },
   "dependencies": {
     "async": "^2.1.4",
