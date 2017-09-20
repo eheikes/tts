@@ -10,8 +10,6 @@ const spawn = require('child_process').spawn;
 const tempfile = require('tempfile');
 const textchunk = require('textchunk');
 
-const maxCharacterCount = 1500;
-
 const fileExtensions = {
   mp3: 'mp3',
   ogg_vorbis: 'ogg', // eslint-disable-line camelcase
@@ -275,7 +273,7 @@ exports.readText = (inputFilename, proc) => {
 };
 
 // Splits a string of text into chunks.
-exports.splitText = text => {
+exports.splitText = (text, maxCharacterCount) => {
   spinner.begin('Splitting text');
   let parts = textchunk.chunk(text, maxCharacterCount);
   parts = parts.map(str => {

@@ -15,6 +15,7 @@ const {
 } = require('./lib');
 
 const args = require('minimist')(process.argv.slice(2));
+const maxCharacterCount = 1500;
 
 let [input, outputFilename] = args._;
 
@@ -31,7 +32,7 @@ checkUsage(args, process);
 
 // Generate the audio file.
 readText(input, process).then(text => {
-  return splitText(text);
+  return splitText(text, maxCharacterCount);
 }).then(parts => {
   return generateSpeech(parts, args);
 }).then(tempFile => {

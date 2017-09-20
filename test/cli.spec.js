@@ -90,7 +90,8 @@ describe('CLI', () => {
     });
 
     it('should split the text', () => {
-      expect(lib.splitText).toHaveBeenCalledWith(text);
+      const defaultNumChars = 1500;
+      expect(lib.splitText).toHaveBeenCalledWith(text, defaultNumChars);
     });
 
     it('should generate the speech', () => {
