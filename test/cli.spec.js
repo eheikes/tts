@@ -91,7 +91,7 @@ describe('CLI', () => {
 
     it('should split the text', () => {
       const defaultNumChars = 1500;
-      expect(lib.splitText).toHaveBeenCalledWith(text, defaultNumChars);
+      expect(lib.splitText).toHaveBeenCalledWith(text, defaultNumChars, jasmine.any(Object));
     });
 
     it('should generate the speech', () => {

@@ -32,7 +32,7 @@ checkUsage(args, process);
 
 // Generate the audio file.
 readText(input, process).then(text => {
-  return splitText(text, maxCharacterCount);
+  return splitText(text, maxCharacterCount, args);
 }).then(parts => {
   return generateSpeech(parts, args);
 }).then(tempFile => {

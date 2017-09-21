@@ -29,6 +29,33 @@ describe('splitText()', () => {
     }).then(done);
   });
 
+  it('should propagate SSML tags through the chunks', done => {
+    const testSsml = '<speak><prosody volume="loud">Hello there<break/> world<break/></prosody></speak>';
+    const testSize = 6;
+    splitText(testSsml, testSize, { type: 'ssml' }).then(text => {
+      expect(text).toEqual([
+        '<speak><prosody volume="loud">Hello</prosody></speak>',
+        '<speak><prosody volume="loud">there</prosody></speak>',
+        '<speak><prosody volume="loud"><break></break>world</prosody></speak>'
+      ]);
+    }).then(done);
+  });
+
+  it('should NOT propagate SSML tags for non-SSML text', done => {
+    const testSsml = '<speak>Hello there world</speak>';
+    const testSize = 6;
+    splitText(testSsml, testSize).then(text => {
+      expect(text).toEqual([
+        '<speak',
+        '>Hello',
+        'there',
+        'world',
+        '</spea',
+        'k>',
+      ]);
+    }).then(done);
+  });
+
   it('should condense whitespace', done => {
     splitText('hello   world', maxChars).then(text => {
       expect(text).toEqual(['hello world']);

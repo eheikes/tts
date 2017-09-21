@@ -243,6 +243,70 @@ exports.getSpinner = () => {
   return spinner;
 };
 
+// Chunk text into pieces.
+let chunkText = (text, maxCharacterCount) => {
+  let parts = textchunk.chunk(text, maxCharacterCount);
+  return Promise.resolve(parts);
+};
+
+// Parse and chunk XML.
+let chunkXml = (xml, maxCharacterCount) => {
+  const parser = require('sax').parser(false, {
+    lowercase: true,
+    normalize: true,
+    trim: true,
+  });
+  const attributeString = attrs => {
+    let str = '';
+    for (let prop in attrs) {
+      if (attrs.hasOwnProperty(prop)) {
+        str += ` ${prop}="${attrs[prop]}"`;
+      }
+    }
+    return str;
+  };
+  return new Promise((resolve, reject) => {
+    let err = null;
+    let extraTags = '';
+    let tags = [];
+    let parts = [];
+    parser.onerror = e => {
+      err = e;
+    };
+    parser.ontext = text => {
+      let chunks = textchunk.chunk(text, maxCharacterCount).map((chunk, index) => {
+        if (index === 0) {
+          chunk = `${extraTags}${chunk}`;
+        }
+        for (let i = tags.length - 1; i >= 0; i--) {
+          chunk = `<${tags[i].name}${attributeString(tags[i].attributes)}>${chunk}</${tags[i].name}>`;
+        }
+        return chunk;
+      });
+      parts.push(...chunks);
+      extraTags = '';
+    };
+    parser.onopentag = tagData => {
+      tags.push(tagData);
+    };
+    parser.onclosetag = tagName => {
+      if (tags[tags.length - 1].name === tagName) {
+        let attrs = attributeString(tags[tags.length - 1].attributes);
+        extraTags += `<${tagName}${attrs}></${tagName}>`;
+        tags.pop();
+      }
+    };
+    parser.onend = () => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(parts);
+      }
+    };
+    parser.write(xml).close();
+  });
+};
+
 // Read in the text from a file.
 // If no file is specified, read from stdin.
 exports.readText = (inputFilename, proc) => {
@@ -273,18 +337,22 @@ exports.readText = (inputFilename, proc) => {
 };
 
 // Splits a string of text into chunks.
-exports.splitText = (text, maxCharacterCount) => {
+exports.splitText = (text, maxCharacterCount, opts) => {
+  opts = opts || {};
   spinner.begin('Splitting text');
-  let parts = textchunk.chunk(text, maxCharacterCount);
-  parts = parts.map(str => {
-    // Compress whitespace.
-    return str.replace(/\s+/g, ' ');
-  }).map(str => {
-    // Trim whitespace from the ends.
-    return str.trim();
+  let chunker = opts.type === 'ssml' ? chunkXml : chunkText;
+  return chunker(text, maxCharacterCount).then(parts => {
+    return parts.map(str => {
+      // Compress whitespace.
+      return str.replace(/\s+/g, ' ');
+    }).map(str => {
+      // Trim whitespace from the ends.
+      return str.trim();
+    });
+  }).then(parts => {
+    spinner.end();
+    return parts;
   });
-  spinner.end();
-  return Promise.resolve(parts);
 };
 
 // Expose the internal functions when testing.
