@@ -6,10 +6,11 @@ describe('CLI', () => {
   const parts = ['hello', 'world'];
   const tempFile = 'tempfile.mp3';
 
-  let fs, lib, loadCli;
+  let fs, lib, loadCli, succeedSpy;
 
   beforeEach(() => {
     fs = jasmine.createSpyObj('fs', ['move']);
+    succeedSpy = jasmine.createSpy('spinner succeed');
 
     lib = jasmine.createSpyObj('lib', [
       'checkUsage',
@@ -20,7 +21,7 @@ describe('CLI', () => {
     ]);
     lib['@noCallThru'] = true; // prevent calling of original file
     lib.getSpinner.and.returnValue({
-      succeed: function() {}
+      succeed: succeedSpy
     });
     lib.generateSpeech.and.returnValue(Promise.resolve(tempFile));
     lib.readText.and.returnValue(Promise.resolve(text));
@@ -28,7 +29,10 @@ describe('CLI', () => {
 
     loadCli = () => {
       return new Promise((resolve) => {
-        fs.move.and.callFake(resolve); // wait after fs.move() is called
+        fs.move.and.callFake((tempFile, outFile, opts, callback) => {
+          callback();
+          resolve(); // wait after fs.move() is called
+        });
         proxyquire('../tts', {
           'fs-extra': fs,
           './lib': lib,
@@ -105,6 +109,11 @@ describe('CLI', () => {
         { overwrite: true },
         jasmine.any(Function)
       );
+    });
+
+    it('should switch the spinner to the success state, with the output filename', () => {
+      expect(succeedSpy).toHaveBeenCalled();
+      expect(succeedSpy.calls.mostRecent().args[0]).toMatch(outputFile);
     });
   });
 

@@ -6,8 +6,9 @@
     "aws-tts": "./tts.js"
   },
   "scripts": {
+    "coverage": "nyc check-coverage --lines 95 jasmine JASMINE_CONFIG_PATH=test/jasmine.json",
     "lint": "ux-lint index.js lib.js test/*.js --extend .lintrc",
-    "test": "jasmine JASMINE_CONFIG_PATH=test/jasmine.json"
+    "test": "nyc jasmine JASMINE_CONFIG_PATH=test/jasmine.json"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
   "homepage": "https://github.com/eheikes/aws-tts#readme",
   "devDependencies": {
     "jasmine": "^2.6.0",
+    "nyc": "^11.2.1",
     "proxyquire": "^1.8.0",
     "ux-lint": "^1.7.1"
   },
