@@ -92,6 +92,7 @@ let callAws = (info, i, callback) => {
     callback(error);
     if (error) {
       // Get the error message from Amazon.
+      /* istanbul ignore next */
       try {
         let response = JSON.parse(fs.readFileSync(info.tempfile, 'utf8'));
         error.message += `: ${response.message}`;
@@ -220,6 +221,7 @@ let generateAll = (parts, opts, func) => {
 // Returns a Promise with the temporary audio file.
 exports.generateSpeech = (strParts, opts) => {
   // Add in the default options.
+  /* istanbul ignore next */
   opts = Object.assign({}, {
     'access-key': opts.accessKey,
     ffmpeg: opts.ffmpeg || 'ffmpeg',
@@ -232,18 +234,23 @@ exports.generateSpeech = (strParts, opts) => {
     type: opts.type || 'text',
     voice: opts.voice || 'Joanna'
   }, opts);
+  /* istanbul ignore next */
   if (typeof opts.lexicon !== 'undefined' && !Array.isArray(opts.lexicon)) {
     opts.lexicon = [opts.lexicon];
   }
 
+  /* istanbul ignore next */
   let polly = createPolly(opts);
 
   // Compile the text parts and options together in a packet.
+  /* istanbul ignore next */
   let parts = strParts.map(part => buildInfo(part, polly.getSynthesizeSpeechUrl.bind(polly), opts));
 
+  /* istanbul ignore next */
   return generateAll(parts, opts, callAws)
     .then(createManifest)
     .then(manifest => {
+      /* istanbul ignore next */
       return combine(manifest, opts);
     });
 };
@@ -280,6 +287,7 @@ let chunkXml = (xml, maxCharacterCount) => {
     let tags = [];
     let parts = [];
     parser.onerror = e => {
+      /* istanbul ignore next */
       err = e;
     };
     parser.ontext = text => {
@@ -307,6 +315,7 @@ let chunkXml = (xml, maxCharacterCount) => {
     };
     parser.onend = () => {
       if (err) {
+        /* istanbul ignore next */
         reject(err);
       } else {
         resolve(parts);
