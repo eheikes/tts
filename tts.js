@@ -40,5 +40,5 @@ readText(input, process).then(text => {
     spinner.succeed(`Done. Saved to ${outputFilename}`);
   });
 }).catch(err => {
-  process.stderr.write(err.stack);
+  spinner.info(err.message);
 });

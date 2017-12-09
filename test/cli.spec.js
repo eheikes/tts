@@ -6,10 +6,11 @@ describe('CLI', () => {
   const parts = ['hello', 'world'];
   const tempFile = 'tempfile.mp3';
 
-  let fs, lib, loadCli, succeedSpy;
+  let fs, lib, loadCli, infoSpy, succeedSpy;
 
   beforeEach(() => {
     fs = jasmine.createSpyObj('fs', ['move']);
+    infoSpy = jasmine.createSpy('spinner info');
     succeedSpy = jasmine.createSpy('spinner succeed');
 
     lib = jasmine.createSpyObj('lib', [
@@ -21,6 +22,7 @@ describe('CLI', () => {
     ]);
     lib['@noCallThru'] = true; // prevent calling of original file
     lib.getSpinner.and.returnValue({
+      info: infoSpy,
       succeed: succeedSpy
     });
     lib.generateSpeech.and.returnValue(Promise.resolve(tempFile));
@@ -124,13 +126,13 @@ describe('CLI', () => {
 
     beforeEach(done => {
       process.argv = ['node', 'tts.js', inputFile, outputFile];
-      spyOn(process.stderr, 'write').and.callFake(done);
+      infoSpy.and.callFake(done);
       lib.readText.and.returnValue(Promise.reject(error));
       loadCli().then(done);
     });
 
-    it('should write the stack trace to stderr', () => {
-      expect(process.stderr.write).toHaveBeenCalledWith(error.stack);
+    it('should display the error message', () => {
+      expect(infoSpy).toHaveBeenCalledWith(error.message);
     });
   });
 });

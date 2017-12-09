@@ -88,7 +88,16 @@ let callAws = (info, i, callback) => {
 
   let error;
   let outputStream = fs.createWriteStream(info.tempfile);
-  outputStream.on('close', () => { callback(error); });
+  outputStream.on('close', () => {
+    callback(error);
+    if (error) {
+      // Get the error message from Amazon.
+      try {
+        let response = JSON.parse(fs.readFileSync(info.tempfile, 'utf8'));
+        error.message += `: ${response.message}`;
+      } catch (err) {}
+    }
+  });
   got.stream(url).on('error', err => { error = err; }).pipe(outputStream);
 };
 
