@@ -36,7 +36,7 @@ $ echo "Hello world! How are you?" | aws-tts test.mp3
 
 Standard arguments:
 
-* `inputfile` is the text file you want to convert to speech. If excluded, aws-tts will read in the text from `stdin`.
+* `inputfile` is the text file you want to convert to speech. It should be encoded as UTF-8. If excluded, aws-tts will read in the text from `stdin`.
 * `outfile` is the filename to save the audio to.
 
 Options:
