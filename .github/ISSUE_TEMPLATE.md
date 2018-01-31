@@ -4,7 +4,7 @@ Also, check out the [Troubleshooting section](https://github.com/eheikes/aws-tts
 
 1. What is the exact command you are running? For your security, please "X" out any AWS access keys and secrets.
 
-2. What result are you seeing in the console? Copy & paste the exact output you get, especially any error messages.
+2. What result are you seeing in the console? Copy & paste the exact output you get, with debugging turned on (see the [Troubleshooting section](https://github.com/eheikes/aws-tts#troubleshooting) for how to enable debugging).
 
 3. If copyright allows, please upload your input file somewhere (e.g. [pastebin](https://pastebin.com/)) and put a link to it here.
 

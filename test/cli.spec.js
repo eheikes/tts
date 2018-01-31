@@ -18,6 +18,7 @@ describe('CLI', () => {
       'generateSpeech',
       'getSpinner',
       'readText',
+      'sanitizeOpts',
       'splitText'
     ]);
     lib['@noCallThru'] = true; // prevent calling of original file
