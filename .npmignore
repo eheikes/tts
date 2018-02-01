@@ -1,4 +1,7 @@
+.github/
+.nyc_output/
 docs/
+test/
 .editorconfig
 .lintrc
 .travis.yml
