@@ -1,6 +1,7 @@
 'use strict';
 
 const async = require('async');
+const debug = require('debug');
 const fs = require('fs-extra');
 const got = require('got');
 const ora = require('ora');
@@ -17,7 +18,26 @@ const fileExtensions = {
 };
 
 // Set up the spinner.
-let spinner = ora().start();
+let spinner;
+/* istanbul ignore if */
+if (debug('aws-tts').enabled) {
+  /* eslint-disable no-console */
+  spinner = {
+    fail: () => {},
+    info: str => {
+      if (str) { console.log(str); }
+    },
+    start: () => { console.log(spinner.text); },
+    stop: () => {},
+    succeed: str => {
+      if (str) { console.log(str); }
+    },
+    text: ''
+  };
+  /* eslint-enable no-console */
+} else {
+  spinner = ora().start();
+}
 spinner.begin = text => {
   spinner.text = text;
   spinner.start();
@@ -87,29 +107,42 @@ let callAws = (info, i, callback) => {
   }, halfHour);
 
   let error;
+  debug('callAws')(`Opening output stream to ${info.tempfile}`);
   let outputStream = fs.createWriteStream(info.tempfile);
   outputStream.on('close', () => {
+    debug('callAws')('Closing output stream');
     callback(error);
+    /* istanbul ignore if */
     if (error) {
+      debug('callAws')(`Error during request: ${error.message}`);
       // Get the error message from Amazon.
-      /* istanbul ignore next */
       try {
-        let response = JSON.parse(fs.readFileSync(info.tempfile, 'utf8'));
-        error.message += `: ${response.message}`;
+        let response = fs.readFileSync(info.tempfile, 'utf8');
+        debug('callAws')(`Amazon responded with ${response}`);
+        let parsedResponse = JSON.parse(response);
+        error.message += `: ${parsedResponse.message}`;
       } catch (err) {}
     }
   });
+  let sanitizedUrl = url
+    .replace(/(Text=.{1,10})([^&]*)/, '$1...')
+    .replace(/(X-Amz-Credential=)([^&]*)/, '$1...')
+    .replace(/(X-Amz-Signature=.)([^&]*)/, '$1...');
+  debug('callAws')(`Making request to ${sanitizedUrl}`);
   got.stream(url).on('error', err => { error = err; }).pipe(outputStream);
 };
 
 // Deletes the manifest and its files.
 let cleanup = manifestFile => {
   let manifest = fs.readFileSync(manifestFile, 'utf8');
+  debug('cleanup')(`Manifest is ${manifest}`);
   let regexpState = /^file\s+'(.*)'$/gm;
   let match;
   while ((match = regexpState.exec(manifest)) !== null) {
+    debug('cleanup')(`Deleting temporary file ${match[1]}`);
     fs.removeSync(match[1]);
   }
+  debug('cleanup')(`Deleting manifest file ${manifestFile}`);
   fs.removeSync(manifestFile);
 };
 
@@ -123,6 +156,7 @@ let combineEncodedAudio = (binary, manifestFile, outputFile) => {
     outputFile
   ];
   return new Promise((resolve, reject) => {
+    debug('combineEncodedAudio')(`Running ${binary} ${args.join(' ')}`);
     let ffmpeg = spawn(binary, args);
     let stderr = '';
     ffmpeg.stderr.on('data', (data) => {
@@ -132,6 +166,8 @@ let combineEncodedAudio = (binary, manifestFile, outputFile) => {
       reject(new Error('Could not start ffmpeg process'));
     });
     ffmpeg.on('close', code => {
+      debug('combineEncodedAudio')(stderr);
+      debug('combineEncodedAudio')(`ffmpeg process completed with code ${code}`);
       if (code > 0) {
         spinner.fail();
         return reject(new Error(`ffmpeg returned an error (${code}): ${stderr}`));
@@ -145,12 +181,17 @@ let combineEncodedAudio = (binary, manifestFile, outputFile) => {
 // Concatenates raw PCM audio into one file.
 let combineRawAudio = (manifestFile, outputFile) => {
   let manifest = fs.readFileSync(manifestFile, 'utf8');
+  debug('combineRawAudio')(`Manifest contains: ${manifest}`);
   let regexpState = /^file\s+'(.*)'$/gm;
+  debug('combineRawAudio')(`Creating file ${outputFile}`);
   fs.createFileSync(outputFile);
+  debug('combineRawAudio')(`Truncating file ${outputFile}`);
   fs.truncateSync(outputFile);
   let match;
   while ((match = regexpState.exec(manifest)) !== null) {
+    debug('combineRawAudio')(`Reading data from ${match[1]}`);
     let dataBuffer = fs.readFileSync(match[1]);
+    debug('combineRawAudio')(`Appending data to ${outputFile}`);
     fs.appendFileSync(outputFile, dataBuffer);
   }
   return Promise.resolve();
@@ -161,6 +202,7 @@ let combineRawAudio = (manifestFile, outputFile) => {
 let combine = (manifestFile, opts) => {
   spinner.begin('Combine audio');
   let newFile = tempfile(`.${fileExtensions[opts.format]}`);
+  debug('combine')(`Combining files into ${newFile}`);
   let combiner = opts.format === 'pcm' ?
     combineRawAudio(manifestFile, newFile) :
     combineEncodedAudio(opts.ffmpeg, manifestFile, newFile);
@@ -179,15 +221,18 @@ let combine = (manifestFile, opts) => {
 // Returns the text filename.
 let createManifest = parts => {
   let txtFile = tempfile('.txt');
+  debug('createManifest')(`Creating ${txtFile} for manifest`);
   let contents = parts.map(info => {
     return `file '${info.tempfile}'`;
   }).join('\n');
+  debug('createManifest')(`Writing manifest contents:\n${contents}`);
   fs.writeFileSync(txtFile, contents, 'utf8');
   return txtFile;
 };
 
 // Create an AWS Polly instance.
 let createPolly = opts => {
+  debug('createPolly')(`Creating Polly instance in ${opts.region}`);
   return new Polly({
     apiVersion: '2016-06-10',
     region: opts.region,
@@ -201,11 +246,13 @@ let generateAll = (parts, opts, func) => {
   let count = parts.length;
   spinner.begin(`Convert to audio (0/${count})`);
   return (new Promise((resolve, reject) => {
+    debug('generateAll')(`Requesting ${count} audio segments, ${opts.limit} at a time`);
     async.eachOfLimit(
       parts,
       opts.limit,
       func,
       err => {
+        debug('generateAll')(`Requested all parts, with error ${err}`);
         if (err) {
           spinner.fail();
           return reject(err);
@@ -238,6 +285,8 @@ exports.generateSpeech = (strParts, opts) => {
   if (typeof opts.lexicon !== 'undefined' && !Array.isArray(opts.lexicon)) {
     opts.lexicon = [opts.lexicon];
   }
+  /* istanbul ignore next */
+  debug('generateSpeech')(`Options: ${JSON.stringify(this.sanitizeOpts(opts))}`); // eslint-disable-line no-invalid-this
 
   /* istanbul ignore next */
   let polly = createPolly(opts);
@@ -262,6 +311,7 @@ exports.getSpinner = () => {
 // Chunk text into pieces.
 let chunkText = (text, maxCharacterCount) => {
   let parts = textchunk.chunk(text, maxCharacterCount);
+  debug('chunkText')(`Chunked into ${parts.length} text parts`);
   return Promise.resolve(parts);
 };
 
@@ -272,6 +322,7 @@ let chunkXml = (xml, maxCharacterCount) => {
     normalize: true,
     trim: true,
   });
+  debug('chunkXml')('Started SAX XML parser');
   const attributeString = attrs => {
     let str = '';
     for (let prop in attrs) {
@@ -286,11 +337,13 @@ let chunkXml = (xml, maxCharacterCount) => {
     let extraTags = '';
     let tags = [];
     let parts = [];
+    /* istanbul ignore next */
     parser.onerror = e => {
-      /* istanbul ignore next */
+      debug('chunkXml')(`Encountered error: ${e}`);
       err = e;
     };
     parser.ontext = text => {
+      debug('chunkXml')(`Found text: ${text.substr(0, 50)}...`); // eslint-disable-line no-magic-numbers
       let chunks = textchunk.chunk(text, maxCharacterCount).map((chunk, index) => {
         if (index === 0) {
           chunk = `${extraTags}${chunk}`;
@@ -300,22 +353,29 @@ let chunkXml = (xml, maxCharacterCount) => {
         }
         return chunk;
       });
+      chunks.forEach(chunk => {
+        debug('chunkXml')(`Adding chunk: ${chunk.substr(0, 50)}...`); // eslint-disable-line no-magic-numbers
+      });
       parts.push(...chunks);
       extraTags = '';
     };
     parser.onopentag = tagData => {
+      debug('chunkXml')(`Found tag: ${JSON.stringify(tagData)}`);
       tags.push(tagData);
     };
     parser.onclosetag = tagName => {
+      debug('chunkXml')(`Found closing tag: "${tagName}"`);
       if (tags[tags.length - 1].name === tagName) {
         let attrs = attributeString(tags[tags.length - 1].attributes);
+        debug('chunkXml')(`Adding "${tagName}" to extra tags and popping the stack`);
         extraTags += `<${tagName}${attrs}></${tagName}>`;
         tags.pop();
       }
     };
     parser.onend = () => {
+      debug('chunkXml')('Reached end of XML');
+      /* istanbul ignore if */
       if (err) {
-        /* istanbul ignore next */
         reject(err);
       } else {
         resolve(parts);
@@ -332,12 +392,15 @@ exports.readText = (inputFilename, proc) => {
   return new Promise((resolve, reject) => {
     if (inputFilename) {
       // Read from a file.
+      debug('readText')(`Reading from ${inputFilename}`);
       fs.readFile(inputFilename, 'utf8', (err, data) => {
         if (err) { return reject(err); }
+        debug('readText')(`Finished reading (${data.length} bytes)`);
         resolve(data);
       });
     } else {
       // Read from stdin.
+      debug('readText')('Reading from stdin');
       let data = '';
       proc.stdin.setEncoding('utf8');
       proc.stdin.on('readable', () => {
@@ -345,6 +408,7 @@ exports.readText = (inputFilename, proc) => {
         if (chunk !== null) { data += chunk; }
       });
       proc.stdin.on('end', () => {
+        debug('readText')(`Finished reading (${data.length} bytes)`);
         resolve(data);
       });
     }
@@ -354,12 +418,21 @@ exports.readText = (inputFilename, proc) => {
   });
 };
 
+/* istanbul ignore next */
+exports.sanitizeOpts = (opts) => {
+  const sanitizedOpts = Object.assign({}, opts);
+  sanitizedOpts['access-key'] = sanitizedOpts['access-key'] ? 'XXXXXXXX' : undefined;
+  sanitizedOpts['secret-key'] = sanitizedOpts['secret-key'] ? 'XXXXXXXX' : undefined;
+  return sanitizedOpts;
+};
+
 // Splits a string of text into chunks.
 exports.splitText = (text, maxCharacterCount, opts) => {
   opts = opts || {};
   spinner.begin('Splitting text');
   let chunker = opts.type === 'ssml' ? chunkXml : chunkText;
   return chunker(text, maxCharacterCount).then(parts => {
+    debug('splitText')('Stripping whitespace');
     return parts.map(str => {
       // Compress whitespace.
       return str.replace(/\s+/g, ' ');
@@ -374,6 +447,7 @@ exports.splitText = (text, maxCharacterCount, opts) => {
 };
 
 // Expose the internal functions when testing.
+/* istanbul ignore next */
 if (process.env.JASMINE_CONFIG_PATH) {
   exports.buildInfo = buildInfo;
   exports.callAws = callAws;

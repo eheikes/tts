@@ -65,6 +65,7 @@ Options:
 * Make sure Node.js is working. Running `node --version` on the command line should give a version of v6.0.0 or higher.
 * Make sure ffmpeg is installed. Running `ffmpeg -version` on the command line should give you the version information.
 * Make sure you can connect to AWS normally. Going to https://polly.us-east-1.amazonaws.com/v1/speech (or whatever AWS region you're using) should give you a "Missing Authentication Token" message. You can use the [AWS CLI tool](https://aws.amazon.com/cli/) to check your configuration -- installing that and running `aws sts get-caller-identity` should return your user info.
+* Run `export DEBUG=*` first (Linux or Mac) to turn on debugging output. On Windows you'll need to use `set DEBUG=*` (command prompt) or `$env:DEBUG = "*"` (PowerShell).
 
 ## Contributing
 
