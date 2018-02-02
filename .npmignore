@@ -4,5 +4,4 @@ coverage/
 docs/
 test/
 .editorconfig
-.lintrc
 .travis.yml

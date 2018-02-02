@@ -6,7 +6,7 @@
     "aws-tts": "./tts.js"
   },
   "scripts": {
-    "lint": "ux-lint index.js lib.js test/*.js --extend .lintrc",
+    "lint": "standard --fix --verbose",
     "test": "JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
   },
   "repository": {
@@ -31,7 +31,7 @@
     "jasmine": "^2.6.0",
     "nyc": "^11.2.1",
     "proxyquire": "^1.8.0",
-    "ux-lint": "^1.7.1"
+    "standard": "^10.0.3"
   },
   "dependencies": {
     "async": "^2.1.4",
@@ -44,6 +44,12 @@
     "sax": "^1.2.4",
     "tempfile": "^1.1.1",
     "textchunk": "^1.1.0"
+  },
+  "standard": {
+    "env": {
+      "jasmine": true,
+      "node": true
+    }
   },
   "nyc": {
     "check-coverage": true,

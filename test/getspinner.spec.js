@@ -1,12 +1,12 @@
-'use strict';
+'use strict'
 describe('getSpinner()', () => {
-  let getSpinner, ora;
+  let getSpinner, ora
 
   beforeEach(() => {
-    ({ getSpinner, ora } = require('./helpers').loadLib());
-  });
+    ({ getSpinner, ora } = require('./helpers').loadLib())
+  })
 
   it('should return the spinner', () => {
-    expect(getSpinner()).toBe(ora);
-  });
-});
+    expect(getSpinner()).toBe(ora)
+  })
+})
