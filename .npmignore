@@ -1,5 +1,6 @@
 .github/
 .nyc_output/
+coverage/
 docs/
 test/
 .editorconfig

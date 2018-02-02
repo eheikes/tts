@@ -6,7 +6,6 @@
     "aws-tts": "./tts.js"
   },
   "scripts": {
-    "coverage": "nyc check-coverage --lines 95 jasmine JASMINE_CONFIG_PATH=test/jasmine.json",
     "lint": "ux-lint index.js lib.js test/*.js --extend .lintrc",
     "test": "JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
   },
@@ -45,5 +44,23 @@
     "sax": "^1.2.4",
     "tempfile": "^1.1.1",
     "textchunk": "^1.1.0"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "per-file": false,
+    "lines": 95,
+    "statements": 95,
+    "functions": 95,
+    "branches": 95,
+    "include": [
+      "*.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "cache": false,
+    "all": false,
+    "report-dir": "./coverage"
   }
 }
