@@ -8,7 +8,7 @@
   "scripts": {
     "coverage": "nyc check-coverage --lines 95 jasmine JASMINE_CONFIG_PATH=test/jasmine.json",
     "lint": "ux-lint index.js lib.js test/*.js --extend .lintrc",
-    "test": "nyc jasmine JASMINE_CONFIG_PATH=test/jasmine.json"
+    "test": "JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
   },
   "repository": {
     "type": "git",
