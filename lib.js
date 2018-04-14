@@ -335,8 +335,8 @@ let chunkXml = (xml, maxCharacterCount) => {
   }
   return new Promise((resolve, reject) => {
     let err = null
-    let extraTags = ''
-    let tags = []
+    let extraTags = '' // self-closing tags
+    let tags = [] // stack of open tags
     let parts = []
     /* istanbul ignore next */
     parser.onerror = e => {
@@ -347,9 +347,11 @@ let chunkXml = (xml, maxCharacterCount) => {
       debug('chunkXml')(`Found text: ${text.substr(0, 50)}...`) // eslint-disable-line no-magic-numbers
       let chunks = textchunk.chunk(text, maxCharacterCount).map((chunk, index) => {
         if (index === 0) {
+          debug('chunkXml')('Adding unused self-closing tags:', extraTags)
           chunk = `${extraTags}${chunk}`
         }
         for (let i = tags.length - 1; i >= 0; i--) {
+          debug('chunkXml')(`Wrapping chunk in ${tags[i].name} tag`)
           chunk = `<${tags[i].name}${attributeString(tags[i].attributes)}>${chunk}</${tags[i].name}>`
         }
         return chunk
@@ -362,16 +364,24 @@ let chunkXml = (xml, maxCharacterCount) => {
     }
     parser.onopentag = tagData => {
       debug('chunkXml')(`Found tag: ${JSON.stringify(tagData)}`)
-      tags.push(tagData)
+      if (tagData.isSelfClosing) {
+        let attrs = attributeString(tagData.attributes)
+        debug('chunkXml')(`Adding "${tagData.name}" to self-closing tags`)
+        extraTags += `<${tagData.name}${attrs}/>`
+      } else {
+        debug('chunkXml')(`Adding "${tagData.name}" to the stack`)
+        tags.push(tagData)
+      }
     }
     parser.onclosetag = tagName => {
       debug('chunkXml')(`Found closing tag: "${tagName}"`)
       /* istanbul ignore else: need to add test for this */
       if (tags[tags.length - 1].name === tagName) {
-        let attrs = attributeString(tags[tags.length - 1].attributes)
-        debug('chunkXml')(`Adding "${tagName}" to extra tags and popping the stack`)
-        extraTags += `<${tagName}${attrs}></${tagName}>`
+        debug('chunkXml')(`Popping "${tagName}" from the stack`)
         tags.pop()
+      } else {
+        // TODO should error
+        debug('chunkXml')(`Problem: mismatched tags`)
       }
     }
     parser.onend = () => {

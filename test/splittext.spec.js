@@ -36,7 +36,18 @@ describe('splitText()', () => {
       expect(text).toEqual([
         '<speak><prosody volume="loud">Hello</prosody></speak>',
         '<speak><prosody volume="loud">there</prosody></speak>',
-        '<speak><prosody volume="loud"><break></break>world</prosody></speak>'
+        '<speak><prosody volume="loud"><break/>world</prosody></speak>'
+      ])
+    }).then(done)
+  })
+
+  it('should work when SSML tags are duplicated in sequence', done => {
+    const testSsml = '<speak><p>Section 1</p><p>Introduction</p></speak>'
+    const testSize = 1500
+    splitText(testSsml, testSize, { type: 'ssml' }).then(text => {
+      expect(text).toEqual([
+        '<speak><p>Section 1</p></speak>',
+        '<speak><p>Introduction</p></speak>'
       ])
     }).then(done)
   })
