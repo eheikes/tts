@@ -1,13 +1,11 @@
-'use strict'
+const { checkUsage } = require('../lib/check-usage')
+
 describe('checkUsage()', () => {
-  let checkUsage, ora
+  let returnValue
   let proc, exit, write
 
   beforeEach(() => {
-    ({ checkUsage, ora } = require('./helpers').loadLib())
-  })
-
-  beforeEach(() => {
+    returnValue = null
     exit = jasmine.createSpy('process.exit')
     write = jasmine.createSpy('process.stderr.write')
     proc = {
@@ -19,14 +17,9 @@ describe('checkUsage()', () => {
     }
   })
 
-  it('should stop the spinner', () => {
-    checkUsage({ _: [] }, proc)
-    expect(ora.stop).toHaveBeenCalled()
-  })
-
   describe('when --help is specified', () => {
     beforeEach(() => {
-      checkUsage({ _: [], help: true }, proc)
+      returnValue = checkUsage({ _: [], help: true }, proc)
     })
 
     it('should output the usage statement', () => {
@@ -40,7 +33,7 @@ describe('checkUsage()', () => {
 
   describe('when 1 argument is passed', () => {
     beforeEach(() => {
-      checkUsage({ _: ['foo'] }, proc)
+      returnValue = checkUsage({ _: ['foo'] }, proc)
     })
 
     it('should NOT output the usage statement', () => {
@@ -54,7 +47,7 @@ describe('checkUsage()', () => {
 
   describe('when no arguments are passed', () => {
     beforeEach(() => {
-      checkUsage({ _: [] }, proc)
+      returnValue = checkUsage({ _: [] }, proc)
     })
 
     it('should output the usage statement', () => {
