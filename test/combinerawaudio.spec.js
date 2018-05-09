@@ -1,5 +1,4 @@
-'use strict'
-describe('combineRawAudio()', () => {
+fdescribe('combineRawAudio()', () => {
   const manifestFilename = 'manifest.txt'
   const outputFilename = 'foobar.mp3'
   const tempFilenames = ['foo.mp3', 'bar.mp3']
@@ -7,7 +6,7 @@ describe('combineRawAudio()', () => {
   let combineRawAudio, fs
 
   beforeEach(() => {
-    ({ combineRawAudio, fs } = require('./helpers').loadLib())
+    ({ combineRawAudio, fs } = require('./helpers').loadLib('combine-parts'))
   })
 
   beforeEach(done => {

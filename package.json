@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/eheikes/aws-tts#readme",
   "devDependencies": {
-    "jasmine": "^2.6.0",
+    "jasmine": "^2.9.0",
     "nyc": "^11.2.1",
     "proxyquire": "^1.8.0",
     "standard": "^10.0.3"
