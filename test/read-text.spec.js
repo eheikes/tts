@@ -1,12 +1,11 @@
-'use strict'
 describe('readText()', () => {
   const testData = 'hello world'
 
-  let readText, fs, ora
-  let proc, stdin
+  let readText, fs
+  let ctx
 
   beforeEach(() => {
-    ({ readText, fs, ora } = require('./helpers').loadLib())
+    ({ readText, fs } = require('./helpers').loadLib('read-text'))
   })
 
   beforeEach(() => {
@@ -18,42 +17,32 @@ describe('readText()', () => {
       sentData = true
       return response
     })
-    proc = {
-      stdin: stdin
+    ctx = {
+      input: null,
+      proc: {
+        stdin: stdin
+      }
     }
   })
 
-  it('should update the spinner', done => {
-    readText(null, proc).then(() => {
-      expect(ora.start).toHaveBeenCalled()
-      expect(ora.text).toMatch('Reading text')
-    }).then(done)
-  })
-
   describe('when it succeeds', () => {
-    it('should show the spinner success state', done => {
-      readText(null, proc).then(() => {
-        expect(ora.succeed).toHaveBeenCalled()
-      }).then(done)
-    })
-
-    it('should return the read text', done => {
-      readText(null, proc).then(text => {
-        expect(text).toBe(testData)
+    it('should set the read text', done => {
+      readText(ctx).then(() => {
+        expect(ctx.text).toBe(testData)
       }).then(done)
     })
   })
 
   describe('when no filename is specified', () => {
     it('should read data from stdin', done => {
-      readText(null, proc).then(() => {
+      readText(ctx).then(() => {
         expect(stdin.on).toHaveBeenCalled()
         expect(stdin.read).toHaveBeenCalled()
       }).then(done)
     })
 
     it('should use UTF-8 encoding', done => {
-      readText(null, proc).then(() => {
+      readText(ctx).then(() => {
         expect(stdin.setEncoding).toHaveBeenCalledWith('utf8')
       }).then(done)
     })
@@ -63,13 +52,14 @@ describe('readText()', () => {
     const testFilename = 'test.txt'
 
     beforeEach(() => {
+      ctx.input = testFilename
       fs.readFile.and.callFake((filename, opts, callback) => {
         callback(null, testData)
       })
     })
 
     it('should read data from the file', done => {
-      readText(testFilename, proc).then(() => {
+      readText(ctx).then(() => {
         expect(fs.readFile).toHaveBeenCalledWith(
           testFilename,
           'utf8',
@@ -79,9 +69,9 @@ describe('readText()', () => {
     })
 
     describe('and can read the file', () => {
-      it('should return the file\'s data', done => {
-        readText(testFilename, proc).then(text => {
-          expect(text).toBe(testData)
+      it('should set the file\'s data', done => {
+        readText(ctx).then(() => {
+          expect(ctx.text).toBe(testData)
         }).then(done)
       })
     })
@@ -92,7 +82,7 @@ describe('readText()', () => {
         fs.readFile.and.callFake((filename, opts, callback) => {
           callback(testError)
         })
-        readText(testFilename, proc).catch(err => {
+        readText(ctx).catch(err => {
           expect(err).toBe(testError)
         }).then(done)
       })
