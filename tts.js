@@ -1,20 +1,19 @@
 #!/usr/bin/env node
-//
-// Takes a text file and calls the AWS Polly API
-//   to convert it to an audio file.
-//
-'use strict'
-
+/**
+ * Takes a text file and calls the AWS Polly API
+ *   to convert it to an audio file.
+ */
 const debug = require('debug')('aws-tts')
+const Listr = require('listr')
 const fs = require('fs-extra')
-const {
-  checkUsage,
-  generateSpeech,
-  getSpinner,
-  readText,
-  sanitizeOpts,
-  splitText
-} = require('./lib')
+const { checkUsage } = require('./lib/check-usage')
+const { cleanup } = require('./lib/cleanup')
+const { combine } = require('./lib/combine-parts')
+const { generateSpeech } = require('./lib/generate-speech')
+const { moveTempFile } = require('./lib/move-temp-file')
+const { readText } = require('./lib/read-text')
+const { sanitizeOpts } = require('./lib/sanitize-opts')
+const { splitText } = require('./lib/split-text')
 
 const args = require('minimist')(process.argv.slice(2))
 const maxCharacterCount = 1500
@@ -30,21 +29,37 @@ if (!outputFilename) {
 debug('input:', input)
 debug('output:', outputFilename)
 
-let spinner = getSpinner()
-
 // Check the usage.
 checkUsage(args, process)
 
-// Generate the audio file.
-readText(input, process).then(text => {
-  return splitText(text, maxCharacterCount, args)
-}).then(parts => {
-  return generateSpeech(parts, args)
-}).then(tempFile => {
-  debug(`copying ${tempFile} to ${outputFilename}`)
-  fs.move(tempFile, outputFilename, { overwrite: true }, () => {
-    spinner.succeed(`Done. Saved to ${outputFilename}`)
-  })
+// Define the tasks.
+const tasks = new Listr([{
+  title: 'Reading text',
+  task: readText
+}, {
+  title: 'Splitting text',
+  task: splitText
+}, {
+  title: 'Convert to audio',
+  task: generateSpeech
+}, {
+  title: 'Combine audio',
+  task: combine
+}, {
+  title: 'Clean up',
+  task: cleanup
+}, {
+  title: 'Saving file',
+  task: moveTempFile
+}])
+
+// Run the tasks.
+tasks.run({
+  args,
+  input,
+  maxCharacterCount,
+  outputFilename,
+  process
 }).catch(err => {
-  spinner.info(err.message)
+  console.error(err)
 })
