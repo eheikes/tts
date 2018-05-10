@@ -1,4 +1,4 @@
-fdescribe('combineRawAudio()', () => {
+describe('combineRawAudio()', () => {
   const manifestFilename = 'manifest.txt'
   const outputFilename = 'foobar.mp3'
   const tempFilenames = ['foo.mp3', 'bar.mp3']
