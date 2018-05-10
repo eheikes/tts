@@ -1,4 +1,3 @@
-'use strict'
 describe('buildInfo()', () => {
   const text = 'foobar'
   const format = 'mp3'
@@ -8,7 +7,7 @@ describe('buildInfo()', () => {
   let buildInfo, output
 
   beforeEach(() => {
-    ({ buildInfo } = require('./helpers').loadLib())
+    ({ buildInfo } = require('./helpers').loadLib('generate-speech'))
     output = buildInfo(text, func, opts)
   })
 
