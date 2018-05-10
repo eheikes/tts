@@ -1,12 +1,14 @@
-'use strict'
 describe('callAws()', () => {
   const fs = require('fs')
   const tempfile = require('tempfile')
 
-  let callAws, got, ora
-  let testData, info, urlCreator
+  let callAws, got
+  let task, testData, info, urlCreator
 
   beforeEach(() => {
+    task = {
+      title: 'Convert to audio (0/42)'
+    }
     testData = {
       filename: tempfile(),
       index: 6,
@@ -23,15 +25,12 @@ describe('callAws()', () => {
     urlCreator = jasmine.createSpy('urlcreator').and.returnValue(testData.url)
     info = {
       opts: testData.opts,
+      task: task,
       tempfile: testData.filename,
       text: testData.text,
       urlcreator: urlCreator
     };
-    ({ callAws, got, ora } = require('./helpers').loadLib())
-  })
-
-  beforeEach(() => {
-    ora.text = 'Convert to audio (0/42)'
+    ({ callAws, got } = require('./helpers').loadLib('generate-speech'))
   })
 
   afterEach(done => {
@@ -40,7 +39,7 @@ describe('callAws()', () => {
 
   it('should update the spinner', done => {
     callAws(info, testData.index, () => {
-      expect(ora.text).toMatch(`\\(${testData.index}/`)
+      expect(task.title).toMatch(`\\(${testData.index}/`)
       done()
     })
   })

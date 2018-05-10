@@ -1,4 +1,5 @@
 describe('buildInfo()', () => {
+  const task = {}
   const text = 'foobar'
   const format = 'mp3'
   const func = function () {}
@@ -8,7 +9,7 @@ describe('buildInfo()', () => {
 
   beforeEach(() => {
     ({ buildInfo } = require('./helpers').loadLib('generate-speech'))
-    output = buildInfo(text, func, opts)
+    output = buildInfo(text, func, task, opts)
   })
 
   it('should return an object', () => {
@@ -17,6 +18,10 @@ describe('buildInfo()', () => {
 
   it('should have an "opts" property with the original options', () => {
     expect(output.opts).toEqual(opts)
+  })
+
+  it('should have a "task" property', () => {
+    expect(output.task).toEqual(task)
   })
 
   it('should have a "tempfile" property', () => {
