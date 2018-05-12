@@ -37,7 +37,9 @@ describe('generateAll()', () => {
       async.eachOfLimit.and.callFake((parts, opts, func, callback) => {
         callback(new Error('reject async'))
       })
-      generateAll(textParts, {}, iteratorFunction, task).catch(done)
+      generateAll(textParts, {}, iteratorFunction, task).catch(() => {
+        done()
+      })
     })
 
     it('should be updated', () => {
