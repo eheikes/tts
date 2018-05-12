@@ -4,8 +4,6 @@
  *   to convert it to an audio file.
  */
 const debug = require('debug')('aws-tts')
-const Listr = require('listr')
-const fs = require('fs-extra')
 const { checkUsage } = require('./lib/check-usage')
 const { cleanup } = require('./lib/cleanup')
 const { combine } = require('./lib/combine-parts')
@@ -32,8 +30,8 @@ debug('output:', outputFilename)
 // Check the usage.
 checkUsage(args, process)
 
-// Define the tasks.
-const tasks = new Listr([{
+// Define the tasks and options.
+const tasks = [{
   title: 'Reading text',
   task: readText
 }, {
@@ -51,15 +49,24 @@ const tasks = new Listr([{
 }, {
   title: 'Saving file',
   task: moveTempFile
-}])
-
-// Run the tasks.
-tasks.run({
+}]
+const opts = {
   args,
   input,
   maxCharacterCount,
   outputFilename,
   process
-}).catch(err => {
-  console.error(err)
-})
+}
+
+// Run the tasks.
+if (require.main === module) {
+  const Listr = require('listr')
+  (new Listr(tasks)).run(opts).catch(err => {
+    console.error(err)
+  })
+}
+
+module.exports = { // for testing
+  opts,
+  tasks
+}
