@@ -61,7 +61,8 @@ const opts = {
 // Run the tasks.
 if (require.main === module) {
   const Listr = require('listr')
-  (new Listr(tasks)).run(opts).catch(err => {
+  const list = new Listr(tasks)
+  list.run(opts).catch(err => {
     console.error(err)
   })
 }
