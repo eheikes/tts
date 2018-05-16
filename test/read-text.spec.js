@@ -19,7 +19,7 @@ describe('readText()', () => {
     })
     ctx = {
       input: null,
-      proc: {
+      process: {
         stdin: stdin
       }
     }
