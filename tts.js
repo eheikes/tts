@@ -66,7 +66,7 @@ if (require.main === module) {
   })
   list.run(context).catch(err => {
     if (debug.enabled) {
-      console.error(err)
+      console.error(err.stack)
     }
   })
 }
