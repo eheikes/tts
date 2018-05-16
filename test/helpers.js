@@ -1,5 +1,3 @@
-'use strict'
-
 const async = require('async')
 const proxyquire = require('proxyquire')
 const { Readable } = require('stream')
@@ -35,10 +33,6 @@ exports.loadLib = (file) => {
   })
 
   // Stub out the Polly SDK.
-  // let getSynthesizeSpeechUrl = jasmine.createSpy('getSynthesizeSpeechUrl');
-  // let PollyStub = function() {
-  //   this.getSynthesizeSpeechUrl = getSynthesizeSpeechUrl;
-  // };
   let PollyStub = jasmine.createSpy('Polly')
   let pollyStub = {
     Presigner: PollyStub
