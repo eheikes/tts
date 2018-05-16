@@ -50,7 +50,7 @@ const tasks = [{
   title: 'Saving file',
   task: moveTempFile
 }]
-const opts = {
+const context = {
   args,
   input,
   maxCharacterCount,
@@ -61,13 +61,17 @@ const opts = {
 // Run the tasks.
 if (require.main === module) {
   const Listr = require('listr')
-  const list = new Listr(tasks)
-  list.run(opts).catch(err => {
-    console.error(err)
+  const list = new Listr(tasks, {
+    renderer: debug.enabled ? 'silent' : 'default'
+  })
+  list.run(context).catch(err => {
+    if (debug.enabled) {
+      console.error(err)
+    }
   })
 }
 
 module.exports = { // for testing
-  opts,
+  context,
   tasks
 }

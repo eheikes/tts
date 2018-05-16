@@ -20,16 +20,16 @@ describe('CLI', () => {
   })
 
   it('should pass the CLI arguments to Listr', () => {
-    expect(cli.opts.args).toBe(args)
+    expect(cli.context.args).toBe(args)
   })
 
   it('should pass the max character count to Listr', () => {
-    expect(cli.opts.maxCharacterCount).toEqual(jasmine.any(Number))
+    expect(cli.context.maxCharacterCount).toEqual(jasmine.any(Number))
   })
 
   it('should pass the process object to Listr', () => {
-    expect(cli.opts.process).toEqual(jasmine.any(Object))
-    expect(cli.opts.process.argv).toEqual(jasmine.any(Array))
+    expect(cli.context.process).toEqual(jasmine.any(Object))
+    expect(cli.context.process.argv).toEqual(jasmine.any(Array))
   })
 
   describe('when 2 arguments are given', () => {
@@ -41,11 +41,11 @@ describe('CLI', () => {
     })
 
     it('should use the first argument for the input filename', () => {
-      expect(cli.opts.input).toBe(inputFile)
+      expect(cli.context.input).toBe(inputFile)
     })
 
     it('should use the second argument for the output filename', () => {
-      expect(cli.opts.outputFilename).toBe(outputFile)
+      expect(cli.context.outputFilename).toBe(outputFile)
     })
   })
 
@@ -56,11 +56,11 @@ describe('CLI', () => {
     })
 
     it('should use null for the input filename', () => {
-      expect(cli.opts.input).toBe(null)
+      expect(cli.context.input).toBe(null)
     })
 
     it('should use the first argument for the output filename', () => {
-      expect(cli.opts.outputFilename).toBe(outputFile)
+      expect(cli.context.outputFilename).toBe(outputFile)
     })
   })
 })
