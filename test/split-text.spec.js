@@ -80,4 +80,13 @@ describe('splitText()', () => {
       expect(ctx.parts).toEqual(['hello world'])
     }).then(done)
   })
+
+  describe('when no args are specified', () => {
+    it('should still work', () => {
+      ctx.args = undefined
+      return splitText(ctx).then(() => {
+        expect(ctx.parts).toEqual([testData])
+      })
+    })
+  })
 })
