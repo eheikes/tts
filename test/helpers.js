@@ -33,7 +33,9 @@ exports.loadLib = (file) => {
   })
 
   // Stub out the Polly SDK.
-  let PollyStub = jasmine.createSpy('Polly')
+  let PollyStub = jasmine.createSpy('Polly').and.returnValue({
+    getSynthesizeSpeechUrl: () => 'http://example.com'
+  })
   let pollyStub = {
     Presigner: PollyStub
   }

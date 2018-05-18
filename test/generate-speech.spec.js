@@ -1,87 +1,61 @@
-describe('generateAll()', () => {
-  let async, generateAll, task
-  let iteratorFunction
-
-  const testLimit = 2
-  const textParts = [
-    'hello', 'world', 'how are you?'
-  ]
+describe('generateSpeech()', () => {
+  let generateSpeech
+  let ctx, task
 
   beforeEach(() => {
-    iteratorFunction = jasmine.createSpy('async iterator')
-    iteratorFunction.and.callFake((data, i, callback) => { callback() })
-    task = { title: '' }
-    const helpers = require('./helpers').loadLib('generate-speech')
-    async = helpers.async
-    generateAll = helpers.generateAll
+    ({ generateSpeech } = require('./helpers').loadLib('generate-speech'))
+    ctx = {
+      args: {
+        accessKey: 'access key',
+        ffmpeg: 'ffmpeg',
+        format: 'format',
+        lexicon: 'lexicon',
+        region: 'region',
+        sampleRate: 'sample rate',
+        secretKey: 'secret key',
+        throttle: '10',
+        type: 'type',
+        voice: 'voice'
+      },
+      parts: ['a', 'b', 'c']
+    }
+    task = { title: 'test task' }
   })
 
-  it('should asynchronously call the function for each of the parts', done => {
-    generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(() => {
-      let [parts] = async.eachOfLimit.calls.mostRecent().args
-      expect(parts).toEqual(textParts)
-      expect(parts.length).toBe(textParts.length)
-      expect(iteratorFunction.calls.count()).toBe(textParts.length)
-    }).then(done)
-  })
-
-  it('should limit the async calls according to the option', done => {
-    generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(() => {
-      let [, limit] = async.eachOfLimit.calls.mostRecent().args
-      expect(limit).toBe(testLimit)
-    }).then(done)
-  })
-
-  describe('initial spinner', () => {
-    beforeEach(done => {
-      async.eachOfLimit.and.callFake((parts, opts, func, callback) => {
-        callback(new Error('reject async'))
-      })
-      generateAll(textParts, {}, iteratorFunction, task).catch(() => {
-        done()
-      })
-    })
-
-    it('should be updated', () => {
-      expect(task.title).toMatch('Convert to audio')
-    })
-
-    it('should show the part count', () => {
-      expect(task.title).toMatch(`/${textParts.length}\\)$`)
-    })
-
-    it('should start at 0', () => {
-      expect(task.title).toMatch('\\(0/')
+  it('should set context "opts" from the args', () => {
+    return generateSpeech(ctx, task).then(() => {
+      expect(ctx.opts['access-key']).toBe(ctx.args.accessKey)
+      expect(ctx.opts.ffmpeg).toBe(ctx.args.ffmpeg)
+      expect(ctx.opts.format).toBe(ctx.args.format)
+      expect(ctx.opts.lexicon).toEqual([ctx.args.lexicon])
+      expect(ctx.opts.limit).toBe(Number(ctx.args.throttle))
+      expect(ctx.opts.region).toBe(ctx.args.region)
+      expect(ctx.opts['sample-rate']).toBe(ctx.args.sampleRate)
+      expect(ctx.opts['secret-key']).toBe(ctx.args.secretKey)
+      expect(ctx.opts.type).toBe(ctx.args.type)
+      expect(ctx.opts.voice).toBe(ctx.args.voice)
     })
   })
 
-  describe('when all requests succeed', () => {
-    it('should respond with the original parts', done => {
-      generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(response => {
-        expect(response).toEqual(textParts)
-      }).then(done)
-    })
-
-    it('should show the final count', done => {
-      generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(() => {
-        expect(task.title).toMatch(`\\(${textParts.length}/`)
-      }).then(done)
+  it('should have context "opts" fall back to the defaults', () => {
+    ctx.args = {}
+    return generateSpeech(ctx, task).then(() => {
+      expect(ctx.opts['access-key']).toBeUndefined()
+      expect(ctx.opts.ffmpeg).toBe('ffmpeg')
+      expect(ctx.opts.format).toBe('mp3')
+      expect(ctx.opts.lexicon).toBeUndefined()
+      expect(ctx.opts.limit).toBe(5)
+      expect(ctx.opts.region).toBe('us-east-1')
+      expect(ctx.opts['sample-rate']).toBeUndefined()
+      expect(ctx.opts['secret-key']).toBeUndefined()
+      expect(ctx.opts.type).toBe('text')
+      expect(ctx.opts.voice).toBe('Joanna')
     })
   })
 
-  describe('when a request fails', () => {
-    const testError = 'test error'
-
-    beforeEach(() => {
-      iteratorFunction.and.callFake((data, i, callback) => {
-        callback(new Error(testError))
-      })
-    })
-
-    it('should return a rejected promise with the error', done => {
-      generateAll(textParts, { limit: testLimit }, iteratorFunction, task).catch(err => {
-        expect(err.message).toBe(testError)
-      }).then(done)
+  it('should save the manifest file to the context', () => {
+    return generateSpeech(ctx, task).then(() => {
+      expect(ctx.manifestFile).toEqual(jasmine.any(String))
     })
   })
 })
