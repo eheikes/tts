@@ -2,7 +2,7 @@ describe('readText()', () => {
   const testData = 'hello world'
 
   let readText, fs
-  let ctx
+  let ctx, stdin
 
   beforeEach(() => {
     ({ readText, fs } = require('./helpers').loadLib('read-text'))

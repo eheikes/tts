@@ -1,11 +1,9 @@
 const { checkUsage } = require('../lib/check-usage')
 
 describe('checkUsage()', () => {
-  let returnValue
   let proc, exit, write
 
   beforeEach(() => {
-    returnValue = null
     exit = jasmine.createSpy('process.exit')
     write = jasmine.createSpy('process.stderr.write')
     proc = {
@@ -19,7 +17,7 @@ describe('checkUsage()', () => {
 
   describe('when --help is specified', () => {
     beforeEach(() => {
-      returnValue = checkUsage({ _: [], help: true }, proc)
+      checkUsage({ _: [], help: true }, proc)
     })
 
     it('should output the usage statement', () => {
@@ -33,7 +31,7 @@ describe('checkUsage()', () => {
 
   describe('when 1 argument is passed', () => {
     beforeEach(() => {
-      returnValue = checkUsage({ _: ['foo'] }, proc)
+      checkUsage({ _: ['foo'] }, proc)
     })
 
     it('should NOT output the usage statement', () => {
@@ -47,7 +45,7 @@ describe('checkUsage()', () => {
 
   describe('when no arguments are passed', () => {
     beforeEach(() => {
-      returnValue = checkUsage({ _: [] }, proc)
+      checkUsage({ _: [] }, proc)
     })
 
     it('should output the usage statement', () => {
