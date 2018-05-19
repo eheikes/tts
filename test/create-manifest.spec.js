@@ -1,4 +1,3 @@
-'use strict'
 describe('createManifest()', () => {
   const testParts = [
     { tempfile: 'foo.mp3' },
@@ -9,7 +8,7 @@ describe('createManifest()', () => {
   let outputFilename, fileContents, options, lines, response
 
   beforeEach(() => {
-    ({ createManifest, fs } = require('./helpers').loadLib())
+    ({ createManifest, fs } = require('./helpers').loadLib('generate-speech'))
   })
 
   beforeEach(() => {

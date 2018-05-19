@@ -1,10 +1,8 @@
-'use strict'
-
 const async = require('async')
 const proxyquire = require('proxyquire')
 const { Readable } = require('stream')
 
-exports.loadLib = () => {
+exports.loadLib = (file) => {
   // Spy on the async module.
   spyOn(async, 'eachOfLimit').and.callThrough()
 
@@ -12,12 +10,14 @@ exports.loadLib = () => {
   let fs = jasmine.createSpyObj('fs', [
     'appendFileSync',
     'createFileSync',
+    'move',
     'readFile',
     'readFileSync',
     'removeSync',
     'truncateSync',
     'writeFileSync'
   ])
+  fs.move.and.callFake((src, dest, opts, callback) => { callback() })
 
   // Stub out the got module with a spy.
   let got = jasmine.createSpyObj('got', ['stream'])
@@ -34,22 +34,10 @@ exports.loadLib = () => {
     })
   })
 
-  // Stub out the spinner with spies.
-  let ora = jasmine.createSpyObj('ora', ['fail', 'start', 'stop', 'succeed'])
-  let oraStub = () => {
-    return {
-      start: () => {
-        return ora
-      }
-    }
-  }
-
   // Stub out the Polly SDK.
-  // let getSynthesizeSpeechUrl = jasmine.createSpy('getSynthesizeSpeechUrl');
-  // let PollyStub = function() {
-  //   this.getSynthesizeSpeechUrl = getSynthesizeSpeechUrl;
-  // };
-  let PollyStub = jasmine.createSpy('Polly')
+  let PollyStub = jasmine.createSpy('Polly').and.returnValue({
+    getSynthesizeSpeechUrl: () => 'http://example.com'
+  })
   let pollyStub = {
     Presigner: PollyStub
   }
@@ -68,20 +56,18 @@ exports.loadLib = () => {
   })
 
   // Load the library module.
-  let lib = proxyquire('../lib', {
+  let lib = proxyquire(`../lib/${file}`, {
     async: async,
     'aws-sdk/clients/polly': pollyStub,
     child_process: { spawn }, // eslint-disable-line camelcase
     'fs-extra': fs,
-    got: got,
-    ora: oraStub
+    got: got
   })
 
   // Add the spies for inspection.
   lib.async = async
   lib.fs = fs
   lib.got = got
-  lib.ora = ora
   lib.Polly = PollyStub
   lib.spawn = spawn
   lib.spawn.on = spawnOnSpy

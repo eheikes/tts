@@ -28,19 +28,19 @@
   },
   "homepage": "https://github.com/eheikes/aws-tts#readme",
   "devDependencies": {
-    "jasmine": "^2.6.0",
-    "nyc": "^11.2.1",
+    "jasmine": "^2.9.0",
+    "nyc": "^11.8.0",
     "proxyquire": "^1.8.0",
     "standard": "^10.0.3"
   },
   "dependencies": {
-    "async": "^2.1.4",
-    "aws-sdk": "^2.7.27",
+    "async": "^2.5.0",
+    "aws-sdk": "^2.88.0",
     "debug": "^3.1.0",
     "fs-extra": "^2.0.0",
     "got": "^6.7.1",
+    "listr": "^0.14.1",
     "minimist": "^1.2.0",
-    "ora": "^1.2.0",
     "sax": "^1.2.4",
     "tempfile": "^1.1.1",
     "textchunk": "^1.1.0"
@@ -59,6 +59,7 @@
     "functions": 95,
     "branches": 95,
     "include": [
+      "lib/*.js",
       "*.js"
     ],
     "reporter": [

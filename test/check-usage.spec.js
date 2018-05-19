@@ -1,11 +1,7 @@
-'use strict'
-describe('checkUsage()', () => {
-  let checkUsage, ora
-  let proc, exit, write
+const { checkUsage } = require('../lib/check-usage')
 
-  beforeEach(() => {
-    ({ checkUsage, ora } = require('./helpers').loadLib())
-  })
+describe('checkUsage()', () => {
+  let proc, exit, write
 
   beforeEach(() => {
     exit = jasmine.createSpy('process.exit')
@@ -17,11 +13,6 @@ describe('checkUsage()', () => {
         write: write
       }
     }
-  })
-
-  it('should stop the spinner', () => {
-    checkUsage({ _: [] }, proc)
-    expect(ora.stop).toHaveBeenCalled()
   })
 
   describe('when --help is specified', () => {

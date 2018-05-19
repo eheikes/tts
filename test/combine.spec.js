@@ -1,74 +1,64 @@
-'use strict'
 describe('combine()', () => {
   const testManifest = 'manifest.txt'
 
-  let opts, combine, fs, ora, spawn
+  let combine, fs, spawn
+  let ctx
 
   beforeEach(() => {
-    opts = {
-      ffmpeg: 'ffmpeg',
-      format: 'mp3'
-    };
-    ({ combine, fs, ora, spawn } = require('./helpers').loadLib())
-  })
-
-  it('should start the spinner', () => {
-    combine(testManifest, opts)
-    expect(ora.start).toHaveBeenCalled()
-    expect(ora.text).toMatch('Combine audio')
+    ctx = {
+      manifestFile: testManifest,
+      opts: {
+        ffmpeg: 'ffmpeg',
+        format: 'mp3'
+      }
+    }
+    const lib = require('./helpers').loadLib('combine-parts')
+    combine = lib.combine
+    fs = lib.fs
+    spawn = lib.spawn
   })
 
   describe('when the format is MP3', () => {
     it('should call combineEncodedAudio()', () => {
-      combine(testManifest, opts)
-      // We can't spy on combineEncodedAudio() directly, so look at its internals.
-      expect(spawn).toHaveBeenCalled()
-      expect(spawn.calls.mostRecent().args[0]).toBe(opts.ffmpeg)
+      return combine(ctx).then(() => {
+        // We can't spy on combineEncodedAudio() directly, so look at its internals.
+        expect(spawn).toHaveBeenCalled()
+        expect(spawn.calls.mostRecent().args[0]).toBe(ctx.opts.ffmpeg)
+      })
     })
   })
 
   describe('when the format is PCM', () => {
     it('should call combineRawAudio()', () => {
-      opts.format = 'pcm'
-      combine(testManifest, opts)
-      // We can't spy on combineRawAudio() directly, so look at its internals.
-      expect(fs.createFileSync).toHaveBeenCalled()
+      ctx.opts.format = 'pcm'
+      return combine(ctx).then(() => {
+        // We can't spy on combineRawAudio() directly, so look at its internals.
+        expect(fs.createFileSync).toHaveBeenCalled()
+      })
     })
   })
 
   describe('when it succeeds', () => {
-    let result
-
-    beforeEach(done => {
-      opts.format = 'pcm'
-      combine(testManifest, opts).then(response => {
-        result = response
-      }).then(done)
-    })
-
-    it('should update the spinner text', () => {
-      expect(ora.text).toMatch('Clean up')
-    })
-
-    it('should set the spinner to the success state', () => {
-      expect(ora.succeed).toHaveBeenCalled()
+    beforeEach(() => {
+      ctx.opts.format = 'pcm'
+      return combine(ctx)
     })
 
     it('should return the new filename', () => {
-      expect(result).toMatch(/\.pcm$/)
+      expect(ctx.tempFile).toMatch(/\.pcm$/)
     })
   })
 
   describe('when it fails', () => {
     let result
 
-    beforeEach(done => {
+    beforeEach(() => {
       spawn.on.and.callFake((type, callback) => {
         if (type === 'error') { callback() }
       })
-      combine(testManifest, opts).catch(response => {
+      return combine(ctx).catch(response => {
         result = response
-      }).then(done)
+      })
     })
 
     it('should return a rejected promise with the error', () => {

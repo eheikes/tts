@@ -1,13 +1,12 @@
-'use strict'
 describe('combineEncodedAudio()', () => {
   const binary = 'ffmpeg'
   const manifestFilename = 'manifest.txt'
   const tempFilename = 'foobar.mp3'
 
-  let combineEncodedAudio, ora, spawn
+  let combineEncodedAudio, spawn
 
   beforeEach(() => {
-    ({ combineEncodedAudio, ora, spawn } = require('./helpers').loadLib())
+    ({ combineEncodedAudio, spawn } = require('./helpers').loadLib('combine-parts'))
   })
 
   describe('process', () => {
@@ -71,24 +70,10 @@ describe('combineEncodedAudio()', () => {
       })
     })
 
-    it('should set the spinner to the failure state', done => {
-      combineEncodedAudio(binary, manifestFilename, tempFilename).catch(() => {
-        expect(ora.fail).toHaveBeenCalled()
-      }).then(done)
-    })
-
     it('should return a rejected promise with the stderr output', done => {
       combineEncodedAudio(binary, manifestFilename, tempFilename).catch(err => {
         expect(err.message).toMatch(`(${errorCode})`)
         expect(err.message).toMatch(`(${errorOutput})`)
-      }).then(done)
-    })
-  })
-
-  describe('when the ffmpeg process succeeds', () => {
-    it('should set the spinner to the success state', done => {
-      combineEncodedAudio(binary, manifestFilename, tempFilename).then(() => {
-        expect(ora.succeed).toHaveBeenCalled()
       }).then(done)
     })
   })

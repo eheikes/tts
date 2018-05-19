@@ -1,4 +1,3 @@
-'use strict'
 describe('createPolly()', () => {
   const opts = {
     'access-key': 'accesskey',
@@ -10,7 +9,7 @@ describe('createPolly()', () => {
   let arg, response
 
   beforeEach(() => {
-    ({ createPolly, Polly } = require('./helpers').loadLib())
+    ({ createPolly, Polly } = require('./helpers').loadLib('generate-speech'))
     response = createPolly(opts)
     arg = Polly.calls.mostRecent().args[0]
   })
