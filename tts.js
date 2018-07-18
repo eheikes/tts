@@ -3,7 +3,7 @@
  * Takes a text file and calls the AWS Polly API
  *   to convert it to an audio file.
  */
-const debug = require('debug')('aws-tts')
+const debug = require('debug')('tts-cli')
 const { checkUsage } = require('./lib/check-usage')
 const { cleanup } = require('./lib/cleanup')
 const { combine } = require('./lib/combine-parts')

@@ -1,4 +1,4 @@
-# AWS Text-To-Speech
+# Text-To-Speech CLI
 
 Command-line tool to convert a text file of any size to speech using the AWS Polly API.
 
@@ -13,7 +13,7 @@ Command-line tool to convert a text file of any size to speech using the AWS Pol
 You can then install the package globally:
 
 ```
-$ npm install aws-tts -g
+$ npm install tts-cli -g
 ```
 
 You'll also need to [get your AWS access keys](http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-your-credentials.html) and [configure your machine with your credentials](http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).
@@ -21,22 +21,22 @@ You'll also need to [get your AWS access keys](http://docs.aws.amazon.com/sdk-fo
 ## Usage
 
 ```
-$ aws-tts [inputfile] outputfile [options]
+$ tts [inputfile] outputfile [options]
 ```
 
 Example:
 
 ```
 # Using a text file as the input, changing the default voice, and specifying the AWS keys.
-$ aws-tts test.txt test.mp3 --voice Brian --access-key ABCDEFG --secret-key hwl500CZygitV91n
+$ tts test.txt test.mp3 --voice Brian --access-key ABCDEFG --secret-key hwl500CZygitV91n
 
 # Passing a string of text as the input.
-$ echo "Hello world! How are you?" | aws-tts test.mp3
+$ echo "Hello world! How are you?" | tts test.mp3
 ```
 
 Standard arguments:
 
-* `inputfile` is the text file you want to convert to speech. It should be encoded as UTF-8. If excluded, aws-tts will read in the text from `stdin`.
+* `inputfile` is the text file you want to convert to speech. It should be encoded as UTF-8. If excluded, tts-cli will read in the text from `stdin`.
 * `outfile` is the filename to save the audio to.
 
 Options:
@@ -69,7 +69,7 @@ Options:
 
 ## Contributing
 
-Pull requests and suggestions are welcome. [Create a new issue](https://github.com/eheikes/aws-tts/issues/new) to report a bug or suggest a new feature.
+Pull requests and suggestions are welcome. [Create a new issue](https://github.com/eheikes/tts-cli/issues/new) to report a bug or suggest a new feature.
 
 Please add tests and maintain the existing styling when adding and updating the code. Run `npm run lint` to lint the code.
 

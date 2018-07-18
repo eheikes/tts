@@ -1,9 +1,9 @@
 {
-  "name": "aws-tts",
+  "name": "tts-cli",
   "version": "1.5.0",
-  "description": "CLI tool to convert text to speech using AWS Polly",
+  "description": "Command-line tool to convert text to speech",
   "bin": {
-    "aws-tts": "./tts.js"
+    "tts": "./tts.js"
   },
   "scripts": {
     "lint": "standard --fix --verbose",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eheikes/aws-tts.git"
+    "url": "git+https://github.com/eheikes/tts-cli.git"
   },
   "keywords": [
     "aws",
@@ -24,9 +24,9 @@
   "author": "Eric Heikes <eheikes@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/eheikes/aws-tts/issues"
+    "url": "https://github.com/eheikes/tts-cli/issues"
   },
-  "homepage": "https://github.com/eheikes/aws-tts#readme",
+  "homepage": "https://github.com/eheikes/tts-cli#readme",
   "devDependencies": {
     "jasmine": "^2.9.0",
     "nyc": "^11.8.0",
