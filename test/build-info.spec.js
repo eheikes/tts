@@ -2,14 +2,14 @@ describe('buildInfo()', () => {
   const task = {}
   const text = 'foobar'
   const format = 'mp3'
-  const func = function () {}
+  const instance = { foo: 1, bar: 2 }
   const opts = { format }
 
   let buildInfo, output
 
   beforeEach(() => {
     ({ buildInfo } = require('./helpers').loadLib('generate-speech'))
-    output = buildInfo(text, func, task, opts)
+    output = buildInfo(text, { buildPart: () => instance }, task, opts)
   })
 
   it('should return an object', () => {
@@ -36,7 +36,8 @@ describe('buildInfo()', () => {
     expect(output.text).toBe(text)
   })
 
-  it('should have a "urlcreator" property', () => {
-    expect(output.urlcreator).toEqual(jasmine.any(Function))
+  it(`should add in the instance's properties`, () => {
+    expect(output.foo).toBe(instance.foo)
+    expect(output.bar).toBe(instance.bar)
   })
 })

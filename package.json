@@ -7,7 +7,7 @@
   },
   "scripts": {
     "lint": "standard --fix --verbose",
-    "test": "JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
+    "test": "cross-env JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/eheikes/tts-cli#readme",
   "devDependencies": {
+    "cross-env": "^5.2.0",
     "jasmine": "^2.9.0",
     "nyc": "^11.8.0",
     "proxyquire": "^1.8.0",
@@ -60,7 +61,7 @@
     "functions": 95,
     "branches": 95,
     "include": [
-      "lib/*.js",
+      "lib/**/*.js",
       "*.js"
     ],
     "reporter": [

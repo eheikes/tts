@@ -14,7 +14,6 @@ const { sanitizeOpts } = require('./lib/sanitize-opts')
 const { splitText } = require('./lib/split-text')
 
 const args = require('minimist')(process.argv.slice(2))
-const maxCharacterCount = 1500
 debug('called with arguments', JSON.stringify(sanitizeOpts(args)))
 
 let [input, outputFilename] = args._
@@ -53,7 +52,7 @@ const tasks = [{
 const context = {
   args,
   input,
-  maxCharacterCount,
+  maxCharacterCount: 1500,
   outputFilename,
   process
 }
