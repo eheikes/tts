@@ -1,6 +1,6 @@
 # Text-To-Speech CLI
 
-Command-line tool to convert a text file of any size to speech using the AWS Polly API.
+Command-line tool to convert a text file of any size to speech using [AWS Polly](https://aws.amazon.com/polly/) or [Google Cloud Text-to-Speech](https://cloud.google.com/text-to-speech/).
 
 ![Animation of the tool in action](docs/tts-cli.gif)
 
@@ -8,7 +8,7 @@ Command-line tool to convert a text file of any size to speech using the AWS Pol
 
 * [Node.js/npm](https://nodejs.org) v6+
 * [ffmpeg](https://ffmpeg.org/)
-* An Amazon/AWS account
+* An Amazon Web Services (AWS) or Google Cloud account
 
 You can then install the package globally:
 
@@ -16,7 +16,10 @@ You can then install the package globally:
 $ npm install tts-cli -g
 ```
 
-You'll also need to [get your AWS access keys](http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-your-credentials.html) and [configure your machine with your credentials](http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).
+You'll also need to set up your computer:
+
+* AWS Polly: [Get your AWS access keys](http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-your-credentials.html) and [configure your machine with your credentials](http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).
+* Google Cloud Text-to-Speech: [Create and set up a Cloud Platform account](https://cloud.google.com/nodejs/docs/reference/text-to-speech/latest/#quickstart) and [download your credentials file](https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually).
 
 ## Usage
 
@@ -54,17 +57,18 @@ Options:
 
 ## What It Does
 
-* Splits the text into the maximum size allowed by the AWS API (1500 characters).
-* Compresses the white space inside the text to minimize the AWS cost.
-* Uses your AWS credentials in `~/.aws/credentials`.
-* Calls the AWS API (in a throttled manner) to get each text part converted to audio.
+* Splits the text into the maximum size allowed by the API (1500 characters for AWS, 5000 characters for Google Cloud).
+* Compresses the white space inside the text to minimize the cost.
+* Uses your credentials in `~/.aws/credentials` (AWS) or the `GOOGLE_APPLICATION_CREDENTIALS` (Google Cloud) file.
+* Calls the API (in a throttled manner) to get each text part converted to audio.
 * Combines the audio together into a single file.
 
 ## Troubleshooting
 
 * Make sure Node.js is working. Running `node --version` on the command line should give a version of v6.0.0 or higher.
 * Make sure ffmpeg is installed. Running `ffmpeg -version` on the command line should give you the version information.
-* Make sure you can connect to AWS normally. Going to https://polly.us-east-1.amazonaws.com/v1/speech (or whatever AWS region you're using) should give you a "Missing Authentication Token" message. You can use the [AWS CLI tool](https://aws.amazon.com/cli/) to check your configuration -- installing that and running `aws sts get-caller-identity` should return your user info.
+* Make sure you can connect to AWS or Google Cloud normally.
+  * Going to https://polly.us-east-1.amazonaws.com/v1/speech (or whatever AWS region you're using) should give you a "Missing Authentication Token" message. You can use the [AWS CLI tool](https://aws.amazon.com/cli/) to check your configuration -- installing that and running `aws sts get-caller-identity` should return your user info.
 * Run `export DEBUG=*` first (Linux or Mac) to turn on debugging output. On Windows you'll need to use `set DEBUG=*` (command prompt) or `$env:DEBUG = "*"` (PowerShell).
 
 ## Contributing
@@ -81,4 +85,4 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-This project is not affiliated with Amazon.
+This project is not affiliated with Amazon or Google.
