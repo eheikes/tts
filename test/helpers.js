@@ -15,9 +15,11 @@ exports.loadLib = (file) => {
     'readFileSync',
     'removeSync',
     'truncateSync',
+    'writeFile',
     'writeFileSync'
   ])
   fs.move.and.callFake((src, dest, opts, callback) => { callback() })
+  fs.writeFile.and.callFake((dest, data, opts, callback) => { callback() })
 
   // Stub out the got module with a spy.
   let got = jasmine.createSpyObj('got', ['stream'])
