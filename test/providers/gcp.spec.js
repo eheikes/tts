@@ -77,6 +77,13 @@ describe('Google Cloud provider', () => {
         })
       })
 
+      it('should update the task title', done => {
+        provider.generate(info, testData.index, () => {
+          expect(task.title).toMatch(`\\(${testData.index}/`)
+          done()
+        })
+      })
+
       it('should write the GCP response to the temp file', done => {
         provider.generate(info, 0, () => {
           expect(fsStub.writeFile).toHaveBeenCalledWith(
