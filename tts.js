@@ -49,12 +49,14 @@ const tasks = [{
   title: 'Saving file',
   task: moveTempFile
 }]
+const service = args.service || 'aws'
 const context = {
   args,
   input,
   maxCharacterCount: 1500,
   outputFilename,
-  process
+  process,
+  service
 }
 
 // Run the tasks.

@@ -63,4 +63,37 @@ describe('CLI', () => {
       expect(cli.context.outputFilename).toBe(outputFile)
     })
   })
+
+  describe('when the "aws" service is specified', () => {
+    beforeEach(() => {
+      args = { _: [outputFile], service: 'aws' }
+      cli = proxyquire('../tts', { minimist })
+    })
+
+    it('should save that as the service', () => {
+      expect(cli.context.service).toBe('aws')
+    })
+  })
+
+  describe('when the "gcp" service is specified', () => {
+    beforeEach(() => {
+      args = { _: [outputFile], service: 'gcp' }
+      cli = proxyquire('../tts', { minimist })
+    })
+
+    it('should save that as the service', () => {
+      expect(cli.context.service).toBe('gcp')
+    })
+  })
+
+  describe('when no service is specified', () => {
+    beforeEach(() => {
+      args = { _: [outputFile] }
+      cli = proxyquire('../tts', { minimist })
+    })
+
+    it('should use the default service', () => {
+      expect(cli.context.service).toBe('aws')
+    })
+  })
 })
