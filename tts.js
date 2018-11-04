@@ -53,7 +53,7 @@ const service = args.service || 'aws'
 const context = {
   args,
   input,
-  maxCharacterCount: 1500,
+  maxCharacterCount: service === 'gcp' ? 5000 : 1500,
   outputFilename,
   process,
   service

@@ -73,6 +73,10 @@ describe('CLI', () => {
     it('should save that as the service', () => {
       expect(cli.context.service).toBe('aws')
     })
+
+    it('should set the appropriate maxCharacterCount', () => {
+      expect(cli.context.maxCharacterCount).toBe(1500)
+    })
   })
 
   describe('when the "gcp" service is specified', () => {
@@ -84,6 +88,10 @@ describe('CLI', () => {
     it('should save that as the service', () => {
       expect(cli.context.service).toBe('gcp')
     })
+
+    it('should set the appropriate maxCharacterCount', () => {
+      expect(cli.context.maxCharacterCount).toBe(5000)
+    })
   })
 
   describe('when no service is specified', () => {
@@ -94,6 +102,10 @@ describe('CLI', () => {
 
     it('should use the default service', () => {
       expect(cli.context.service).toBe('aws')
+    })
+
+    it('should set the appropriate maxCharacterCount', () => {
+      expect(cli.context.maxCharacterCount).toBe(1500)
     })
   })
 })
