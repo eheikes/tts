@@ -3,6 +3,7 @@ const fs = require('fs')
 const tempfile = require('tempfile')
 
 describe('Google Cloud provider', () => {
+  let fsStub
   let create
   let GoogleProvider
   let provider
