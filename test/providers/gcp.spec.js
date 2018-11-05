@@ -42,6 +42,8 @@ describe('Google Cloud provider', () => {
         filename: tempfile(),
         index: 6,
         opts: {
+          type: 'text',
+          voice: 'John'
         },
         response: 'fake audio data',
         text: 'hello world',
@@ -80,6 +82,79 @@ describe('Google Cloud provider', () => {
       it('should update the task title', done => {
         provider.generate(info, testData.index, () => {
           expect(task.title).toMatch(`\\(${testData.index}/`)
+          done()
+        })
+      })
+
+      it('should work with the MP3 format', done => {
+        testData.opts.format = 'mp3'
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audio_config.audio_encoding).toBe('MP3')
+          done()
+        })
+      })
+
+      it('should work with the OGG format', done => {
+        testData.opts.format = 'ogg'
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audio_config.audio_encoding).toBe('OGG_OPUS')
+          done()
+        })
+      })
+
+      it('should work with the PCM format', done => {
+        testData.opts.format = 'pcm'
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audio_config.audio_encoding).toBe('LINEAR16')
+          done()
+        })
+      })
+
+      it('should not use sample rate if not specified', done => {
+        delete info.opts['sample-rate']
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audio_config.sample_rate_hertz).toBeUndefined()
+          done()
+        })
+      })
+
+      it('should use the (numeric) sample rate, when specified', done => {
+        testData.opts['sample-rate'] = '999'
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audio_config.sample_rate_hertz).toBe(999)
+          done()
+        })
+      })
+
+      it('should use the given (plain) text', done => {
+        testData.opts.type = 'text'
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.input.text).toBe(testData.text)
+          expect(opts.input.ssml).toBeUndefined()
+          done()
+        })
+      })
+
+      it('should use the given (SSML) text', done => {
+        testData.opts.type = 'ssml'
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.input.ssml).toBe(testData.text)
+          expect(opts.input.text).toBeUndefined()
+          done()
+        })
+      })
+
+      it('should use the given voice', done => {
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.voice.name).toBe(testData.opts.voice)
           done()
         })
       })

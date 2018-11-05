@@ -38,8 +38,9 @@ describe('generateSpeech()', () => {
     })
   })
 
-  it('should have context "opts" fall back to the defaults', () => {
+  it('should have context "opts" fall back to the (AWS) defaults', () => {
     ctx.args = {}
+    ctx.service = 'aws'
     return generateSpeech(ctx, task).then(() => {
       expect(ctx.opts['access-key']).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
@@ -51,6 +52,27 @@ describe('generateSpeech()', () => {
       expect(ctx.opts['secret-key']).toBeUndefined()
       expect(ctx.opts.type).toBe('text')
       expect(ctx.opts.voice).toBe('Joanna')
+    })
+  })
+
+  it('should have context "opts" fall back to the (GCP) defaults', () => {
+    ctx.args = {}
+    ctx.service = 'gcp'
+    return generateSpeech(ctx, task).then(() => {
+      expect(ctx.opts.ffmpeg).toBe('ffmpeg')
+      expect(ctx.opts.format).toBe('mp3')
+      expect(ctx.opts.limit).toBe(5)
+      expect(ctx.opts['sample-rate']).toBeUndefined()
+      expect(ctx.opts.type).toBe('text')
+      expect(ctx.opts.voice).toBe('en-US-Standard-C')
+    })
+  })
+
+  it('should set format to "ogg" when argument is "ogg_vorbis" (AWS)', () => {
+    ctx.service = 'aws'
+    ctx.args.format = 'ogg_vorbis'
+    return generateSpeech(ctx, task).then(() => {
+      expect(ctx.opts.format).toBe('ogg')
     })
   })
 

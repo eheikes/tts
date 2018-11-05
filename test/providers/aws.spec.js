@@ -82,10 +82,29 @@ describe('AWS provider', () => {
       })
     })
 
-    it('should use the given format', done => {
+    it('should work with the MP3 format', done => {
+      testData.opts.format = 'mp3'
       provider.generate(info, 0, () => {
         let opts = urlCreator.calls.mostRecent().args[0]
-        expect(opts.OutputFormat).toBe(testData.opts.format)
+        expect(opts.OutputFormat).toBe('mp3')
+        done()
+      })
+    })
+
+    it('should work with the OGG format', done => {
+      testData.opts.format = 'ogg'
+      provider.generate(info, 0, () => {
+        let opts = urlCreator.calls.mostRecent().args[0]
+        expect(opts.OutputFormat).toBe('ogg_vorbis')
+        done()
+      })
+    })
+
+    it('should work with the PCM format', done => {
+      testData.opts.format = 'pcm'
+      provider.generate(info, 0, () => {
+        let opts = urlCreator.calls.mostRecent().args[0]
+        expect(opts.OutputFormat).toBe('pcm')
         done()
       })
     })

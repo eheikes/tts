@@ -60,6 +60,7 @@ exports.loadLib = (file) => {
   // Load the library module.
   let lib = proxyquire(`../lib/${file}`, {
     './providers/aws': providerStub,
+    './providers/gcp': providerStub,
     async: async,
     child_process: { spawn }, // eslint-disable-line camelcase
     'fs-extra': fs,
