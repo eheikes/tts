@@ -1,5 +1,6 @@
 const TextToSpeechClient = require('@google-cloud/text-to-speech').TextToSpeechClient
 const fs = require('fs')
+const path = require('path')
 const tempfile = require('tempfile')
 
 describe('Google Cloud provider', () => {
@@ -10,7 +11,12 @@ describe('Google Cloud provider', () => {
 
   beforeEach(() => {
     ({ fs: fsStub, create, GoogleProvider } = require('../helpers').loadLib('providers/gcp'))
-    provider = create({})
+    provider = create({
+      email: 'foo@example.com',
+      'private-key': 'private key',
+      'project-file': 'project-file.json',
+      'project-id': 'project ID'
+    })
   })
 
   describe('create()', () => {
@@ -20,6 +26,57 @@ describe('Google Cloud provider', () => {
 
     it('should have an underlying Google Cloud object', () => {
       expect(provider.instance).toEqual(jasmine.any(TextToSpeechClient))
+    })
+
+    it('should use the email address from the options', () => {
+      expect(provider.instance.auth.jsonContent.client_email).toBe('foo@example.com')
+    })
+
+    it('should use the private key from the options', () => {
+      expect(provider.instance.auth.jsonContent.private_key).toBe('private key')
+    })
+
+    it('should use the project ID from the options', () => {
+      provider.instance.getProjectId().then(id => {
+        expect(id).toBe('project ID')
+      })
+    })
+
+    it('should leave out the project file if not specified', () => {
+      provider = create({
+        email: 'foo@example.com',
+        'private-key': 'private key'
+      })
+      expect(provider.instance.auth.keyFilename).toBeUndefined()
+    })
+
+    it('should convert the project file to an absolute path if relative', () => {
+      expect(provider.instance.auth.keyFilename).toBe(
+        path.resolve('project-file.json')
+      )
+    })
+
+    it('should use the project file as-is if an absolute path', () => {
+      provider = create({
+        email: 'foo@example.com',
+        'private-key': 'fake key',
+        'project-file': path.resolve('project-file.json')
+      })
+      expect(provider.instance.auth.keyFilename).toBe(
+        path.resolve('project-file.json')
+      )
+    })
+
+    it('should work if email and private key are not specified', () => {
+      const filename = tempfile()
+      const fakeProject = {
+        client_email: 'foo@example.com',
+        private_key: 'fake key'
+      }
+      fs.writeFileSync(filename, JSON.stringify(fakeProject), 'utf8')
+      expect(() => {
+        create({ 'project-file': filename })
+      }).not.toThrow()
     })
   })
 
