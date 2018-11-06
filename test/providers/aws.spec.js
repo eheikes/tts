@@ -53,6 +53,7 @@ describe('AWS provider', () => {
         index: 6,
         opts: {
           format: 'ogg',
+          language: 'en-US',
           lexicon: ['lexicon1', 'lexicon2'],
           'sample-rate': 16000,
           type: 'ssml',
@@ -155,6 +156,23 @@ describe('AWS provider', () => {
       provider.generate(info, 0, () => {
         let opts = urlCreator.calls.mostRecent().args[0]
         expect(opts.Text).toBe(testData.text)
+        done()
+      })
+    })
+
+    it('should not use a language if not specified', done => {
+      delete info.opts.language
+      provider.generate(info, 0, () => {
+        let opts = urlCreator.calls.mostRecent().args[0]
+        expect(opts.LanguageCode).toBeUndefined()
+        done()
+      })
+    })
+
+    it('should use the language, when specified', done => {
+      provider.generate(info, 0, () => {
+        let opts = urlCreator.calls.mostRecent().args[0]
+        expect(opts.LanguageCode).toBe(testData.opts.language)
         done()
       })
     })

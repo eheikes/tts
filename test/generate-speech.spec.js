@@ -11,6 +11,7 @@ describe('generateSpeech()', () => {
         email: 'foo@example.com',
         ffmpeg: 'ffmpeg',
         format: 'format',
+        language: 'ab-CD',
         lexicon: 'lexicon',
         privateKey: 'private key',
         projectFile: 'project file',
@@ -34,6 +35,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.email).toBe(ctx.args.email)
       expect(ctx.opts.ffmpeg).toBe(ctx.args.ffmpeg)
       expect(ctx.opts.format).toBe(ctx.args.format)
+      expect(ctx.opts.language).toBe(ctx.args.language)
       expect(ctx.opts.lexicon).toEqual([ctx.args.lexicon])
       expect(ctx.opts.limit).toBe(Number(ctx.args.throttle))
       expect(ctx.opts['private-key']).toBe(ctx.args.privateKey)
@@ -54,6 +56,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts['access-key']).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
+      expect(ctx.opts.language).toBeUndefined()
       expect(ctx.opts.lexicon).toBeUndefined()
       expect(ctx.opts.limit).toBe(5)
       expect(ctx.opts.region).toBe('us-east-1')
@@ -71,6 +74,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.email).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
+      expect(ctx.opts.language).toBe('en-US')
       expect(ctx.opts.limit).toBe(5)
       expect(ctx.opts['private-key']).toBeUndefined()
       expect(ctx.opts['project-file']).toBeUndefined()

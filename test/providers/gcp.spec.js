@@ -99,6 +99,7 @@ describe('Google Cloud provider', () => {
         filename: tempfile(),
         index: 6,
         opts: {
+          language: 'en-US',
           type: 'text',
           voice: 'John'
         },
@@ -204,6 +205,14 @@ describe('Google Cloud provider', () => {
           let opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.input.ssml).toBe(testData.text)
           expect(opts.input.text).toBeUndefined()
+          done()
+        })
+      })
+
+      it('should use the given language', done => {
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.voice.language_code).toBe(testData.opts.language)
           done()
         })
       })
