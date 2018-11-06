@@ -59,6 +59,13 @@ const context = {
   service
 }
 
+// The Google Cloud constructor has uncatchable async calls inside it,
+//   so suppress any errors they throw.
+// See https://github.com/googleapis/nodejs-text-to-speech/issues/12
+process.on('unhandledRejection', /* istanbul ignore next */ () => {
+  // Swallow the error. It will still surface when Listr runs.
+})
+
 // Run the tasks.
 if (require.main === module) /* istanbul ignore next */{
   const Listr = require('listr')
