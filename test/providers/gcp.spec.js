@@ -148,7 +148,7 @@ describe('Google Cloud provider', () => {
         testData.opts.format = 'mp3'
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
-          expect(opts.audio_config.audio_encoding).toBe('MP3')
+          expect(opts.audioConfig.audioEncoding).toBe('MP3')
           done()
         })
       })
@@ -157,7 +157,7 @@ describe('Google Cloud provider', () => {
         testData.opts.format = 'ogg'
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
-          expect(opts.audio_config.audio_encoding).toBe('OGG_OPUS')
+          expect(opts.audioConfig.audioEncoding).toBe('OGG_OPUS')
           done()
         })
       })
@@ -166,7 +166,7 @@ describe('Google Cloud provider', () => {
         testData.opts.format = 'pcm'
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
-          expect(opts.audio_config.audio_encoding).toBe('LINEAR16')
+          expect(opts.audioConfig.audioEncoding).toBe('LINEAR16')
           done()
         })
       })
@@ -175,7 +175,7 @@ describe('Google Cloud provider', () => {
         delete info.opts['sample-rate']
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
-          expect(opts.audio_config.sample_rate_hertz).toBeUndefined()
+          expect(opts.audioConfig.sampleRateHertz).toBeUndefined()
           done()
         })
       })
@@ -184,7 +184,7 @@ describe('Google Cloud provider', () => {
         testData.opts['sample-rate'] = '999'
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
-          expect(opts.audio_config.sample_rate_hertz).toBe(999)
+          expect(opts.audioConfig.sampleRateHertz).toBe(999)
           done()
         })
       })
@@ -212,7 +212,7 @@ describe('Google Cloud provider', () => {
       it('should use the given language', done => {
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
-          expect(opts.voice.language_code).toBe(testData.opts.language)
+          expect(opts.voice.languageCode).toBe(testData.opts.language)
           done()
         })
       })
