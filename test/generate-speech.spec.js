@@ -7,18 +7,18 @@ describe('generateSpeech()', () => {
     ({ fs: fsStub, generateSpeech } = require('./helpers').loadLib('generate-speech'))
     ctx = {
       args: {
-        accessKey: 'access key',
+        'access-key': 'access key',
         email: 'foo@example.com',
         ffmpeg: 'ffmpeg',
         format: 'format',
         language: 'ab-CD',
         lexicon: 'lexicon',
-        privateKey: 'private key',
-        projectFile: 'project file',
-        projectId: 'project ID',
+        'private-key': 'private key',
+        'project-file': 'project file',
+        'project-id': 'project ID',
         region: 'region',
-        sampleRate: 'sample rate',
-        secretKey: 'secret key',
+        'sample-rate': 'sample rate',
+        'secret-key': 'secret key',
         throttle: '10',
         type: 'type',
         voice: 'voice'
@@ -31,19 +31,19 @@ describe('generateSpeech()', () => {
 
   it('should set context "opts" from the args', () => {
     return generateSpeech(ctx, task).then(() => {
-      expect(ctx.opts['access-key']).toBe(ctx.args.accessKey)
+      expect(ctx.opts.accessKey).toBe(ctx.args['access-key'])
       expect(ctx.opts.email).toBe(ctx.args.email)
       expect(ctx.opts.ffmpeg).toBe(ctx.args.ffmpeg)
       expect(ctx.opts.format).toBe(ctx.args.format)
       expect(ctx.opts.language).toBe(ctx.args.language)
       expect(ctx.opts.lexicon).toEqual([ctx.args.lexicon])
       expect(ctx.opts.limit).toBe(Number(ctx.args.throttle))
-      expect(ctx.opts['private-key']).toBe(ctx.args.privateKey)
-      expect(ctx.opts['project-file']).toBe(ctx.args.projectFile)
-      expect(ctx.opts['project-id']).toBe(ctx.args.projectId)
+      expect(ctx.opts.privateKey).toBe(ctx.args['private-key'])
+      expect(ctx.opts.projectFile).toBe(ctx.args['project-file'])
+      expect(ctx.opts.projectId).toBe(ctx.args['project-id'])
       expect(ctx.opts.region).toBe(ctx.args.region)
-      expect(ctx.opts['sample-rate']).toBe(ctx.args.sampleRate)
-      expect(ctx.opts['secret-key']).toBe(ctx.args.secretKey)
+      expect(ctx.opts.sampleRate).toBe(ctx.args['sample-rate'])
+      expect(ctx.opts.secretKey).toBe(ctx.args['secret-key'])
       expect(ctx.opts.type).toBe(ctx.args.type)
       expect(ctx.opts.voice).toBe(ctx.args.voice)
     })
@@ -53,15 +53,15 @@ describe('generateSpeech()', () => {
     ctx.args = {}
     ctx.service = 'aws'
     return generateSpeech(ctx, task).then(() => {
-      expect(ctx.opts['access-key']).toBeUndefined()
+      expect(ctx.opts.accessKey).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
       expect(ctx.opts.language).toBeUndefined()
       expect(ctx.opts.lexicon).toBeUndefined()
       expect(ctx.opts.limit).toBe(5)
       expect(ctx.opts.region).toBe('us-east-1')
-      expect(ctx.opts['sample-rate']).toBeUndefined()
-      expect(ctx.opts['secret-key']).toBeUndefined()
+      expect(ctx.opts.sampleRate).toBeUndefined()
+      expect(ctx.opts.secretKey).toBeUndefined()
       expect(ctx.opts.type).toBe('text')
       expect(ctx.opts.voice).toBe('Joanna')
     })
@@ -76,10 +76,10 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.format).toBe('mp3')
       expect(ctx.opts.language).toBe('en-US')
       expect(ctx.opts.limit).toBe(5)
-      expect(ctx.opts['private-key']).toBeUndefined()
-      expect(ctx.opts['project-file']).toBeUndefined()
-      expect(ctx.opts['project-id']).toBeUndefined()
-      expect(ctx.opts['sample-rate']).toBeUndefined()
+      expect(ctx.opts.privateKey).toBeUndefined()
+      expect(ctx.opts.projectFile).toBeUndefined()
+      expect(ctx.opts.projectId).toBeUndefined()
+      expect(ctx.opts.sampleRate).toBeUndefined()
       expect(ctx.opts.type).toBe('text')
       expect(ctx.opts.voice).toBe('en-US-Standard-C')
     })
@@ -88,11 +88,11 @@ describe('generateSpeech()', () => {
   it('should set private-key when private-key-file is specified', () => {
     fsStub.readFileSync.and.returnValue('private key data')
     ctx.args = {
-      privateKeyFile: 'foobar.pem'
+      'private-key-file': 'foobar.pem'
     }
     return generateSpeech(ctx, task).then(() => {
       expect(fsStub.readFileSync).toHaveBeenCalledWith('foobar.pem', 'utf8')
-      expect(ctx.opts['private-key']).toBe('private key data')
+      expect(ctx.opts.privateKey).toBe('private key data')
     })
   })
 

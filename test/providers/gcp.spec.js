@@ -13,9 +13,9 @@ describe('Google Cloud provider', () => {
     ({ fs: fsStub, create, GoogleProvider } = require('../helpers').loadLib('providers/gcp'))
     provider = create({
       email: 'foo@example.com',
-      'private-key': 'private key',
-      'project-file': 'project-file.json',
-      'project-id': 'project ID'
+      privateKey: 'private key',
+      projectFile: 'project-file.json',
+      projectId: 'project ID'
     })
   })
 
@@ -59,8 +59,8 @@ describe('Google Cloud provider', () => {
     it('should use the project file as-is if an absolute path', () => {
       provider = create({
         email: 'foo@example.com',
-        'private-key': 'fake key',
-        'project-file': path.resolve('project-file.json')
+        privateKey: 'fake key',
+        projectFile: path.resolve('project-file.json')
       })
       expect(provider.instance.auth.keyFilename).toBe(
         path.resolve('project-file.json')
@@ -172,7 +172,7 @@ describe('Google Cloud provider', () => {
       })
 
       it('should not use sample rate if not specified', done => {
-        delete info.opts['sample-rate']
+        delete info.opts.sampleRate
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.sampleRateHertz).toBeUndefined()
@@ -181,7 +181,7 @@ describe('Google Cloud provider', () => {
       })
 
       it('should use the (numeric) sample rate, when specified', done => {
-        testData.opts['sample-rate'] = '999'
+        testData.opts.sampleRate = '999'
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.sampleRateHertz).toBe(999)

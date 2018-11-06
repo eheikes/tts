@@ -3,6 +3,8 @@ describe('sanitizeOpts()', () => {
   const exampleOpts = {
     foo: 1,
     bar: 2,
+    accessKey: 3,
+    secretKey: 4,
     'access-key': 3,
     'secret-key': 4
   }
@@ -18,6 +20,8 @@ describe('sanitizeOpts()', () => {
   })
 
   it('should sanitize AWS secrets', () => {
+    expect(sanitized.accessKey).toMatch(/^X+$/)
+    expect(sanitized.secretKey).toMatch(/^X+$/)
     expect(sanitized['access-key']).toMatch(/^X+$/)
     expect(sanitized['secret-key']).toMatch(/^X+$/)
   })

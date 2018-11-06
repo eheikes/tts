@@ -12,8 +12,8 @@ describe('AWS provider', () => {
     ({ got, create, PollyProvider } = require('../helpers').loadLib('providers/aws'))
     provider = create({
       region: 'aws-west-1',
-      'access-key': 'ACCESS KEY',
-      'secret-key': 'SECRET KEY'
+      accessKey: 'ACCESS KEY',
+      secretKey: 'SECRET KEY'
     })
   })
 
@@ -55,7 +55,7 @@ describe('AWS provider', () => {
           format: 'ogg',
           language: 'en-US',
           lexicon: ['lexicon1', 'lexicon2'],
-          'sample-rate': 16000,
+          sampleRate: 16000,
           type: 'ssml',
           voice: 'John'
         },
@@ -111,7 +111,7 @@ describe('AWS provider', () => {
     })
 
     it('should not use sample rate if not specified', done => {
-      delete info.opts['sample-rate']
+      delete info.opts.sampleRate
       provider.generate(info, 0, () => {
         let opts = urlCreator.calls.mostRecent().args[0]
         expect(opts.SampleRate).toBeUndefined()
@@ -122,7 +122,7 @@ describe('AWS provider', () => {
     it('should use the (string) sample rate, when specified', done => {
       provider.generate(info, 0, () => {
         let opts = urlCreator.calls.mostRecent().args[0]
-        expect(opts.SampleRate).toBe(String(testData.opts['sample-rate']))
+        expect(opts.SampleRate).toBe(String(testData.opts.sampleRate))
         done()
       })
     })
