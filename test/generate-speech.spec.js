@@ -81,7 +81,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.projectId).toBeUndefined()
       expect(ctx.opts.sampleRate).toBeUndefined()
       expect(ctx.opts.type).toBe('text')
-      expect(ctx.opts.voice).toBe('en-US-Standard-C')
+      expect(ctx.opts.voice).toBeUndefined()
     })
   })
 
