@@ -20,6 +20,7 @@ describe('generateSpeech()', () => {
         region: 'region',
         'sample-rate': 'sample rate',
         'secret-key': 'secret key',
+        speed: '2.3',
         throttle: '10',
         type: 'type',
         voice: 'voice'
@@ -46,6 +47,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.region).toBe(ctx.args.region)
       expect(ctx.opts.sampleRate).toBe(ctx.args['sample-rate'])
       expect(ctx.opts.secretKey).toBe(ctx.args['secret-key'])
+      expect(ctx.opts.speed).toBe(parseFloat(ctx.args.speed))
       expect(ctx.opts.type).toBe(ctx.args.type)
       expect(ctx.opts.voice).toBe(ctx.args.voice)
     })
@@ -65,6 +67,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.region).toBe('us-east-1')
       expect(ctx.opts.sampleRate).toBeUndefined()
       expect(ctx.opts.secretKey).toBeUndefined()
+      expect(ctx.opts.speed).toBeUndefined()
       expect(ctx.opts.type).toBe('text')
       expect(ctx.opts.voice).toBe('Joanna')
     })
@@ -84,6 +87,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.projectFile).toBeUndefined()
       expect(ctx.opts.projectId).toBeUndefined()
       expect(ctx.opts.sampleRate).toBeUndefined()
+      expect(ctx.opts.speed).toBeUndefined()
       expect(ctx.opts.type).toBe('text')
       expect(ctx.opts.voice).toBeUndefined()
     })

@@ -101,6 +101,7 @@ describe('Google Cloud provider', () => {
         opts: {
           gender: 'neutral',
           language: 'en-US',
+          speed: 4.2,
           type: 'text',
           voice: 'John'
         },
@@ -222,6 +223,14 @@ describe('Google Cloud provider', () => {
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.voice.languageCode).toBe(testData.opts.language)
+          done()
+        })
+      })
+
+      it('should use the given speed', done => {
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audioConfig.speakingRate).toBe(testData.opts.speed)
           done()
         })
       })
