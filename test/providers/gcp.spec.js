@@ -132,7 +132,7 @@ describe('Google Cloud provider', () => {
 
     describe('when everything works', () => {
       beforeEach(() => {
-        synthesizer.and.callFake((req, {}, cb) => {
+        synthesizer.and.callFake((req, opts, cb) => {
           cb(null, { audioContent: testData.response })
         })
       })
@@ -240,7 +240,7 @@ describe('Google Cloud provider', () => {
 
     describe('when GCP returns an error', () => {
       beforeEach(() => {
-        synthesizer.and.callFake((req, {}, cb) => {
+        synthesizer.and.callFake((req, opts, cb) => {
           cb(new Error('testing GCP error'))
         })
       })
@@ -255,7 +255,7 @@ describe('Google Cloud provider', () => {
 
     describe('when file writing fails', () => {
       beforeEach(() => {
-        synthesizer.and.callFake((req, {}, cb) => {
+        synthesizer.and.callFake((req, opts, cb) => {
           cb(null, { audioContent: testData.response })
         })
         fsStub.writeFile.and.callFake((dest, data, opts, cb) => {
