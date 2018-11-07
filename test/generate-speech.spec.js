@@ -10,7 +10,7 @@ describe('generateSpeech()', () => {
         'access-key': 'access key',
         email: 'foo@example.com',
         ffmpeg: 'ffmpeg',
-        format: 'format',
+        format: 'mp3',
         language: 'ab-CD',
         lexicon: 'lexicon',
         'private-key': 'private key',
