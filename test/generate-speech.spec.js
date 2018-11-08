@@ -11,6 +11,7 @@ describe('generateSpeech()', () => {
         email: 'foo@example.com',
         ffmpeg: 'ffmpeg',
         format: 'mp3',
+        gain: '1.2',
         gender: 'neutral',
         language: 'ab-CD',
         lexicon: 'lexicon',
@@ -38,6 +39,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.email).toBe(ctx.args.email)
       expect(ctx.opts.ffmpeg).toBe(ctx.args.ffmpeg)
       expect(ctx.opts.format).toBe(ctx.args.format)
+      expect(ctx.opts.gain).toBe(Number(ctx.args.gain))
       expect(ctx.opts.gender).toBe(ctx.args.gender)
       expect(ctx.opts.language).toBe(ctx.args.language)
       expect(ctx.opts.lexicon).toEqual([ctx.args.lexicon])
@@ -62,6 +64,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.accessKey).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
+      expect(ctx.opts.gain).toBeUndefined()
       expect(ctx.opts.gender).toBeUndefined()
       expect(ctx.opts.language).toBeUndefined()
       expect(ctx.opts.lexicon).toBeUndefined()
@@ -83,6 +86,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.email).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
+      expect(ctx.opts.gain).toBeUndefined()
       expect(ctx.opts.gender).toBeUndefined()
       expect(ctx.opts.language).toBe('en-US')
       expect(ctx.opts.limit).toBe(5)

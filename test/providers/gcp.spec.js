@@ -99,6 +99,7 @@ describe('Google Cloud provider', () => {
         filename: tempfile(),
         index: 6,
         opts: {
+          gain: -1.2,
           gender: 'neutral',
           language: 'en-US',
           pitch: -9.8,
@@ -208,6 +209,14 @@ describe('Google Cloud provider', () => {
           let opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.input.ssml).toBe(testData.text)
           expect(opts.input.text).toBeUndefined()
+          done()
+        })
+      })
+
+      it('should use the given volume gain', done => {
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audioConfig.volumeGainDb).toBe(testData.opts.gain)
           done()
         })
       })
