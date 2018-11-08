@@ -14,6 +14,7 @@ describe('generateSpeech()', () => {
         gender: 'neutral',
         language: 'ab-CD',
         lexicon: 'lexicon',
+        pitch: '9.8',
         'private-key': 'private key',
         'project-file': 'project file',
         'project-id': 'project ID',
@@ -41,6 +42,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.language).toBe(ctx.args.language)
       expect(ctx.opts.lexicon).toEqual([ctx.args.lexicon])
       expect(ctx.opts.limit).toBe(Number(ctx.args.throttle))
+      expect(ctx.opts.pitch).toBe(Number(ctx.args.pitch))
       expect(ctx.opts.privateKey).toBe(ctx.args['private-key'])
       expect(ctx.opts.projectFile).toBe(ctx.args['project-file'])
       expect(ctx.opts.projectId).toBe(ctx.args['project-id'])
@@ -64,6 +66,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.language).toBeUndefined()
       expect(ctx.opts.lexicon).toBeUndefined()
       expect(ctx.opts.limit).toBe(5)
+      expect(ctx.opts.pitch).toBeUndefined()
       expect(ctx.opts.region).toBe('us-east-1')
       expect(ctx.opts.sampleRate).toBeUndefined()
       expect(ctx.opts.secretKey).toBeUndefined()
@@ -83,6 +86,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.gender).toBeUndefined()
       expect(ctx.opts.language).toBe('en-US')
       expect(ctx.opts.limit).toBe(5)
+      expect(ctx.opts.pitch).toBeUndefined()
       expect(ctx.opts.privateKey).toBeUndefined()
       expect(ctx.opts.projectFile).toBeUndefined()
       expect(ctx.opts.projectId).toBeUndefined()
