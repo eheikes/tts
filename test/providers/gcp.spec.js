@@ -99,6 +99,7 @@ describe('Google Cloud provider', () => {
         filename: tempfile(),
         index: 6,
         opts: {
+          effect: ['effect1', 'effect2'],
           gain: -1.2,
           gender: 'neutral',
           language: 'en-US',
@@ -209,6 +210,23 @@ describe('Google Cloud provider', () => {
           let opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.input.ssml).toBe(testData.text)
           expect(opts.input.text).toBeUndefined()
+          done()
+        })
+      })
+
+      it('should not use effects if not specified', done => {
+        delete info.opts.effect
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audioConfig.effectsProfileId).toBeUndefined()
+          done()
+        })
+      })
+
+      it('should use the effects, when specified', done => {
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.audioConfig.effectsProfileId).toEqual(testData.opts.effect)
           done()
         })
       })

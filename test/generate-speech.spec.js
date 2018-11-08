@@ -9,6 +9,7 @@ describe('generateSpeech()', () => {
       args: {
         'access-key': 'access key',
         email: 'foo@example.com',
+        effect: 'effect',
         ffmpeg: 'ffmpeg',
         format: 'mp3',
         gain: '1.2',
@@ -36,6 +37,7 @@ describe('generateSpeech()', () => {
   it('should set context "opts" from the args', () => {
     return generateSpeech(ctx, task).then(() => {
       expect(ctx.opts.accessKey).toBe(ctx.args['access-key'])
+      expect(ctx.opts.effect).toEqual([ctx.args.effect])
       expect(ctx.opts.email).toBe(ctx.args.email)
       expect(ctx.opts.ffmpeg).toBe(ctx.args.ffmpeg)
       expect(ctx.opts.format).toBe(ctx.args.format)
@@ -62,6 +64,7 @@ describe('generateSpeech()', () => {
     ctx.service = 'aws'
     return generateSpeech(ctx, task).then(() => {
       expect(ctx.opts.accessKey).toBeUndefined()
+      expect(ctx.opts.effect).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
       expect(ctx.opts.gain).toBeUndefined()
@@ -83,6 +86,7 @@ describe('generateSpeech()', () => {
     ctx.args = {}
     ctx.service = 'gcp'
     return generateSpeech(ctx, task).then(() => {
+      expect(ctx.opts.effect).toBeUndefined()
       expect(ctx.opts.email).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
