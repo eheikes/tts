@@ -119,7 +119,7 @@ describe('AWS provider', () => {
       })
     })
 
-    it('should use the (string) sample rate, when specified', done => {
+    it('should use the (stringified) sample rate, when specified', done => {
       provider.generate(info, 0, () => {
         let opts = urlCreator.calls.mostRecent().args[0]
         expect(opts.SampleRate).toBe(String(testData.opts.sampleRate))

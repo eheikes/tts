@@ -21,7 +21,7 @@ describe('generateSpeech()', () => {
         'project-file': 'project file',
         'project-id': 'project ID',
         region: 'region',
-        'sample-rate': 'sample rate',
+        'sample-rate': '22000',
         'secret-key': 'secret key',
         speed: '2.3',
         throttle: '10',
@@ -51,7 +51,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.projectFile).toBe(ctx.args['project-file'])
       expect(ctx.opts.projectId).toBe(ctx.args['project-id'])
       expect(ctx.opts.region).toBe(ctx.args.region)
-      expect(ctx.opts.sampleRate).toBe(ctx.args['sample-rate'])
+      expect(ctx.opts.sampleRate).toBe(Number(ctx.args['sample-rate']))
       expect(ctx.opts.secretKey).toBe(ctx.args['secret-key'])
       expect(ctx.opts.speed).toBe(parseFloat(ctx.args.speed))
       expect(ctx.opts.type).toBe(ctx.args.type)

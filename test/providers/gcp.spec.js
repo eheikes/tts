@@ -104,6 +104,7 @@ describe('Google Cloud provider', () => {
           gender: 'neutral',
           language: 'en-US',
           pitch: -9.8,
+          sampleRate: 16000,
           speed: 4.2,
           type: 'text',
           voice: 'John'
@@ -185,11 +186,10 @@ describe('Google Cloud provider', () => {
         })
       })
 
-      it('should use the (numeric) sample rate, when specified', done => {
-        testData.opts.sampleRate = '999'
+      it('should use the sample rate, when specified', done => {
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
-          expect(opts.audioConfig.sampleRateHertz).toBe(999)
+          expect(opts.audioConfig.sampleRateHertz).toBe(testData.opts.sampleRate)
           done()
         })
       })
