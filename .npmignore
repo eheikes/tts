@@ -1,7 +1,0 @@
-.github/
-.nyc_output/
-coverage/
-docs/
-test/
-.editorconfig
-.travis.yml

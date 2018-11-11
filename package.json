@@ -5,6 +5,12 @@
   "bin": {
     "tts": "./tts.js"
   },
+  "files": [
+    "lib/*",
+    "LICENSE.txt",
+    "tts.js",
+    "yarn.lock"
+  ],
   "scripts": {
     "lint": "standard --fix --verbose",
     "test": "cross-env JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
