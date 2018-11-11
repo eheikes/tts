@@ -247,6 +247,15 @@ describe('Google Cloud provider', () => {
         })
       })
 
+      it('should leave out gender if not specified', done => {
+        delete testData.opts.gender
+        provider.generate(info, 0, () => {
+          let opts = synthesizer.calls.mostRecent().args[0]
+          expect(opts.voice.ssmlGender).toBeUndefined()
+          done()
+        })
+      })
+
       it('should use the given language', done => {
         provider.generate(info, 0, () => {
           let opts = synthesizer.calls.mostRecent().args[0]
