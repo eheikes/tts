@@ -59,7 +59,7 @@ Service options:
 
 Audio options:
 
-* `--effects ID` -- Apply an audio effect profile. Can be specified multiple times.
+* `--effect ID` -- Apply an audio effect profile. Can be specified multiple times.
 * `--ffmpeg BINARY` -- Path to the ffmpeg binary (defaults to the one in PATH)
 * `--format FORMAT` -- Target audio format (`mp3`, `ogg`, or `pcm`) (default `mp3`)
 * `--gain GAIN` -- Volume gain, where `0.0` is normal gain
