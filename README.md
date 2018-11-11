@@ -8,7 +8,7 @@ Command-line tool to convert a text file of any size to speech using [AWS Polly]
 
 * [Node.js/npm](https://nodejs.org) v6+
 * [ffmpeg](https://ffmpeg.org/)
-* An Amazon Web Services (AWS) or Google Cloud account
+* An Amazon Web Services (AWS) or Google Cloud Platform (GCP) account
 
 You can then install the package globally:
 
@@ -33,6 +33,9 @@ Example:
 # Using a text file as the input, changing the default voice, and specifying the AWS keys.
 $ tts test.txt test.mp3 --voice Brian --access-key ABCDEFG --secret-key hwl500CZygitV91n
 
+# Using Google Cloud Text-to-Speech.
+$ tts test.txt test.mp3 --service gcp --language en-US
+
 # Passing a string of text as the input.
 $ echo "Hello world! How are you?" | tts test.mp3
 ```
@@ -42,18 +45,35 @@ Standard arguments:
 * `inputfile` is the text file you want to convert to speech. It should be encoded as UTF-8. If excluded, tts-cli will read in the text from `stdin`.
 * `outfile` is the filename to save the audio to.
 
-Options:
+Service options:
 
 * `--access-key KEY` -- AWS access key ID
+* `--email EMAIL` -- GCP client email address (required if `private-key` or `private-key-file` is used)
+* `--private-key KEY` -- GCP private key
+* `--private-key-file FILE` -- GCP private key file (`.pem` or `.p12` file)
+* `--project-file FILE` -- GCP `.json` file with project info
+* `--project-id ID` -- GCP project ID (e.g. `grape-spaceship-123`)
+* `--secret-key KEY` -- AWS secret access key
+* `--service TYPE` -- Cloud service to use (`aws` or `gcp`) (default `aws`)
+* `--throttle SIZE` -- Number of simultaneous requests allowed against the API (default `5`)
+
+Audio options:
+
+* `--effects ID` -- Apply an audio effect profile. Can be specified multiple times.
 * `--ffmpeg BINARY` -- Path to the ffmpeg binary (defaults to the one in PATH)
-* `--format FORMAT` -- Target audio format (`mp3`, `ogg_vorbis`, or `pcm`) (default `mp3`)
+* `--format FORMAT` -- Target audio format (`mp3`, `ogg`, or `pcm`) (default `mp3`)
+* `--gain GAIN` -- Volume gain, where `0.0` is normal gain
+* `--gender GENDER` -- Gender of the voice (`male`, `female`, or `neutral`)
+* `--language LANG` -- Code for the desired language (default `en-US` for GCP, no default for AWS)
 * `--lexicon NAME` -- Apply a stored pronunciation lexicon. Can be specified multiple times.
+* `--pitch PITCH` -- Change in speaking pich, in semitones
+* `--speed RATE` -- Speaking rate, where `1.0` is normal speed
 * `--region REGION` -- AWS region to send requests to (default `us-east-1`)
 * `--sample-rate RATE` -- Audio frequency, in hertz. See the [API docs](http://docs.aws.amazon.com/polly/latest/dg/API_SynthesizeSpeech.html#polly-SynthesizeSpeech-request-SampleRate) for valid values.
-* `--secret-key KEY` -- AWS secret access key
-* `--throttle SIZE` -- Number of simultaneous requests allowed against the AWS API (default `5`)
 * `--type TYPE` -- Type of input text (`text` or `ssml`) (default `text`)
-* `--voice VOICE` -- Voice to use for the speech (default `Joanna`). See the [API docs](http://docs.aws.amazon.com/polly/latest/dg/API_SynthesizeSpeech.html#polly-SynthesizeSpeech-request-VoiceId) for the full list of voices. You can also [test out the voices](https://console.aws.amazon.com/polly/home/SynthesizeSpeech) in the AWS console.
+* `--voice VOICE` -- Voice to use for the speech (default `Joanna` for AWS).
+
+Note that not all services support all options. For example, AWS Polly does not understand the `speed` option.
 
 ## What It Does
 
