@@ -14,7 +14,6 @@ const { sanitizeOpts } = require('./lib/sanitize-opts')
 const { splitText } = require('./lib/split-text')
 
 const args = require('minimist')(process.argv.slice(2))
-const maxCharacterCount = 1500
 debug('called with arguments', JSON.stringify(sanitizeOpts(args)))
 
 let [input, outputFilename] = args._
@@ -50,13 +49,22 @@ const tasks = [{
   title: 'Saving file',
   task: moveTempFile
 }]
+const service = args.service || 'aws'
 const context = {
   args,
   input,
-  maxCharacterCount,
+  maxCharacterCount: service === 'gcp' ? 5000 : 1500,
   outputFilename,
-  process
+  process,
+  service
 }
+
+// The Google Cloud constructor has uncatchable async calls inside it,
+//   so suppress any errors they throw.
+// See https://github.com/googleapis/nodejs-text-to-speech/issues/12
+process.on('unhandledRejection', /* istanbul ignore next */ () => {
+  // Swallow the error. It will still surface when Listr runs.
+})
 
 // Run the tasks.
 if (require.main === module) /* istanbul ignore next */{

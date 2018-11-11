@@ -63,4 +63,49 @@ describe('CLI', () => {
       expect(cli.context.outputFilename).toBe(outputFile)
     })
   })
+
+  describe('when the "aws" service is specified', () => {
+    beforeEach(() => {
+      args = { _: [outputFile], service: 'aws' }
+      cli = proxyquire('../tts', { minimist })
+    })
+
+    it('should save that as the service', () => {
+      expect(cli.context.service).toBe('aws')
+    })
+
+    it('should set the appropriate maxCharacterCount', () => {
+      expect(cli.context.maxCharacterCount).toBe(1500)
+    })
+  })
+
+  describe('when the "gcp" service is specified', () => {
+    beforeEach(() => {
+      args = { _: [outputFile], service: 'gcp' }
+      cli = proxyquire('../tts', { minimist })
+    })
+
+    it('should save that as the service', () => {
+      expect(cli.context.service).toBe('gcp')
+    })
+
+    it('should set the appropriate maxCharacterCount', () => {
+      expect(cli.context.maxCharacterCount).toBe(5000)
+    })
+  })
+
+  describe('when no service is specified', () => {
+    beforeEach(() => {
+      args = { _: [outputFile] }
+      cli = proxyquire('../tts', { minimist })
+    })
+
+    it('should use the default service', () => {
+      expect(cli.context.service).toBe('aws')
+    })
+
+    it('should set the appropriate maxCharacterCount', () => {
+      expect(cli.context.maxCharacterCount).toBe(1500)
+    })
+  })
 })

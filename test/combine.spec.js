@@ -29,11 +29,26 @@ describe('combine()', () => {
   })
 
   describe('when the format is PCM', () => {
-    it('should call combineRawAudio()', () => {
-      ctx.opts.format = 'pcm'
-      return combine(ctx).then(() => {
-        // We can't spy on combineRawAudio() directly, so look at its internals.
-        expect(fs.createFileSync).toHaveBeenCalled()
+    describe('and the service is AWS', () => {
+      it('should call combineRawAudio()', () => {
+        ctx.service = 'aws'
+        ctx.opts.format = 'pcm'
+        return combine(ctx).then(() => {
+          // We can't spy on combineRawAudio() directly, so look at its internals.
+          expect(fs.createFileSync).toHaveBeenCalled()
+        })
+      })
+    })
+
+    describe('and the service is GCP', () => {
+      it('should call combineRawAudio()', () => {
+        ctx.service = 'gcm'
+        ctx.opts.format = 'pcm'
+        return combine(ctx).then(() => {
+          // We can't spy on combineEncodedAudio() directly, so look at its internals.
+          expect(spawn).toHaveBeenCalled()
+          expect(spawn.calls.mostRecent().args[0]).toBe(ctx.opts.ffmpeg)
+        })
       })
     })
   })

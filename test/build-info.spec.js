@@ -2,14 +2,16 @@ describe('buildInfo()', () => {
   const task = {}
   const text = 'foobar'
   const format = 'mp3'
-  const func = function () {}
-  const opts = { format }
+  const instance = { foo: 1, bar: 2 }
+  const ctx = {
+    opts: { format }
+  }
 
   let buildInfo, output
 
   beforeEach(() => {
     ({ buildInfo } = require('./helpers').loadLib('generate-speech'))
-    output = buildInfo(text, func, task, opts)
+    output = buildInfo(text, { buildPart: () => instance }, task, ctx)
   })
 
   it('should return an object', () => {
@@ -17,7 +19,7 @@ describe('buildInfo()', () => {
   })
 
   it('should have an "opts" property with the original options', () => {
-    expect(output.opts).toEqual(opts)
+    expect(output.opts).toEqual(ctx.opts)
   })
 
   it('should have a "task" property', () => {
@@ -36,7 +38,8 @@ describe('buildInfo()', () => {
     expect(output.text).toBe(text)
   })
 
-  it('should have a "urlcreator" property', () => {
-    expect(output.urlcreator).toEqual(jasmine.any(Function))
+  it(`should add in the instance's properties`, () => {
+    expect(output.foo).toBe(instance.foo)
+    expect(output.bar).toBe(instance.bar)
   })
 })

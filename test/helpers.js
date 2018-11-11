@@ -15,9 +15,11 @@ exports.loadLib = (file) => {
     'readFileSync',
     'removeSync',
     'truncateSync',
+    'writeFile',
     'writeFileSync'
   ])
   fs.move.and.callFake((src, dest, opts, callback) => { callback() })
+  fs.writeFile.and.callFake((dest, data, opts, callback) => { callback() })
 
   // Stub out the got module with a spy.
   let got = jasmine.createSpyObj('got', ['stream'])
@@ -34,12 +36,12 @@ exports.loadLib = (file) => {
     })
   })
 
-  // Stub out the Polly SDK.
-  let PollyStub = jasmine.createSpy('Polly').and.returnValue({
-    getSynthesizeSpeechUrl: () => 'http://example.com'
-  })
-  let pollyStub = {
-    Presigner: PollyStub
+  // Stub out a provider.
+  let providerStub = {
+    create: () => ({
+      buildPart: () => ({}),
+      generate: (item, key, callback) => callback(null, null)
+    })
   }
 
   let spawnOnSpy = jasmine.createSpy('spawn.on').and.callFake((type, callback) => {
@@ -57,8 +59,9 @@ exports.loadLib = (file) => {
 
   // Load the library module.
   let lib = proxyquire(`../lib/${file}`, {
+    './providers/aws': providerStub,
+    './providers/gcp': providerStub,
     async: async,
-    'aws-sdk/clients/polly': pollyStub,
     child_process: { spawn }, // eslint-disable-line camelcase
     'fs-extra': fs,
     got: got
@@ -68,7 +71,7 @@ exports.loadLib = (file) => {
   lib.async = async
   lib.fs = fs
   lib.got = got
-  lib.Polly = PollyStub
+  lib.provider = providerStub
   lib.spawn = spawn
   lib.spawn.on = spawnOnSpy
   lib.spawn.stderr = { on: spawnStderrOn }
