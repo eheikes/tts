@@ -47,7 +47,7 @@ $ tts test.txt test.mp3 --ffmpeg C:\ffmpeg\ffmpeg.exe
 Specifies the audio format you want for the output file. Possible values:
 
 * `mp3` (default)
-* `ogg` -- [Vorbis](https://en.wikipedia.org/wiki/Vorbis) (AWS) or [Opus](https://en.wikipedia.org/wiki/Opus_(audio_format)) audio wrapped inside an Ogg container.
+* `ogg` -- [Vorbis](https://en.wikipedia.org/wiki/Vorbis) (AWS) or [Opus](https://en.wikipedia.org/wiki/Opus_(audio_format)) (GCP) audio wrapped inside an Ogg container.
 * `ogg_vorbis` -- Deprecated, use `ogg` instead.
 * `pcm` -- Audio in a linear PCM sequence  (signed 16-bit, 1 channel mono, little-endian format). Audio frequency depends on the `--sample-rate` option. AWS returns raw audio; GCP includes a WAV file header.
 
