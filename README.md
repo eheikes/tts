@@ -73,7 +73,7 @@ Audio options:
 * `--type TYPE` -- Type of input text (`text` or `ssml`) (default `text`)
 * `--voice VOICE` -- Voice to use for the speech (default `Joanna` for AWS).
 
-Note that not all services support all options. For example, AWS Polly does not understand the `speed` option.
+Note that not all services support all options. For example, AWS Polly does not understand the `speed` option. See the [options documentation](docs/options.md) for more info.
 
 ## What It Does
 
