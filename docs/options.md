@@ -1,5 +1,7 @@
 # Options Reference
 
+Options have a 2-hyphen prefix, e.g. `--format`. The value follows, either separated by a space or an equal sign -- `--format mp3` and `--format=mp3` are equally valid.
+
 ## `--access-key` / `--secret-key`
 
 **Supported: AWS**
@@ -65,6 +67,12 @@ Volume gain (in dB), from -96.0 to 16.0. A value of 0.0 will play at normal nati
 $ tts test.txt test.mp3 --service gcp --gain 6
 ```
 
+Note that negative gains must be specified using the equal-sign syntax, otherwise the value is interpreted as an option name:
+
+```
+$ tts test.txt test.mp3 --service gcp --gain=-12
+```
+
 ## `--gender`
 
 **Supported: GCP**
@@ -113,6 +121,12 @@ Changes the speaking pitch (in semitones), from -20.0 to 20.0.
 
 ```
 $ tts test.txt test.mp3 --service gcp --pitch 10
+```
+
+Note that negative pitch must be specified using the equal-sign syntax, otherwise the value is interpreted as an option name:
+
+```
+$ tts test.txt test.mp3 --service gcp --pitch=-10
 ```
 
 ## `--private-key` / `--private-key-file`
