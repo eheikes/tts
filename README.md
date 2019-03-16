@@ -6,7 +6,7 @@ Command-line tool to convert a text file of any size to speech using [AWS Polly]
 
 ## Requirements / Installation
 
-* [Node.js/npm](https://nodejs.org) v6+
+* [Node.js/npm](https://nodejs.org) v8+
 * [ffmpeg](https://ffmpeg.org/)
 * An Amazon Web Services (AWS) or Google Cloud Platform (GCP) account
 
@@ -85,7 +85,7 @@ Note that not all services support all options. For example, AWS Polly does not 
 
 ## Troubleshooting
 
-* Make sure Node.js is working. Running `node --version` on the command line should give a version of v6.0.0 or higher.
+* Make sure Node.js is working. Running `node --version` on the command line should give a version of v8.0.0 or higher.
 * Make sure ffmpeg is installed. Running `ffmpeg -version` on the command line should give you the version information.
 * Make sure you can connect to AWS or Google Cloud normally.
   * Going to https://polly.us-east-1.amazonaws.com/v1/speech (or whatever AWS region you're using) should give you a "Missing Authentication Token" message. You can use the [AWS CLI tool](https://aws.amazon.com/cli/) to check your configuration -- installing that and running `aws sts get-caller-identity` should return your user info.
