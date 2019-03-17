@@ -16,11 +16,13 @@ $ tts test.txt test.mp3 --access-key ABCDEFG --secret-key hwl500CZygitV91n
 
 **Supported: GCP**
 
-Adds an audio effect to the speech after synthesis. Can be specified multiple times -- effects are applied on top of each other in the order given.
+Adds an audio effect (also called an audio profile or a device profile) to the speech after synthesis. Can be specified multiple times -- effects are applied on top of each other in the order given.
 
 ```
-$ tts test.txt test.mp3 --service gcp --effect effect1 --effect effect2
+$ tts test.txt test.mp3 --service gcp --effect handset-class-device
 ```
+
+See the [GCP documentation](https://cloud.google.com/text-to-speech/docs/audio-profiles) for the available effects.
 
 ## `--email`
 
