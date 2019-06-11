@@ -1,0 +1,27 @@
+{
+  "name": "tts-lib",
+  "version": "1.0.0-pre",
+  "description": "Abstraction library for TTS services",
+  "keywords": [
+    "tts",
+    "amazon",
+    "google",
+    "polly",
+    "cloud",
+    "aws",
+    "text-to-speech"
+  ],
+  "author": "Eric Heikes <eheikes@gmail.com>",
+  "homepage": "https://github.com/eheikes/tts/tree/master/packages/tts-lib#readme",
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eheikes/tts.git"
+  },
+  "scripts": {
+  },
+  "bugs": {
+    "url": "https://github.com/eheikes/tts/issues"
+  }
+}
