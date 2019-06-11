@@ -1,0 +1,25 @@
+{
+  "name": "tts-app",
+  "version": "0.1.0",
+  "description": "Graphical text-to-speech app",
+  "keywords": [
+    "tts",
+    "text-to-speech",
+    "windows",
+    "mac",
+    "linux"
+  ],
+  "author": "Eric Heikes <eheikes@gmail.com>",
+  "homepage": "https://github.com/eheikes/tts/tree/master/packages/tts-app#readme",
+  "license": "Apache-2.0",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eheikes/tts.git"
+  },
+  "scripts": {
+  },
+  "bugs": {
+    "url": "https://github.com/eheikes/tts/issues"
+  }
+}
