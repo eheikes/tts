@@ -32,7 +32,7 @@
   "bugs": {
     "url": "https://github.com/eheikes/tts/issues"
   },
-  "homepage": "https://github.com/eheikes/tts#readme",
+  "homepage": "https://github.com/eheikes/tts/tree/master/packages/tts-cli#readme",
   "dependencies": {
     "@google-cloud/text-to-speech": "^0.5.1",
     "async": "^2.6.2",
