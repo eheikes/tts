@@ -1,23 +1,10 @@
 {
-  "name": "tts-cli",
-  "version": "1.7.1",
-  "description": "Command-line tool to convert text to speech",
-  "bin": {
-    "tts": "./tts.js"
-  },
-  "files": [
-    "lib/*",
-    "LICENSE.txt",
-    "tts.js",
-    "yarn.lock"
-  ],
-  "scripts": {
-    "lint": "standard --fix --verbose",
-    "test": "cross-env JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
-  },
+  "name": "tts-monorepo",
+  "private": true,
+  "description": "Monorepo for text-to-speech tools",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eheikes/tts-cli.git"
+    "url": "git+https://github.com/eheikes/tts.git"
   },
   "keywords": [
     "aws",
@@ -30,52 +17,23 @@
   "author": "Eric Heikes <eheikes@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/eheikes/tts-cli/issues"
+    "url": "https://github.com/eheikes/tts/issues"
   },
-  "homepage": "https://github.com/eheikes/tts-cli#readme",
+  "homepage": "https://github.com/eheikes/tts#readme",
+  "scripts": {
+    "lint": "lerna run lint",
+    "postinstall": "lerna bootstrap",
+    "test": "lerna run test"
+  },
   "devDependencies": {
     "cross-env": "^5.2.0",
     "jasmine": "^2.9.0",
+    "lerna": "^3.14.1",
     "nyc": "^14.1.0",
     "proxyquire": "^1.8.0",
     "standard": "^12.0.1"
   },
   "dependencies": {
-    "@google-cloud/text-to-speech": "^0.5.1",
-    "async": "^2.6.2",
-    "aws-sdk": "^2.349.0",
-    "debug": "^3.1.0",
-    "fs-extra": "^2.0.0",
-    "got": "^6.7.1",
-    "listr": "^0.14.1",
-    "minimist": "^1.2.0",
-    "sax": "^1.2.4",
-    "tempfile": "^1.1.1",
-    "textchunk": "^1.1.0"
-  },
-  "standard": {
-    "env": {
-      "jasmine": true,
-      "node": true
-    }
-  },
-  "nyc": {
-    "check-coverage": true,
-    "per-file": false,
-    "lines": 95,
-    "statements": 95,
-    "functions": 95,
-    "branches": 95,
-    "include": [
-      "lib/**/*.js",
-      "*.js"
-    ],
-    "reporter": [
-      "lcov",
-      "text-summary"
-    ],
-    "cache": false,
-    "all": false,
-    "report-dir": "./coverage"
+    "tts-cli": "file:packages/tts-cli"
   }
 }

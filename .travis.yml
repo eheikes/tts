@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "node"
+  # The grpc module doesn't work in v12 yet
   - "11"
   - "10"
   - "8"
