@@ -1,6 +1,6 @@
 {
   "name": "tts-lib",
-  "version": "1.0.0-pre",
+  "version": "1.0.0-pre.0",
   "description": "Abstraction library for TTS services",
   "keywords": [
     "tts",
@@ -19,8 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/eheikes/tts.git"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "bugs": {
     "url": "https://github.com/eheikes/tts/issues"
   }

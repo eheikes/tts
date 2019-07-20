@@ -1,6 +1,6 @@
 {
   "name": "tts-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Graphical text-to-speech app",
   "keywords": [
     "tts",
@@ -17,8 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/eheikes/tts.git"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "bugs": {
     "url": "https://github.com/eheikes/tts/issues"
   }
