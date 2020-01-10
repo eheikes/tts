@@ -18,6 +18,7 @@ Options:
   --effect ID              Apply an audio effect profile. Can be specified multiple times.
   --email EMAIL            GCP client email address (required if "private-key" or
                              "private-key-file" is used)
+  --engine ENGINE          AWS voice engine
   --ffmpeg BINARY          Path to the ffmpeg binary (defaults to the one in PATH)
   --format FORMAT          Target audio format ("mp3", "ogg", or "pcm") (default "mp3")
   --gain GAIN              Volume gain, where 0.0 is normal gain

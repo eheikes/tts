@@ -52,6 +52,7 @@ describe('AWS provider', () => {
         filename: tempfile(),
         index: 6,
         opts: {
+          engine: 'neural',
           format: 'ogg',
           language: 'en-US',
           lexicon: ['lexicon1', 'lexicon2'],
@@ -106,6 +107,14 @@ describe('AWS provider', () => {
       provider.generate(info, 0, () => {
         let opts = urlCreator.calls.mostRecent().args[0]
         expect(opts.OutputFormat).toBe('pcm')
+        done()
+      })
+    })
+
+    it('should use the given voice engine', done => {
+      provider.generate(info, 0, () => {
+        let opts = urlCreator.calls.mostRecent().args[0]
+        expect(opts.Engine).toBe('neural')
         done()
       })
     })

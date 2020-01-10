@@ -67,6 +67,7 @@ exports.generateSpeech = (ctx, task) => {
     accessKey: ctx.args['access-key'],
     effect: ctx.args.effect,
     email: ctx.args.email,
+    engine: ctx.args.engine,
     ffmpeg: ctx.args.ffmpeg || 'ffmpeg',
     format: ctx.args.format || 'mp3',
     gain: ctx.args.gain ? parseFloat(ctx.args.gain) : undefined,

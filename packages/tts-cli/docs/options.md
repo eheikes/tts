@@ -34,6 +34,18 @@ Specifies the email address used to identify the account. This is the same as th
 $ tts test.txt test.mp3 --service gcp --email starting-account-kjd6bvn58@alert-vista-12345.iam.gserviceaccount.com --private-key-file .\key.pem
 ```
 
+## `--engine`
+
+**Supported: AWS**
+
+Specifies the voice engine to use for generating the speech.
+
+```
+$ tts test.txt test.mp3 --engine neural
+```
+
+See the [AWS documentation](https://docs.aws.amazon.com/polly/latest/dg/NTTS-main.html) for the available engines.
+
 ## `--ffmpeg`
 
 **Supported: AWS, GCP**
