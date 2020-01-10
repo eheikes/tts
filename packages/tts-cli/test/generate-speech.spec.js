@@ -10,6 +10,7 @@ describe('generateSpeech()', () => {
         'access-key': 'access key',
         email: 'foo@example.com',
         effect: 'effect',
+        engine: 'neural',
         ffmpeg: 'ffmpeg',
         format: 'mp3',
         gain: '1.2',
@@ -39,6 +40,7 @@ describe('generateSpeech()', () => {
       expect(ctx.opts.accessKey).toBe(ctx.args['access-key'])
       expect(ctx.opts.effect).toEqual([ctx.args.effect])
       expect(ctx.opts.email).toBe(ctx.args.email)
+      expect(ctx.opts.engine).toBe(ctx.args.engine)
       expect(ctx.opts.ffmpeg).toBe(ctx.args.ffmpeg)
       expect(ctx.opts.format).toBe(ctx.args.format)
       expect(ctx.opts.gain).toBe(Number(ctx.args.gain))
@@ -65,6 +67,7 @@ describe('generateSpeech()', () => {
     return generateSpeech(ctx, task).then(() => {
       expect(ctx.opts.accessKey).toBeUndefined()
       expect(ctx.opts.effect).toBeUndefined()
+      expect(ctx.opts.engine).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
       expect(ctx.opts.gain).toBeUndefined()
@@ -88,6 +91,7 @@ describe('generateSpeech()', () => {
     return generateSpeech(ctx, task).then(() => {
       expect(ctx.opts.effect).toBeUndefined()
       expect(ctx.opts.email).toBeUndefined()
+      expect(ctx.opts.engine).toBeUndefined()
       expect(ctx.opts.ffmpeg).toBe('ffmpeg')
       expect(ctx.opts.format).toBe('mp3')
       expect(ctx.opts.gain).toBeUndefined()
