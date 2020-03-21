@@ -9,6 +9,19 @@ These tools require an account with at least one of these (paid) services:
 * [Amazon Web Services](https://aws.amazon.com) for [AWS Polly](https://aws.amazon.com/polly/)
 * [Google Cloud Platform](https://cloud.google.com) for [GCP Text-to-Speech](https://cloud.google.com/text-to-speech/)
 
+<a href="https://img.shields.io/snyk/vulnerabilities/npm/tts-cli" alt="Vulnerabilities">
+  <img src="https://img.shields.io/snyk/vulnerabilities/npm/tts-cli" />
+</a>
+<a href="https://img.shields.io/travis/eheikes/tts" alt="Build Status">
+  <img src="https://img.shields.io/travis/eheikes/tts" />
+</a>
+<a href="https://img.shields.io/david/eheikes/tts" alt="Dependencies">
+  <img src="https://img.shields.io/david/eheikes/tts" />
+</a>
+<a href="https://img.shields.io/github/license/eheikes/tts" alt="License">
+  <img src="https://img.shields.io/github/license/eheikes/tts" />
+</a>
+        
 ## Contributing
 
 Pull requests and suggestions are welcome. [Create a new issue](https://github.com/eheikes/tts/issues/new) to report a bug or suggest a new feature.
