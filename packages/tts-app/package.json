@@ -20,5 +20,8 @@
   "scripts": {},
   "bugs": {
     "url": "https://github.com/eheikes/tts/issues"
+  },
+  "devDependencies": {
+    "codecov": "^3.6.5"
   }
 }

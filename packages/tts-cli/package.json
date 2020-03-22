@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "lint": "standard --fix --verbose",
+    "report-coverage": "codecov",
     "test": "cross-env JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
   },
   "repository": {
@@ -45,6 +46,9 @@
     "sax": "^1.2.4",
     "tempfile": "^1.1.1",
     "textchunk": "^1.1.0"
+  },
+  "devDependencies": {
+    "codecov": "^3.6.5"
   },
   "standard": {
     "env": {

@@ -23,6 +23,7 @@
   "scripts": {
     "lint": "lerna run lint",
     "postinstall": "lerna bootstrap",
+    "report-coverage": "lerna run report-coverage",
     "test": "lerna run test"
   },
   "devDependencies": {
