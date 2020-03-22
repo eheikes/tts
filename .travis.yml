@@ -4,4 +4,5 @@ node_js:
   - "11"
   - "10"
   - "8"
+install: lerna bootstrap
 script: yarn lint && yarn test && yarn report-coverage
