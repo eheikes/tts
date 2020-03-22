@@ -1,6 +1,9 @@
 {
   "name": "tts-monorepo",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "description": "Monorepo for text-to-speech tools",
   "repository": {
     "type": "git",
