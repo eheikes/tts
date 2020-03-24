@@ -18,6 +18,9 @@ These tools require an account with at least one of these (paid) services:
 <a href="https://img.shields.io/david/eheikes/tts" alt="Dependencies">
   <img src="https://img.shields.io/david/eheikes/tts" />
 </a>
+<a href="https://codecov.io/gh/eheikes/tts">
+  <img src="https://img.shields.io/codecov/c/gh/eheikes/tts?token=9bd5731ce1a34766bdf3d780a648fa05" alt="Coverage" />
+</a>
 <a href="https://img.shields.io/github/license/eheikes/tts" alt="License">
   <img src="https://img.shields.io/github/license/eheikes/tts" />
 </a>
