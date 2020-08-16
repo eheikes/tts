@@ -19,3 +19,10 @@ These tools require an account with at least one of these (paid) services:
 
 Pull requests and suggestions are welcome. [Create a new issue](https://github.com/eheikes/tts/issues/new) to report a bug or suggest a new feature.
 
+Development commands:
+
+```
+npx lerna bootstrap   # download the project dependencies
+lerna run lint        # lint code
+lerna run test        # run tests
+```
