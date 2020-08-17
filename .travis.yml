@@ -1,7 +1,7 @@
 language: node_js
 node_js:
+  - "14"
   - "12"
   - "10"
-  - "8"
 install: npx lerna bootstrap
 script: yarn lint && yarn test && yarn report-coverage
