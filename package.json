@@ -31,12 +31,16 @@
   "devDependencies": {
     "cross-env": "^5.2.0",
     "jasmine": "^2.9.0",
-    "lerna": "^3.14.1",
+    "lerna": "^3.22.1",
     "nyc": "^14.1.0",
     "proxyquire": "^1.8.0",
     "standard": "^12.0.1"
   },
   "dependencies": {
     "tts-cli": "file:packages/tts-cli"
+  },
+  "resolutions": {
+    "**/dot-prop": "^5.1.1",
+    "**/kind-of": "^6.0.3"
   }
 }
