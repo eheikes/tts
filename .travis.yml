@@ -1,7 +1,6 @@
 language: node_js
 node_js:
-  # The grpc module doesn't work in v14 yet
-  - "13"
+  - "14"
   - "12"
   - "10"
 install: npx lerna bootstrap
