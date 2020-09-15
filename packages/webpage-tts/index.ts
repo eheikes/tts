@@ -179,7 +179,17 @@ const doAction = async (action: Command) => {
 }
 
 ;(async () => {
-  const args = minimist(process.argv.slice(2))
+  const cliOpts = {
+    boolean: ['debug', 'headless'],
+    default: {
+      debug: false,
+      delay: 0,
+      headless: true,
+      height: 1000,
+      width: 2000
+    }
+  }
+  const args = minimist(process.argv.slice(2), cliOpts)
 
   const commandsFile = args._[0]
   if (!commandsFile) {
@@ -195,16 +205,18 @@ const doAction = async (action: Command) => {
   const actions = safeLoad(input) as Command[]
 
   const browser = await puppeteer.launch({
-    // headless: false,
-    // devtools: true,
-    // slowMo: 250
+    headless: args.headless,
+    devtools: args.debug,
+    slowMo: args.delay
   })
   page = await browser.newPage()
-  page.on('console', msg => console.log('PAGE LOG:', msg.text()))
+  if (args.debug) {
+    page.on('console', msg => console.log('PAGE LOG:', msg.text()))
+  }
   await page.setViewport({
-    width: 2000,
-    height: 1000
-  });
+    width: args.width,
+    height: args.height
+  })
 
   for (const action of actions) {
     await doAction(action)
@@ -218,12 +230,17 @@ const doAction = async (action: Command) => {
 
   console.log('Converting text to audio...')
   const audioFilename = tempy.file()
-  await execa('node', [
+  let ttsArgs = [
     'node_modules/.bin/tts',
     textFilename,
-    audioFilename,
-    '--engine', 'neural'
-  ], {
+    audioFilename
+  ]
+  for (const name in args) {
+    if (name === '_' || Object.keys(cliOpts.default).includes(name)) { continue }
+    ttsArgs.push(`--${name}`, args[name])
+  }
+  console.log(`  Running 'node ${ttsArgs.join(' ')}'`)
+  await execa('node', ttsArgs, {
     stdout: 'inherit',
     stderr: 'inherit'
   })
