@@ -17,7 +17,9 @@
   "bugs": {
     "url": "https://github.com/eheikes/tts/issues"
   },
-  "files": [],
+  "files": [
+    "dist/index.js"
+  ],
   "dependencies": {
     "execa": "^4.0.3",
     "js-yaml": "^3.14.0",
