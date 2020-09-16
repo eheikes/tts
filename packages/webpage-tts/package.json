@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "description": "Convert webpages to audio file",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc"
+  },
   "author": "Eric Heikes <eheikes@gmail.com>",
   "license": "Apache-2.0",
   "keywords": [],
