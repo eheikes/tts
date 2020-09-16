@@ -148,6 +148,11 @@ const doAction = async (action: Command) => {
         'table',
         'ul',
       ].map(name => name.toUpperCase())
+      const codeElements = [
+        'noscript',
+        'script',
+        'style'
+      ].map(name => name.toUpperCase())
       const inlineBreaks = [
         'br'
       ].map(name => name.toUpperCase())
@@ -156,7 +161,7 @@ const doAction = async (action: Command) => {
         for (let child of Array.from(node.childNodes)) {
           if (child.nodeType === 3) { // text node
             str += child.textContent
-          } else if (child.nodeType === 1) { // element node
+          } else if (child.nodeType === 1 && !codeElements.includes(child.nodeName)) { // element node
             if (blockElements.includes(child.nodeName)) {
               str += `\n${domToString(child)}.\n`
             } else {
