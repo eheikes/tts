@@ -228,7 +228,6 @@ const doAction = async (action: Command) => {
   }
 
   await browser.close()
-  console.log('Contents:', sourceText)
 
   const textFilename = tempy.file()
   await writeFile(textFilename, sourceText, 'utf8')
