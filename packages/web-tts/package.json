@@ -1,5 +1,5 @@
 {
-  "name": "webpage-tts",
+  "name": "web-tts",
   "version": "0.1.0",
   "description": "Convert webpages to audio file",
   "main": "index.js",
