@@ -1,8 +1,9 @@
 # Text-To-Speech Tools
 
-This monorepository includes tools to convert a text file of any size to speech:
+This monorepository includes tools to convert text of any size to speech:
 
-* [Command-line interface (CLI) tool](packages/tts-cli)
+* [Command-line interface (CLI) tool](packages/tts-cli) to convert text to speech
+* [Web TTS CLI tool](packages/web-tts) to convert webpages to speech
 
 These tools require an account with at least one of these (paid) services:
 
