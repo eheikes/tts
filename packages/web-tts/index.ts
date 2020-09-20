@@ -59,7 +59,10 @@ const doAction = async (action: Command) => {
     await page.click(opts.selector)
   } else if (action.command === 'each') {
     let opts = action as CommandEach
-    for (const item of Array.from(vars[opts.from])) {
+    const iterable = typeof vars[opts.from] === 'string'
+      ? [vars[opts.from] as string]
+      : Array.from(vars[opts.from])
+    for (const item of iterable) {
       const replaceThis = (str: string): string  => {
         return str.replace(/{{this}}/g, item)
       }
@@ -82,6 +85,15 @@ const doAction = async (action: Command) => {
     }, opts.selector, opts.property)
     console.log(`  ${results.length} matches found. Storing into "${opts.saveAs}".`)
     vars[opts.saveAs] = results
+  } else if (action.command === 'getOne') {
+    let opts = action as CommandGet
+    console.log(`Getting selector matching "${opts.selector}...`)
+    const result = await page.evaluate((selector, prop) => {
+      const el = document.querySelector(selector)
+      return el && String(el[prop])
+    }, opts.selector, opts.property)
+    console.log(`  ${result ? '1' : 'No'} match found. Storing into "${opts.saveAs}".`)
+    vars[opts.saveAs] = result
   } else if (action.command === 'go') {
     let opts = action as CommandGo
     console.log(`Loading URL ${opts.url}...`)
