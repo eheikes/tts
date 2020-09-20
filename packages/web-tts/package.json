@@ -1,19 +1,28 @@
 {
   "name": "web-tts",
   "version": "0.1.0",
-  "description": "Convert webpages to audio file",
-  "main": "index.js",
+  "description": "Convert webpages to audio speech",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc"
   },
   "author": "Eric Heikes <eheikes@gmail.com>",
   "license": "Apache-2.0",
-  "keywords": [],
+  "keywords": [
+    "audio",
+    "text",
+    "speech",
+    "tts",
+    "scrape",
+    "web",
+    "webpage",
+    "website"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eheikes/tts.git"
   },
-  "homepage": "https://github.com/eheikes/tts#readme",
+  "homepage": "https://github.com/eheikes/tts/tree/master/packages/web-tts#readme",
   "bugs": {
     "url": "https://github.com/eheikes/tts/issues"
   },
