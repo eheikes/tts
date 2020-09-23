@@ -41,6 +41,7 @@
   },
   "resolutions": {
     "**/dot-prop": "^5.1.1",
-    "**/kind-of": "^6.0.3"
+    "**/kind-of": "^6.0.3",
+    "**/node-forge": "^0.10.0"
   }
 }
