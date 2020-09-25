@@ -3,6 +3,9 @@
   "version": "0.1.1",
   "description": "Convert webpages to audio speech",
   "main": "dist/index.js",
+  "bin": {
+    "web-tts": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc"
   },
