@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import execa = require('execa')
 import { promises as fs } from 'fs'
 import { safeLoad } from 'js-yaml'

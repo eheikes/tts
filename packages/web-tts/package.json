@@ -4,10 +4,10 @@
   "description": "Convert webpages to audio speech",
   "main": "dist/index.js",
   "bin": {
-    "web-tts": "node ./dist/index.js"
+    "web-tts": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc && chmod a+x dist/index.js"
   },
   "author": "Eric Heikes <eheikes@gmail.com>",
   "license": "Apache-2.0",
