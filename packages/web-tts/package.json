@@ -4,7 +4,7 @@
   "description": "Convert webpages to audio speech",
   "main": "dist/index.js",
   "bin": {
-    "web-tts": "./dist/index.js"
+    "web-tts": "node ./dist/index.js"
   },
   "scripts": {
     "build": "tsc"
