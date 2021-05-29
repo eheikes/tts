@@ -14,16 +14,38 @@
   "author": "Eric Heikes <eheikes@gmail.com>",
   "homepage": "https://github.com/eheikes/tts/tree/master/packages/tts-lib#readme",
   "license": "Apache-2.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eheikes/tts.git"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "tsc",
+    "test": "run-s test:*",
+    "test:acceptance": "jest test/acceptance",
+    "test:acceptance:watch": "jest --watch test/acceptance",
+    "test:integration": "jest test/integration",
+    "test:integration:watch": "jest --watch test/integration",
+    "test:unit": "jest test/unit",
+    "test:unit:watch": "jest --watch test/unit"
+  },
   "bugs": {
     "url": "https://github.com/eheikes/tts/issues"
   },
   "devDependencies": {
-    "codecov": "^3.6.5"
+    "@types/async": "^3.2.6",
+    "@types/debug": "^4.1.5",
+    "@types/fs-extra": "^9.0.11",
+    "@types/jest": "^26.0.23",
+    "@types/sax": "^1.2.1",
+    "codecov": "^3.6.5",
+    "jest": "^27.0.1",
+    "ts-jest": "^27.0.1",
+    "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "debug": "^4.3.1",
+    "tempy": "^1.0.1"
   }
 }
