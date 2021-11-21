@@ -40,8 +40,9 @@
     "tts-cli": "file:packages/tts-cli"
   },
   "resolutions": {
-    "**/dot-prop": "^5.1.1",
-    "**/kind-of": "^6.0.3",
-    "**/node-forge": "^0.10.0"
+    "**/@grpc/grpc-js": ">=1.1.8",
+    "**/dot-prop": ">=5.1.1",
+    "**/kind-of": ">=6.0.3",
+    "**/node-forge": ">=0.10.0"
   }
 }
