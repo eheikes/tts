@@ -25,4 +25,5 @@ jobs:
         run: npx lerna bootstrap
       - run: yarn lint
       - run: yarn test
-      - run: yarn report-coverage
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v2
