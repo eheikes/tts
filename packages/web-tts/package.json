@@ -1,6 +1,6 @@
 {
   "name": "web-tts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Convert webpages to audio speech",
   "main": "dist/index.js",
   "bin": {
@@ -38,7 +38,7 @@
     "minimist": "^1.2.5",
     "puppeteer": "^5.2.1",
     "tempy": "^0.6.0",
-    "tts-cli": "^3.0.0"
+    "tts-cli": "^3.0.1"
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.5",
