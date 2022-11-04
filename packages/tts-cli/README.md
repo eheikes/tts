@@ -6,7 +6,7 @@ Command-line tool to convert a text file of any size to speech using [AWS Polly]
 
 ## Requirements / Installation
 
-* [Node.js/npm](https://nodejs.org) v12+
+* [Node.js/npm](https://nodejs.org) v14+
 * [ffmpeg](https://ffmpeg.org/)
 * An Amazon Web Services (AWS) or Google Cloud Platform (GCP) account
 
