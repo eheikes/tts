@@ -37,7 +37,7 @@
   "dependencies": {
     "@google-cloud/text-to-speech": "^3.4.0",
     "async": "^3.0.0",
-    "aws-sdk": "^2.600.0",
+    "aws-sdk": "^2.1360.0",
     "debug": "^3.1.0",
     "fs-extra": "^2.0.0",
     "got": "^6.7.1",
