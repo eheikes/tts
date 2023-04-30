@@ -1,6 +1,6 @@
 {
   "name": "tts-cli",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "Command-line tool to convert text to speech",
   "bin": {
     "tts": "./tts.js"
