@@ -3,6 +3,9 @@ const fs = require('fs-extra')
 const got = require('got')
 const Polly = require('aws-sdk/clients/polly').Presigner
 
+// Ignore v2 deprecation warnings for now.
+require('aws-sdk/lib/maintenance_mode_message').suppress = true
+
 const PollyProvider = function (opts) {
   this.instance = new Polly({
     apiVersion: '2016-06-10',
