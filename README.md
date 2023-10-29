@@ -22,7 +22,7 @@ Pull requests and suggestions are welcome. [Create a new issue](https://github.c
 Development commands:
 
 ```
-npx lerna bootstrap   # download the project dependencies
-lerna run lint        # lint code
-lerna run test        # run tests
+npm install      # download the project dependencies
+npm run lint     # lint code
+npm run test     # run tests
 ```
