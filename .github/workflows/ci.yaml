@@ -22,8 +22,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: npx lerna@6 bootstrap
-      - run: yarn lint
-      - run: yarn test
+        run: npm install
+      - run: npm run lint
+      - run: npm run test
       - name: Upload coverage report
         uses: codecov/codecov-action@v2

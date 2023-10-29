@@ -24,14 +24,13 @@
   },
   "homepage": "https://github.com/eheikes/tts#readme",
   "scripts": {
-    "lint": "lerna run lint",
-    "report-coverage": "lerna run report-coverage",
-    "test": "lerna run test"
+    "lint": "npm run lint --workspaces --if-present",
+    "report-coverage": "npm run report-coverage --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
     "jasmine": "^2.9.0",
-    "lerna": "^6.0.2",
     "nyc": "^14.1.0",
     "proxyquire": "^1.8.0",
     "standard": "^12.0.1"
