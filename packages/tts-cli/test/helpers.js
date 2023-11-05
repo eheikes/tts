@@ -1,6 +1,6 @@
 const async = require('async')
+const originalFs = require('fs')
 const proxyquire = require('proxyquire')
-const { Readable } = require('stream')
 
 exports.loadLib = (file) => {
   // Spy on the async module.
@@ -10,6 +10,7 @@ exports.loadLib = (file) => {
   let fs = jasmine.createSpyObj('fs', [
     'appendFileSync',
     'createFileSync',
+    'createWriteStream',
     'move',
     'readFile',
     'readFileSync',
@@ -18,23 +19,12 @@ exports.loadLib = (file) => {
     'writeFile',
     'writeFileSync'
   ])
+  fs.createWriteStream.and.callFake(filename => {
+    const stream = originalFs.createWriteStream(filename)
+    return stream
+  })
   fs.move.and.callFake((src, dest, opts, callback) => { callback() })
   fs.writeFile.and.callFake((dest, data, opts, callback) => { callback() })
-
-  // Stub out the got module with a spy.
-  let got = jasmine.createSpyObj('got', ['stream'])
-  got.stream.and.callFake(url => {
-    return new Readable({
-      read () {
-        if (this.alreadySent) {
-          this.push(null)
-        } else {
-          this.push('test')
-          this.alreadySent = true
-        }
-      }
-    })
-  })
 
   // Stub out a provider.
   let providerStub = {
@@ -63,14 +53,12 @@ exports.loadLib = (file) => {
     './providers/gcp': providerStub,
     async: async,
     child_process: { spawn }, // eslint-disable-line camelcase
-    'fs-extra': fs,
-    got: got
+    'fs-extra': fs
   })
 
   // Add the spies for inspection.
   lib.async = async
   lib.fs = fs
-  lib.got = got
   lib.provider = providerStub
   lib.spawn = spawn
   lib.spawn.on = spawnOnSpy
