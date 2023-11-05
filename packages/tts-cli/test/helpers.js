@@ -1,4 +1,5 @@
 const async = require('async')
+const originalFs = require('fs')
 const proxyquire = require('proxyquire')
 
 exports.loadLib = (file) => {
@@ -9,6 +10,7 @@ exports.loadLib = (file) => {
   let fs = jasmine.createSpyObj('fs', [
     'appendFileSync',
     'createFileSync',
+    'createWriteStream',
     'move',
     'readFile',
     'readFileSync',
@@ -17,6 +19,10 @@ exports.loadLib = (file) => {
     'writeFile',
     'writeFileSync'
   ])
+  fs.createWriteStream.and.callFake(filename => {
+    const stream = originalFs.createWriteStream(filename)
+    return stream
+  })
   fs.move.and.callFake((src, dest, opts, callback) => { callback() })
   fs.writeFile.and.callFake((dest, data, opts, callback) => { callback() })
 

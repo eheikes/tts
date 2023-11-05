@@ -5,11 +5,12 @@ const tempfile = require('tempfile')
 
 describe('AWS provider', () => {
   let create
+  let fsStub
   let PollyProvider
   let provider
 
   beforeEach(() => {
-    ({ create, PollyProvider } = require('../helpers').loadLib('providers/aws'))
+    ({ create, fs: fsStub, PollyProvider } = require('../helpers').loadLib('providers/aws'))
     provider = create({
       region: 'aws-west-1',
       accessKey: 'ACCESS KEY',
@@ -84,7 +85,10 @@ describe('AWS provider', () => {
     })
 
     afterEach(done => {
-      fs.unlink(testData.filename, done)
+      fs.access(testData.filename, fs.constants.F_OK, err => {
+        if (err) { return done() }
+        fs.unlink(testData.filename, done)
+      })
     })
 
     it('should update the task title', done => {
@@ -208,6 +212,28 @@ describe('AWS provider', () => {
       provider.generate(info, 0, () => {
         const contents = fs.readFileSync(testData.filename, 'utf-8')
         expect(contents).toBe('testing')
+        done()
+      })
+    })
+
+    it('should callback with an error if send() fails', done => {
+      info.send = jasmine.createSpy('send').and.rejectWith(new Error('test error'))
+      provider.generate(info, 0, err => {
+        expect(err).toEqual(new Error('test error'))
+        done()
+      })
+    })
+
+    it('should callback with an error if file saving fails', done => {
+      fsStub.createWriteStream.and.callFake(filename => {
+        const stream = fs.createWriteStream(filename)
+        stream.on('pipe', () => {
+          stream.emit('error', new Error('write stream error'))
+        })
+        return stream
+      })
+      provider.generate(info, 0, err => {
+        expect(err).toEqual(new Error('write stream error'))
         done()
       })
     })
