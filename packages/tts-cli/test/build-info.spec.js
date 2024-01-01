@@ -38,7 +38,7 @@ describe('buildInfo()', () => {
     expect(output.text).toBe(text)
   })
 
-  it(`should add in the instance's properties`, () => {
+  it('should add in the instance\'s properties', () => {
     expect(output.foo).toBe(instance.foo)
     expect(output.bar).toBe(instance.bar)
   })

@@ -12,7 +12,7 @@
     "yarn.lock"
   ],
   "scripts": {
-    "lint": "standard --fix --verbose",
+    "lint": "standard --env jasmine --fix --verbose",
     "report-coverage": "codecov",
     "test": "cross-env JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
   },
@@ -52,7 +52,6 @@
   },
   "standard": {
     "env": {
-      "jasmine": true,
       "node": true
     }
   },

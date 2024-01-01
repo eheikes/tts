@@ -18,7 +18,7 @@ describe('generateAll()', () => {
 
   it('should asynchronously call the function for each of the parts', done => {
     generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(() => {
-      let [parts] = async.eachOfLimit.calls.mostRecent().args
+      const [parts] = async.eachOfLimit.calls.mostRecent().args
       expect(parts).toEqual(textParts)
       expect(parts.length).toBe(textParts.length)
       expect(iteratorFunction.calls.count()).toBe(textParts.length)
@@ -27,7 +27,7 @@ describe('generateAll()', () => {
 
   it('should limit the async calls according to the option', done => {
     generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(() => {
-      let [, limit] = async.eachOfLimit.calls.mostRecent().args
+      const [, limit] = async.eachOfLimit.calls.mostRecent().args
       expect(limit).toBe(testLimit)
     }).then(done)
   })

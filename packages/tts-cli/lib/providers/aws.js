@@ -26,7 +26,7 @@ PollyProvider.prototype.buildPart = function () {
 PollyProvider.prototype.generate = (info, i, callback) => {
   info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
 
-  let command = new SynthesizeSpeechCommand({
+  const command = new SynthesizeSpeechCommand({
     Engine: info.opts.engine,
     LanguageCode: info.opts.language,
     LexiconNames: info.opts.lexicon,

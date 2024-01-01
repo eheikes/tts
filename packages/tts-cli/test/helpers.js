@@ -7,7 +7,7 @@ exports.loadLib = (file) => {
   spyOn(async, 'eachOfLimit').and.callThrough()
 
   // Stub out the fs(-extra) module with spies.
-  let fs = jasmine.createSpyObj('fs', [
+  const fs = jasmine.createSpyObj('fs', [
     'appendFileSync',
     'createFileSync',
     'createWriteStream',
@@ -27,18 +27,18 @@ exports.loadLib = (file) => {
   fs.writeFile.and.callFake((dest, data, opts, callback) => { callback() })
 
   // Stub out a provider.
-  let providerStub = {
+  const providerStub = {
     create: () => ({
       buildPart: () => ({}),
       generate: (item, key, callback) => callback(null, null)
     })
   }
 
-  let spawnOnSpy = jasmine.createSpy('spawn.on').and.callFake((type, callback) => {
+  const spawnOnSpy = jasmine.createSpy('spawn.on').and.callFake((type, callback) => {
     if (type === 'close') { callback() }
   })
-  let spawnStderrOn = jasmine.createSpy('spawn.stderr.on')
-  let spawn = jasmine.createSpy('spawn').and.callFake(() => {
+  const spawnStderrOn = jasmine.createSpy('spawn.stderr.on')
+  const spawn = jasmine.createSpy('spawn').and.callFake(() => {
     return {
       on: spawnOnSpy,
       stderr: {
@@ -48,10 +48,10 @@ exports.loadLib = (file) => {
   })
 
   // Load the library module.
-  let lib = proxyquire(`../lib/${file}`, {
+  const lib = proxyquire(`../lib/${file}`, {
     './providers/aws': providerStub,
     './providers/gcp': providerStub,
-    async: async,
+    async,
     child_process: { spawn }, // eslint-disable-line camelcase
     'fs-extra': fs
   })

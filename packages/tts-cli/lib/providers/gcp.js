@@ -6,10 +6,12 @@ const GoogleClient = require('@google-cloud/text-to-speech').TextToSpeechClient
 const GoogleProvider = function (opts) {
   try {
     this.instance = new GoogleClient({
-      credentials: opts.email || opts.privateKey ? {
-        client_email: opts.email,
-        private_key: opts.privateKey
-      } : undefined,
+      credentials: opts.email || opts.privateKey
+        ? {
+            client_email: opts.email,
+            private_key: opts.privateKey
+          }
+        : undefined,
       keyFilename: opts.projectFile ? path.resolve(opts.projectFile) : undefined,
       projectId: opts.projectId
     })
@@ -43,7 +45,8 @@ GoogleProvider.prototype.generate = (info, i, callback) => {
       name: info.opts.voice
     },
     audioConfig: {
-      audioEncoding: info.opts.format === 'pcm' ? 'LINEAR16'
+      audioEncoding: info.opts.format === 'pcm'
+        ? 'LINEAR16'
         : info.opts.format === 'ogg' ? 'OGG_OPUS' : 'MP3',
       effectsProfileId: info.opts.effect,
       pitch: info.opts.pitch,
@@ -78,6 +81,6 @@ GoogleProvider.prototype.generate = (info, i, callback) => {
  * Create a Google Cloud TTS instance.
  */
 exports.create = opts => {
-  debug('create')(`Creating Google Cloud TTS instance`)
+  debug('create')('Creating Google Cloud TTS instance')
   return new GoogleProvider(opts)
 }
