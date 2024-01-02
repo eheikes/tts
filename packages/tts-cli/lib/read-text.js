@@ -23,7 +23,7 @@ exports.readText = (ctx) => {
       let data = ''
       proc.stdin.setEncoding('utf8')
       proc.stdin.on('readable', () => {
-        let chunk = proc.stdin.read()
+        const chunk = proc.stdin.read()
         /* istanbul ignore else: need to add test for this */
         if (chunk !== null) { data += chunk }
       })

@@ -11,9 +11,9 @@ const { sanitizeOpts } = require('./sanitize-opts')
 exports.buildInfo = (text, instance, task, ctx) => {
   return Object.assign({
     opts: ctx.opts,
-    task: task,
+    task,
     tempfile: tempfile(`.${extensionFor(ctx.opts.format, ctx.service)}`),
-    text: text
+    text
   }, instance.buildPart(text, task, ctx.opts))
 }
 
@@ -22,9 +22,9 @@ exports.buildInfo = (text, instance, task, ctx) => {
  * Returns the text filename.
  */
 exports.createManifest = parts => {
-  let txtFile = tempfile('.txt')
+  const txtFile = tempfile('.txt')
   debug('createManifest')(`Creating ${txtFile} for manifest`)
-  let contents = parts.map(info => {
+  const contents = parts.map(info => {
     return `file '${info.tempfile}'`
   }).join('\n')
   debug('createManifest')(`Writing manifest contents:\n${contents}`)
@@ -36,7 +36,7 @@ exports.createManifest = parts => {
  * Calls the API for each text part (throttled). Returns a Promise.
  */
 exports.generateAll = (parts, opts, func, task) => {
-  let count = parts.length
+  const count = parts.length
   task.title = `Convert to audio (0/${count})`
   return (new Promise((resolve, reject) => {
     debug('generateAll')(`Requesting ${count} audio segments, ${opts.limit} at a time`)
@@ -106,7 +106,7 @@ exports.generateSpeech = (ctx, task) => {
   const instance = provider.create(ctx.opts)
 
   // Compile the text parts and options together in a packet.
-  let parts = strParts.map(part => exports.buildInfo(part, instance, task, ctx))
+  const parts = strParts.map(part => exports.buildInfo(part, instance, task, ctx))
 
   return exports.generateAll(parts, ctx.opts, instance.generate.bind(instance), task)
     .then(exports.createManifest)

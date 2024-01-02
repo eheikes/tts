@@ -5,7 +5,7 @@ const textchunk = require('textchunk')
  * Chunk text into pieces.
  */
 const chunkText = (text, maxCharacterCount) => {
-  let parts = textchunk.chunk(text, maxCharacterCount)
+  const parts = textchunk.chunk(text, maxCharacterCount)
   debug('chunkText')(`Chunked into ${parts.length} text parts`)
   return Promise.resolve(parts)
 }
@@ -22,9 +22,9 @@ const chunkXml = (xml, maxCharacterCount) => {
   debug('chunkXml')('Started SAX XML parser')
   const attributeString = attrs => {
     let str = ''
-    for (let prop in attrs) {
+    for (const prop in attrs) {
       /* istanbul ignore else: need to add test for this */
-      if (attrs.hasOwnProperty(prop)) {
+      if (Object.prototype.hasOwnProperty.call(attrs, prop)) {
         str += ` ${prop}="${attrs[prop]}"`
       }
     }
@@ -33,8 +33,8 @@ const chunkXml = (xml, maxCharacterCount) => {
   return new Promise((resolve, reject) => {
     let err = null
     let extraTags = '' // self-closing tags
-    let tags = [] // stack of open tags
-    let parts = []
+    const tags = [] // stack of open tags
+    const parts = []
     /* istanbul ignore next */
     parser.onerror = e => {
       debug('chunkXml')(`Encountered error: ${e}`)
@@ -42,7 +42,7 @@ const chunkXml = (xml, maxCharacterCount) => {
     }
     parser.ontext = text => {
       debug('chunkXml')(`Found text: ${text.substr(0, 50)}...`) // eslint-disable-line no-magic-numbers
-      let chunks = textchunk.chunk(text, maxCharacterCount).map((chunk, index) => {
+      const chunks = textchunk.chunk(text, maxCharacterCount).map((chunk, index) => {
         if (index === 0) {
           debug('chunkXml')('Adding unused self-closing tags:', extraTags)
           chunk = `${extraTags}${chunk}`
@@ -62,7 +62,7 @@ const chunkXml = (xml, maxCharacterCount) => {
     parser.onopentag = tagData => {
       debug('chunkXml')(`Found tag: ${JSON.stringify(tagData)}`)
       if (tagData.isSelfClosing) {
-        let attrs = attributeString(tagData.attributes)
+        const attrs = attributeString(tagData.attributes)
         debug('chunkXml')(`Adding "${tagData.name}" to self-closing tags`)
         extraTags += `<${tagData.name}${attrs}/>`
       } else {
@@ -78,7 +78,7 @@ const chunkXml = (xml, maxCharacterCount) => {
         tags.pop()
       } else {
         // TODO should error
-        debug('chunkXml')(`Problem: mismatched tags`)
+        debug('chunkXml')('Problem: mismatched tags')
       }
     }
     parser.onend = () => {
@@ -101,7 +101,7 @@ exports.splitText = (ctx) => {
   const text = ctx.text
   const maxCharacterCount = ctx.maxCharacterCount
   const opts = ctx.args || {}
-  let chunker = opts.type === 'ssml' ? chunkXml : chunkText
+  const chunker = opts.type === 'ssml' ? chunkXml : chunkText
   return chunker(text, maxCharacterCount).then(parts => {
     debug('splitText')('Stripping whitespace')
     return parts.map(str => {

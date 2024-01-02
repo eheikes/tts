@@ -13,14 +13,14 @@ describe('readText()', () => {
     stdin = jasmine.createSpyObj('stdin', ['on', 'read', 'setEncoding'])
     stdin.on.and.callFake((type, callback) => { callback() })
     stdin.read.and.callFake(() => {
-      let response = sentData ? null : testData
+      const response = sentData ? null : testData
       sentData = true
       return response
     })
     ctx = {
       input: null,
       process: {
-        stdin: stdin
+        stdin
       }
     }
   })

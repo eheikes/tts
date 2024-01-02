@@ -8,9 +8,9 @@ describe('checkUsage()', () => {
     write = jasmine.createSpy('process.stderr.write')
     proc = {
       argv: ['node', 'tts.js'],
-      exit: exit,
+      exit,
       stderr: {
-        write: write
+        write
       }
     }
   })

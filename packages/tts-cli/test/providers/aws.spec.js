@@ -77,10 +77,10 @@ describe('AWS provider', () => {
       })
       info = {
         opts: testData.opts,
-        task: task,
+        task,
         tempfile: testData.filename,
         text: testData.text,
-        send: send
+        send
       }
     })
 
@@ -101,7 +101,7 @@ describe('AWS provider', () => {
     it('should work with the MP3 format', done => {
       testData.opts.format = 'mp3'
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.OutputFormat).toBe('mp3')
         done()
       })
@@ -110,7 +110,7 @@ describe('AWS provider', () => {
     it('should work with the OGG format', done => {
       testData.opts.format = 'ogg'
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.OutputFormat).toBe('ogg_vorbis')
         done()
       })
@@ -119,7 +119,7 @@ describe('AWS provider', () => {
     it('should work with the PCM format', done => {
       testData.opts.format = 'pcm'
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.OutputFormat).toBe('pcm')
         done()
       })
@@ -127,7 +127,7 @@ describe('AWS provider', () => {
 
     it('should use the given voice engine', done => {
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.Engine).toBe('neural')
         done()
       })
@@ -136,7 +136,7 @@ describe('AWS provider', () => {
     it('should not use sample rate if not specified', done => {
       delete info.opts.sampleRate
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.SampleRate).toBeUndefined()
         done()
       })
@@ -144,7 +144,7 @@ describe('AWS provider', () => {
 
     it('should use the (stringified) sample rate, when specified', done => {
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.SampleRate).toBe(String(testData.opts.sampleRate))
         done()
       })
@@ -153,7 +153,7 @@ describe('AWS provider', () => {
     it('should not use lexicon names if not specified', done => {
       delete info.opts.lexicon
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.LexiconNames).toBeUndefined()
         done()
       })
@@ -161,7 +161,7 @@ describe('AWS provider', () => {
 
     it('should use the lexicon names, when specified', done => {
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.LexiconNames).toEqual(testData.opts.lexicon)
         done()
       })
@@ -169,7 +169,7 @@ describe('AWS provider', () => {
 
     it('should use the given text type', done => {
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.TextType).toBe(testData.opts.type)
         done()
       })
@@ -177,7 +177,7 @@ describe('AWS provider', () => {
 
     it('should use the given text part', done => {
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.Text).toBe(testData.text)
         done()
       })
@@ -186,7 +186,7 @@ describe('AWS provider', () => {
     it('should not use a language if not specified', done => {
       delete info.opts.language
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.LanguageCode).toBeUndefined()
         done()
       })
@@ -194,7 +194,7 @@ describe('AWS provider', () => {
 
     it('should use the language, when specified', done => {
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.LanguageCode).toBe(testData.opts.language)
         done()
       })
@@ -202,7 +202,7 @@ describe('AWS provider', () => {
 
     it('should use the given voice', done => {
       provider.generate(info, 0, () => {
-        let command = send.calls.mostRecent().args[0]
+        const command = send.calls.mostRecent().args[0]
         expect(command.input.VoiceId).toBe(String(testData.opts.voice))
         done()
       })

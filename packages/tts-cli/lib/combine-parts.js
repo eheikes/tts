@@ -8,7 +8,7 @@ const { extensionFor } = require('./file-extensions')
  * Combines MP3 or OGG files into one file.
  */
 exports.combineEncodedAudio = (binary, manifestFile, outputFile) => {
-  let args = [
+  const args = [
     '-f', 'concat',
     '-safe', '0',
     '-i', manifestFile,
@@ -17,7 +17,7 @@ exports.combineEncodedAudio = (binary, manifestFile, outputFile) => {
   ]
   return new Promise((resolve, reject) => {
     debug('combineEncodedAudio')(`Running ${binary} ${args.join(' ')}`)
-    let ffmpeg = spawn(binary, args)
+    const ffmpeg = spawn(binary, args)
     let stderr = ''
     ffmpeg.stderr.on('data', (data) => {
       stderr += `\n${data}`
@@ -40,9 +40,9 @@ exports.combineEncodedAudio = (binary, manifestFile, outputFile) => {
  * Concatenates raw PCM audio into one file.
  */
 exports.combineRawAudio = (manifestFile, outputFile) => {
-  let manifest = fs.readFileSync(manifestFile, 'utf8')
+  const manifest = fs.readFileSync(manifestFile, 'utf8')
   debug('combineRawAudio')(`Manifest contains: ${manifest}`)
-  let regexpState = /^file\s+'(.*)'$/gm
+  const regexpState = /^file\s+'(.*)'$/gm
   debug('combineRawAudio')(`Creating file ${outputFile}`)
   fs.createFileSync(outputFile)
   debug('combineRawAudio')(`Truncating file ${outputFile}`)
@@ -50,7 +50,7 @@ exports.combineRawAudio = (manifestFile, outputFile) => {
   let match
   while ((match = regexpState.exec(manifest)) !== null) {
     debug('combineRawAudio')(`Reading data from ${match[1]}`)
-    let dataBuffer = fs.readFileSync(match[1])
+    const dataBuffer = fs.readFileSync(match[1])
     debug('combineRawAudio')(`Appending data to ${outputFile}`)
     fs.appendFileSync(outputFile, dataBuffer)
   }
@@ -64,9 +64,9 @@ exports.combineRawAudio = (manifestFile, outputFile) => {
 exports.combine = (ctx) => {
   const manifestFile = ctx.manifestFile
   const opts = ctx.opts
-  let newFile = tempfile(`.${extensionFor(opts.format, ctx.service)}`)
+  const newFile = tempfile(`.${extensionFor(opts.format, ctx.service)}`)
   debug('combine')(`Combining files into ${newFile}`)
-  let combiner = opts.format === 'pcm' && ctx.service === 'aws'
+  const combiner = opts.format === 'pcm' && ctx.service === 'aws'
     ? exports.combineRawAudio(manifestFile, newFile)
     : exports.combineEncodedAudio(opts.ffmpeg, manifestFile, newFile)
   return combiner.then(() => {

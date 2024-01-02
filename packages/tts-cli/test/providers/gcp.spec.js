@@ -116,10 +116,10 @@ describe('Google Cloud provider', () => {
       synthesizer = jasmine.createSpy('synthesizer')
       info = {
         opts: testData.opts,
-        task: task,
+        task,
         tempfile: testData.filename,
         text: testData.text,
-        synthesizer: synthesizer
+        synthesizer
       }
     })
 
@@ -153,7 +153,7 @@ describe('Google Cloud provider', () => {
       it('should work with the MP3 format', done => {
         testData.opts.format = 'mp3'
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.audioEncoding).toBe('MP3')
           done()
         })
@@ -162,7 +162,7 @@ describe('Google Cloud provider', () => {
       it('should work with the OGG format', done => {
         testData.opts.format = 'ogg'
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.audioEncoding).toBe('OGG_OPUS')
           done()
         })
@@ -171,7 +171,7 @@ describe('Google Cloud provider', () => {
       it('should work with the PCM format', done => {
         testData.opts.format = 'pcm'
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.audioEncoding).toBe('LINEAR16')
           done()
         })
@@ -180,7 +180,7 @@ describe('Google Cloud provider', () => {
       it('should not use sample rate if not specified', done => {
         delete info.opts.sampleRate
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.sampleRateHertz).toBeUndefined()
           done()
         })
@@ -188,7 +188,7 @@ describe('Google Cloud provider', () => {
 
       it('should use the sample rate, when specified', done => {
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.sampleRateHertz).toBe(testData.opts.sampleRate)
           done()
         })
@@ -197,7 +197,7 @@ describe('Google Cloud provider', () => {
       it('should use the given (plain) text', done => {
         testData.opts.type = 'text'
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.input.text).toBe(testData.text)
           expect(opts.input.ssml).toBeUndefined()
           done()
@@ -207,7 +207,7 @@ describe('Google Cloud provider', () => {
       it('should use the given (SSML) text', done => {
         testData.opts.type = 'ssml'
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.input.ssml).toBe(testData.text)
           expect(opts.input.text).toBeUndefined()
           done()
@@ -217,7 +217,7 @@ describe('Google Cloud provider', () => {
       it('should not use effects if not specified', done => {
         delete info.opts.effect
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.effectsProfileId).toBeUndefined()
           done()
         })
@@ -225,7 +225,7 @@ describe('Google Cloud provider', () => {
 
       it('should use the effects, when specified', done => {
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.effectsProfileId).toEqual(testData.opts.effect)
           done()
         })
@@ -233,7 +233,7 @@ describe('Google Cloud provider', () => {
 
       it('should use the given volume gain', done => {
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.volumeGainDb).toBe(testData.opts.gain)
           done()
         })
@@ -241,7 +241,7 @@ describe('Google Cloud provider', () => {
 
       it('should use the given gender', done => {
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.voice.ssmlGender).toBe(testData.opts.gender.toUpperCase())
           done()
         })
@@ -250,7 +250,7 @@ describe('Google Cloud provider', () => {
       it('should leave out gender if not specified', done => {
         delete testData.opts.gender
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.voice.ssmlGender).toBeUndefined()
           done()
         })
@@ -258,7 +258,7 @@ describe('Google Cloud provider', () => {
 
       it('should use the given language', done => {
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.voice.languageCode).toBe(testData.opts.language)
           done()
         })
@@ -266,7 +266,7 @@ describe('Google Cloud provider', () => {
 
       it('should use the given pitch', done => {
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.pitch).toBe(testData.opts.pitch)
           done()
         })
@@ -274,7 +274,7 @@ describe('Google Cloud provider', () => {
 
       it('should use the given speed', done => {
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.audioConfig.speakingRate).toBe(testData.opts.speed)
           done()
         })
@@ -282,7 +282,7 @@ describe('Google Cloud provider', () => {
 
       it('should use the given voice', done => {
         provider.generate(info, 0, () => {
-          let opts = synthesizer.calls.mostRecent().args[0]
+          const opts = synthesizer.calls.mostRecent().args[0]
           expect(opts.voice.name).toBe(testData.opts.voice)
           done()
         })

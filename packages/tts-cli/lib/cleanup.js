@@ -6,9 +6,9 @@ const fs = require('fs-extra')
  */
 exports.cleanup = ctx => {
   const manifestFile = ctx.manifestFile
-  let manifest = fs.readFileSync(manifestFile, 'utf8')
+  const manifest = fs.readFileSync(manifestFile, 'utf8')
   debug(`Manifest is ${manifest}`)
-  let regexpState = /^file\s+'(.*)'$/gm
+  const regexpState = /^file\s+'(.*)'$/gm
   let match
   while ((match = regexpState.exec(manifest)) !== null) {
     debug(`Deleting temporary file ${match[1]}`)
