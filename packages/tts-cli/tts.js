@@ -61,7 +61,7 @@ const context = {
 
 // Run the tasks.
 if (require.main === module) /* istanbul ignore next */{
-  const Listr = require('listr')
+  const { Listr } = require('listr2')
   const list = new Listr(tasks, {
     renderer: debug.enabled ? 'silent' : 'default'
   })
