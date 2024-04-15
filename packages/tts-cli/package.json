@@ -43,8 +43,8 @@
     "listr2": "^8.0.2",
     "minimist": "^1.2.0",
     "sax": "^1.2.4",
+    "sentence-splitter": "^5.0.0",
     "tempfile": "^1.1.1",
-    "textchunk": "^1.1.0",
     "zen-observable": "^0.10.0"
   },
   "devDependencies": {
