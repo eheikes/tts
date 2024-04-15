@@ -128,7 +128,7 @@ outstanding shares, or (iii) beneficial ownership of such entity.`
     const parts = splitIntoSentences(text)
     expect(parts).toEqual([
       'Lorem ipsum, dolor sed amat frequentor minimus.',
-      'Second sentence.',
+      'Second sentence.'
     ])
   })
 
@@ -330,9 +330,9 @@ outstanding shares, or (iii) beneficial ownership of such entity.`
   })
 
   it('should ignore multilines', () => {
-    const text = 'How now brown cow.\
-    \
-    Peter Piper Picked a peck of pickled peppers. A peck of pickled peppers peter piper picked.'
+    const text = `How now brown cow.
+
+    Peter Piper Picked a peck of pickled peppers. A peck of pickled peppers peter piper picked.`
     const parts = splitIntoSentences(text)
     expect(parts).toEqual([
       'How now brown cow.',
