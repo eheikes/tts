@@ -60,9 +60,9 @@ describe('splitText()', () => {
         '<speak',
         '>Hello',
         'there',
-        'world',
-        '</spea',
-        'k>'
+        'world<',
+        '/speak',
+        '>'
       ])
     }).then(done)
   })

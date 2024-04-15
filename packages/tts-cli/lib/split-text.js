@@ -1,11 +1,11 @@
 const debug = require('debug')
-const textchunk = require('textchunk')
+const { chunkText: chunk } = require('./text-chunk')
 
 /**
  * Chunk text into pieces.
  */
 const chunkText = (text, maxCharacterCount) => {
-  const parts = textchunk.chunk(text, maxCharacterCount)
+  const parts = chunk(text, maxCharacterCount)
   debug('chunkText')(`Chunked into ${parts.length} text parts`)
   return Promise.resolve(parts)
 }
@@ -42,7 +42,7 @@ const chunkXml = (xml, maxCharacterCount) => {
     }
     parser.ontext = text => {
       debug('chunkXml')(`Found text: ${text.substr(0, 50)}...`) // eslint-disable-line no-magic-numbers
-      const chunks = textchunk.chunk(text, maxCharacterCount).map((chunk, index) => {
+      const chunks = chunk(text, maxCharacterCount).map((chunk, index) => {
         if (index === 0) {
           debug('chunkXml')('Adding unused self-closing tags:', extraTags)
           chunk = `${extraTags}${chunk}`
