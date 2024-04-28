@@ -16,6 +16,7 @@ const splitIntoSentences = (text) => {
  */
 const chunkText = (text, maxLength) => {
   const sentences = splitIntoSentences(text)
+  const epsilon = 100
 
   // Loop through the sentences, putting them into chunks.
   const chunks = []
@@ -45,7 +46,7 @@ const chunkText = (text, maxLength) => {
           j++
         }
         safety3++
-        if (safety3 > 100) { throw new Error('Infinite loop') }
+        if (safety3 > words.length + epsilon) { throw new Error('Infinite loop') }
       }
 
       // If there is an unfilled chunk remaining, add it to the list.
@@ -64,12 +65,12 @@ const chunkText = (text, maxLength) => {
         chunk += newChunk
         i++
         safety2++
-        if (safety2 > 100) { throw new Error('Infinite loop') }
+        if (safety2 > sentences.length + epsilon) { throw new Error('Infinite loop') }
       }
       chunks.push(chunk)
     }
     safety++
-    if (safety > 100) { throw new Error('Infinite loop') }
+    if (safety > sentences.length + epsilon) { throw new Error('Infinite loop') }
   }
 
   return chunks

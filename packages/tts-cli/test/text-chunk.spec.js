@@ -71,6 +71,13 @@ describe('chunkText()', () => {
       'people, for the people, shall not perish from the earth.'
     ])
   })
+
+  it('should work for long texts', () => {
+    const text = new Array(200).fill(0).map(_ => 'This is a sentence.').join(' ')
+    expect(() => {
+      chunkText(text, 20)
+    }).not.toThrow()
+  })
 })
 
 describe('splitIntoSentences()', () => {
