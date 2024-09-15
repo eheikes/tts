@@ -40,11 +40,16 @@ $ tts test.txt test.mp3 --service gcp --email starting-account-kjd6bvn58@alert-v
 
 Specifies the voice engine to use for generating the speech.
 
+* `standard` -- uses concatenative synthesis
+* `neural` -- uses a neural network
+* `generative` -- Uses generative AI
+* `long-form` -- uses generative AI designed for longer content
+
 ```
 $ tts test.txt test.mp3 --engine neural
 ```
 
-See the [AWS documentation](https://docs.aws.amazon.com/polly/latest/dg/NTTS-main.html) for the available engines.
+See the [AWS documentation](https://docs.aws.amazon.com/polly/latest/dg/voice-engines-polly.html) for the available engines.
 
 ## `--ffmpeg`
 
