@@ -3,7 +3,7 @@
   "version": "5.4.0",
   "description": "Command-line tool to convert text to speech",
   "bin": {
-    "tts": "./tts.js"
+    "tts": "tts.js"
   },
   "files": [
     "lib/*",
