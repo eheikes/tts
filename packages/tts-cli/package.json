@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/eheikes/tts/tree/master/packages/tts-cli#readme",
   "dependencies": {
-    "@aws-sdk/client-polly": "^3.441.0",
+    "@aws-sdk/client-polly": "^3.651.1",
     "@google-cloud/text-to-speech": "^5.0.1",
     "async": "^3.0.0",
     "debug": "^3.1.0",
