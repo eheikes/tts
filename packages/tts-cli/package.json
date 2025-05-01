@@ -35,20 +35,14 @@
   },
   "homepage": "https://github.com/eheikes/tts/tree/master/packages/tts-cli#readme",
   "dependencies": {
-    "@aws-sdk/client-polly": "^3.651.1",
-    "@google-cloud/text-to-speech": "^5.0.1",
-    "async": "^3.0.0",
     "debug": "^3.1.0",
     "fs-extra": "^2.0.0",
     "listr2": "^8.0.2",
-    "minimist": "^1.2.0",
-    "sax": "^1.2.4",
-    "sentence-splitter": "^5.0.0",
-    "tempfile": "^1.1.1",
-    "zen-observable": "^0.10.0"
+    "minimist": "^1.2.0"
   },
   "devDependencies": {
-    "codecov": "^3.6.5"
+    "codecov": "^3.6.5",
+    "proxyquire": "^2.1.3"
   },
   "standard": {
     "env": {

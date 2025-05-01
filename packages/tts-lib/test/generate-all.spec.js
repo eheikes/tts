@@ -17,7 +17,7 @@ describe('generateAll()', () => {
   })
 
   it('should asynchronously call the function for each of the parts', done => {
-    generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(() => {
+    generateAll(textParts, testLimit, iteratorFunction, task).then(() => {
       const [parts] = async.eachOfLimit.calls.mostRecent().args
       expect(parts).toEqual(textParts)
       expect(parts.length).toBe(textParts.length)
@@ -26,7 +26,7 @@ describe('generateAll()', () => {
   })
 
   it('should limit the async calls according to the option', done => {
-    generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(() => {
+    generateAll(textParts, testLimit, iteratorFunction, task).then(() => {
       const [, limit] = async.eachOfLimit.calls.mostRecent().args
       expect(limit).toBe(testLimit)
     }).then(done)
@@ -37,7 +37,7 @@ describe('generateAll()', () => {
       async.eachOfLimit.and.callFake((parts, opts, func, callback) => {
         callback(new Error('reject async'))
       })
-      generateAll(textParts, {}, iteratorFunction, task).catch(() => {
+      generateAll(textParts, 1, iteratorFunction, task).catch(() => {
         done()
       })
     })
@@ -57,13 +57,13 @@ describe('generateAll()', () => {
 
   describe('when all requests succeed', () => {
     it('should respond with the original parts', done => {
-      generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(response => {
+      generateAll(textParts, testLimit, iteratorFunction, task).then(response => {
         expect(response).toEqual(textParts)
       }).then(done)
     })
 
     it('should show the final count', done => {
-      generateAll(textParts, { limit: testLimit }, iteratorFunction, task).then(() => {
+      generateAll(textParts, testLimit, iteratorFunction, task).then(() => {
         expect(task.title).toMatch(`\\(${textParts.length}/`)
       }).then(done)
     })
@@ -79,7 +79,7 @@ describe('generateAll()', () => {
     })
 
     it('should return a rejected promise with the error', done => {
-      generateAll(textParts, { limit: testLimit }, iteratorFunction, task).catch(err => {
+      generateAll(textParts, testLimit, iteratorFunction, task).catch(err => {
         expect(err.message).toBe(testError)
       }).then(done)
     })

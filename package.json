@@ -36,7 +36,8 @@
     "standard": "^17.1.0"
   },
   "dependencies": {
-    "tts-cli": "file:packages/tts-cli"
+    "tts-cli": "file:packages/tts-cli",
+    "tts-lib": "file:packages/tts-lib"
   },
   "resolutions": {
     "**/@grpc/grpc-js": ">=1.1.8",
