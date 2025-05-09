@@ -1,4 +1,4 @@
-// TODO clean this up
+// TODO clean up this file
 const async = require('async')
 const originalFs = require('fs')
 const proxyquire = require('proxyquire')
@@ -50,6 +50,8 @@ exports.loadLib = (file) => {
 
   // Load the library module.
   const lib = proxyquire(`../lib/${file}`, {
+    './providers/aws': providerStub,
+    './providers/gcp': providerStub,
     async,
     child_process: { spawn }, // eslint-disable-line camelcase
     'fs-extra': fs

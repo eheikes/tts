@@ -97,11 +97,8 @@ const chunkXml = (xml, maxCharacterCount) => {
 /**
  * Splits a string of text into chunks.
  */
-exports.splitText = (ctx) => {
-  const text = ctx.text
-  const maxCharacterCount = ctx.maxCharacterCount
-  const opts = ctx.args || {}
-  const chunker = opts.type === 'ssml' ? chunkXml : chunkText
+exports.splitText = (text, maxCharacterCount, type = 'text') => {
+  const chunker = type === 'ssml' ? chunkXml : chunkText
   return chunker(text, maxCharacterCount).then(parts => {
     debug('splitText')('Stripping whitespace')
     return parts.map(str => {
@@ -111,7 +108,5 @@ exports.splitText = (ctx) => {
       // Trim whitespace from the ends.
       return str.trim()
     })
-  }).then(parts => {
-    ctx.parts = parts
   })
 }

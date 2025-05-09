@@ -1,15 +1,44 @@
 const proxyquire = require('proxyquire')
 
 describe('CLI', () => {
+  const manifestFile = 'manifest file'
   const outputFile = 'output-file'
+  const parts = ['part1', 'part2']
+  const tempFile = 'temp file'
 
   let cli
-  let args, minimist
+  let args
+  let mocks
+  let minimist
+  let cleanup
+  let createProvider
 
   beforeEach(() => {
     args = { _: [outputFile] }
     minimist = jasmine.createSpy('minimist').and.callFake(() => args)
-    cli = proxyquire('../tts', { minimist })
+    cleanup = jasmine.createSpy('cleanup')
+    createProvider = jasmine.createSpy('createProvider').and.returnValue({
+      combineAudio: () => {
+        return Promise.resolve(tempFile)
+      },
+      generateSpeech: () => {
+        return Promise.resolve(manifestFile)
+      },
+      splitText: () => {
+        return Promise.resolve(parts)
+      }
+    })
+    mocks = {
+      'fs-extra': {
+        readFileSync: () => 'file contents'
+      },
+      minimist,
+      '../tts-lib/lib/cleanup': { cleanup },
+      '../tts-lib/lib/provider': {
+        createProvider
+      }
+    }
+    cli = proxyquire('../tts', mocks)
   })
 
   it('should construct an array of tasks', () => {
@@ -23,10 +52,6 @@ describe('CLI', () => {
     expect(cli.context.args).toBe(args)
   })
 
-  it('should pass the max character count to Listr', () => {
-    expect(cli.context.maxCharacterCount).toEqual(jasmine.any(Number))
-  })
-
   it('should pass the process object to Listr', () => {
     expect(cli.context.process).toEqual(jasmine.any(Object))
     expect(cli.context.process.argv).toEqual(jasmine.any(Array))
@@ -37,7 +62,7 @@ describe('CLI', () => {
 
     beforeEach(() => {
       args = { _: [inputFile, outputFile] }
-      cli = proxyquire('../tts', { minimist })
+      cli = proxyquire('../tts', mocks)
     })
 
     it('should use the first argument for the input filename', () => {
@@ -52,7 +77,7 @@ describe('CLI', () => {
   describe('when only 1 argument is given', () => {
     beforeEach(() => {
       args = { _: [outputFile] }
-      cli = proxyquire('../tts', { minimist })
+      cli = proxyquire('../tts', mocks)
     })
 
     it('should use null for the input filename', () => {
@@ -64,48 +89,143 @@ describe('CLI', () => {
     })
   })
 
-  describe('when the "aws" service is specified', () => {
-    beforeEach(() => {
-      args = { _: [outputFile], service: 'aws' }
-      cli = proxyquire('../tts', { minimist })
-    })
+  it('should create an AWS service', () => {
+    args = { _: [outputFile], service: 'aws' }
+    cli = proxyquire('../tts', mocks)
+    expect(cli.context.service).toBe('aws')
+  })
 
-    it('should save that as the service', () => {
-      expect(cli.context.service).toBe('aws')
-    })
+  it('should create a GCP service', () => {
+    args = { _: [outputFile], service: 'gcp' }
+    cli = proxyquire('../tts', mocks)
+    expect(cli.context.service).toBe('gcp')
+  })
 
-    it('should set the appropriate maxCharacterCount', () => {
-      expect(cli.context.maxCharacterCount).toBe(1500)
+  it('should create a default service', () => {
+    args = { _: [outputFile] }
+    cli = proxyquire('../tts', mocks)
+    expect(cli.context.service).toBe('aws')
+  })
+
+  it('should create the service with options derived from the CLI arguments', () => {
+    createProvider.calls.reset()
+    args = {
+      _: [outputFile],
+      'access-key': 'test access key',
+      effect: 'test effect',
+      email: 'test email',
+      engine: 'test engine',
+      ffmpeg: 'test ffmpeg',
+      format: 'test format',
+      gain: '11.13',
+      gender: 'test gender',
+      language: 'test language',
+      lexicon: 'test lexicon',
+      pitch: '2.3',
+      'private-key': 'test private key',
+      'project-file': 'test project file',
+      'project-id': 'test project id',
+      region: 'test region',
+      'sample-rate': '16000',
+      'secret-key': 'test secret key',
+      service: 'aws',
+      speed: '2.5',
+      throttle: '4',
+      type: 'test type',
+      voice: 'test voice'
+    }
+    cli = proxyquire('../tts', mocks)
+    expect(createProvider).toHaveBeenCalledWith('aws', {
+      accessKey: 'test access key',
+      effect: ['test effect'],
+      email: 'test email',
+      engine: 'test engine',
+      ffmpeg: 'test ffmpeg',
+      format: 'test format',
+      gain: 11.13,
+      gender: 'test gender',
+      language: 'test language',
+      lexicon: ['test lexicon'],
+      limit: 4,
+      pitch: 2.3,
+      privateKey: 'test private key',
+      projectFile: 'test project file',
+      projectId: 'test project id',
+      region: 'test region',
+      sampleRate: 16000,
+      secretKey: 'test secret key',
+      speed: 2.5,
+      type: 'test type',
+      voice: 'test voice'
     })
   })
 
-  describe('when the "gcp" service is specified', () => {
-    beforeEach(() => {
-      args = { _: [outputFile], service: 'gcp' }
-      cli = proxyquire('../tts', { minimist })
-    })
-
-    it('should save that as the service', () => {
-      expect(cli.context.service).toBe('gcp')
-    })
-
-    it('should set the appropriate maxCharacterCount', () => {
-      expect(cli.context.maxCharacterCount).toBe(5000)
+  it('should create the service with default options', () => {
+    createProvider.calls.reset()
+    args = { _: [outputFile] }
+    cli = proxyquire('../tts', mocks)
+    expect(createProvider).toHaveBeenCalledWith('aws', {
+      accessKey: undefined,
+      effect: undefined,
+      email: undefined,
+      engine: undefined,
+      ffmpeg: 'ffmpeg',
+      format: 'mp3',
+      gain: undefined,
+      gender: undefined,
+      language: undefined,
+      lexicon: undefined,
+      limit: 5,
+      pitch: undefined,
+      privateKey: undefined,
+      projectFile: undefined,
+      projectId: undefined,
+      region: 'us-east-1',
+      sampleRate: undefined,
+      secretKey: undefined,
+      speed: undefined,
+      type: 'text',
+      voice: undefined
     })
   })
 
-  describe('when no service is specified', () => {
-    beforeEach(() => {
-      args = { _: [outputFile] }
-      cli = proxyquire('../tts', { minimist })
-    })
+  it('should use private key in private key file', () => {
+    createProvider.calls.reset()
+    args = { _: [outputFile], 'private-key-file': 'foobar' }
+    cli = proxyquire('../tts', mocks)
+    const opts = createProvider.calls.mostRecent().args[1]
+    expect(opts.privateKey).toBe('file contents')
+  })
 
-    it('should use the default service', () => {
-      expect(cli.context.service).toBe('aws')
-    })
+  it('should call splitText() in the text-splitting task', async () => {
+    args = { _: [outputFile] }
+    cli = proxyquire('../tts', mocks)
+    const context = { text: 'test text' }
+    await cli.tasks[1].task(context)
+    expect(context.parts).toEqual(parts)
+  })
 
-    it('should set the appropriate maxCharacterCount', () => {
-      expect(cli.context.maxCharacterCount).toBe(1500)
-    })
+  it('should call generateSpeech() in the speech-generation task', async () => {
+    args = { _: [outputFile] }
+    cli = proxyquire('../tts', mocks)
+    const context = { parts }
+    await cli.tasks[2].task(context, {})
+    expect(context.manifestFile).toBe(manifestFile)
+  })
+
+  it('should call combineAudio() in the combine-audio task', async () => {
+    args = { _: [outputFile] }
+    cli = proxyquire('../tts', mocks)
+    const context = { manifestFile }
+    await cli.tasks[3].task(context)
+    expect(context.tempFile).toBe(tempFile)
+  })
+
+  it('should call cleanup() in the cleanup task', async () => {
+    args = { _: [outputFile] }
+    cli = proxyquire('../tts', mocks)
+    const context = { manifestFile }
+    await cli.tasks[4].task(context)
+    expect(cleanup).toHaveBeenCalledWith(manifestFile)
   })
 })

@@ -1,8 +1,6 @@
 const spawn = require('child_process').spawn
 const debug = require('debug')
 const fs = require('fs-extra')
-const tempfile = require('tempfile')
-const { extensionFor } = require('./file-extensions')
 
 /**
  * Combines MP3 or OGG files into one file.
@@ -61,15 +59,12 @@ exports.combineRawAudio = (manifestFile, outputFile) => {
  * Combines all the parts into one file.
  * Resolves with the new filename.
  */
-exports.combine = (ctx) => {
-  const manifestFile = ctx.manifestFile
-  const opts = ctx.opts
-  const newFile = tempfile(`.${extensionFor(opts.format, ctx.service)}`)
+exports.combine = async (manifestFile, newFile, format = 'encoded', ffmpegBinary = 'ffmpeg') => {
   debug('combine')(`Combining files into ${newFile}`)
-  const combiner = opts.format === 'pcm' && ctx.service === 'aws'
-    ? exports.combineRawAudio(manifestFile, newFile)
-    : exports.combineEncodedAudio(opts.ffmpeg, manifestFile, newFile)
-  return combiner.then(() => {
-    ctx.tempFile = newFile
-  })
+  if (format === 'raw') {
+    await exports.combineRawAudio(manifestFile, newFile)
+  } else {
+    await exports.combineEncodedAudio(ffmpegBinary, manifestFile, newFile)
+  }
+  return newFile
 }
