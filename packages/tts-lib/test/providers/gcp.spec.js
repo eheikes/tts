@@ -4,35 +4,24 @@ const path = require('path')
 const proxyquire = require('proxyquire')
 const tempfile = require('tempfile')
 
-describe('Google Cloud provider', () => {
+describe('GCP provider', () => {
   const chunks = ['hello world']
-  const manifestFile = 'manifest.txt'
-  const parts = ['foo.txt', 'bar.txt']
-  const text = 'hello world'
 
   let combineStub
-  let createManifestStub
   let fsStub
-  let generateAllStub
   let splitTextStub
   let GcpProvider
   let provider
 
   beforeEach(() => {
     combineStub = jasmine.createSpy('combine')
-    createManifestStub = jasmine.createSpy('createManifest').and.returnValue(manifestFile)
     fsStub = jasmine.createSpyObj('fs', ['writeFile'])
     fsStub.writeFile.and.callFake((dest, data, opts, callback) => { callback() })
-    generateAllStub = jasmine.createSpy('generateAll').and.returnValue(Promise.resolve(parts))
     splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
     ;({ GcpProvider } = proxyquire('../../lib/providers/gcp', {
       'fs-extra': fsStub,
       '../combine-parts': {
         combine: combineStub
-      },
-      '../generate-speech': {
-        createManifest: createManifestStub,
-        generateAll: generateAllStub
       },
       '../split-text': {
         splitText: splitTextStub
@@ -154,32 +143,6 @@ describe('Google Cloud provider', () => {
       expect(() => {
         provider.extensionFor('foo')
       }).toThrow()
-    })
-  })
-
-  describe('splitText()', () => {
-    it('should call the splitText routine with the correct parameters', () => {
-      const result = provider.splitText(text)
-      expect(splitTextStub).toHaveBeenCalledWith(text, provider.maxCharacterCount, provider.opts.type)
-      expect(result).toEqual(chunks)
-    })
-  })
-
-  describe('combineAudio()', () => {
-    it('should call combine() for the audio', async () => {
-      provider = new GcpProvider({
-        email: 'foo@example.com',
-        privateKey: 'fake key',
-        projectFile: path.resolve('project-file.json'),
-        format: 'mp3',
-        ffmpeg: 'ffmpeg-test'
-      })
-      await provider.combineAudio('foobar')
-      const args = combineStub.calls.mostRecent().args
-      expect(args[0]).toBe('foobar')
-      expect(args[1]).toMatch(/\.mp3$/)
-      expect(args[2]).toBe('encoded')
-      expect(args[3]).toBe('ffmpeg-test')
     })
   })
 
@@ -441,29 +404,6 @@ describe('Google Cloud provider', () => {
           done()
         })
       })
-    })
-  })
-
-  describe('generateSpeech()', () => {
-    it('should call generateAll()', async () => {
-      const task = {}
-      await provider.generateSpeech(chunks, task)
-      expect(generateAllStub).toHaveBeenCalledWith([{
-        task,
-        tempfile: jasmine.any(String),
-        text: chunks[0],
-        synthesizer: jasmine.any(Function)
-      }], provider.opts.limit, jasmine.any(Function), task)
-    })
-
-    it('should call createManifest()', async () => {
-      await provider.generateSpeech(chunks, {})
-      expect(createManifestStub).toHaveBeenCalledWith(parts)
-    })
-
-    it('should return the manifest file', async () => {
-      const result = await provider.generateSpeech(chunks, {})
-      expect(result).toBe(manifestFile)
     })
   })
 })

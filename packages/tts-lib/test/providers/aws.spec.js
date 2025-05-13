@@ -6,36 +6,25 @@ const tempfile = require('tempfile')
 
 describe('AWS provider', () => {
   const chunks = ['hello world']
-  const manifestFile = 'manifest.txt'
-  const parts = ['foo.txt', 'bar.txt']
-  const text = 'hello world'
 
   let combineStub
-  let createManifestStub
   let fsStub
-  let generateAllStub
   let splitTextStub
   let AwsProvider
   let provider
 
   beforeEach(() => {
     combineStub = jasmine.createSpy('combine')
-    createManifestStub = jasmine.createSpy('createManifest').and.returnValue(manifestFile)
     fsStub = jasmine.createSpyObj('fs', ['createWriteStream'])
     fsStub.createWriteStream.and.callFake(filename => {
       const stream = fs.createWriteStream(filename)
       return stream
     })
-    generateAllStub = jasmine.createSpy('generateAll').and.returnValue(Promise.resolve(parts))
     splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
     ;({ AwsProvider } = proxyquire('../../lib/providers/aws', {
       'fs-extra': fsStub,
       '../combine-parts': {
         combine: combineStub
-      },
-      '../generate-speech': {
-        createManifest: createManifestStub,
-        generateAll: generateAllStub
       },
       '../split-text': {
         splitText: splitTextStub
@@ -122,14 +111,6 @@ describe('AWS provider', () => {
       expect(() => {
         provider.extensionFor('foo')
       }).toThrow()
-    })
-  })
-
-  describe('splitText()', () => {
-    it('should call the splitText routine with the correct parameters', () => {
-      const result = provider.splitText(text)
-      expect(splitTextStub).toHaveBeenCalledWith(text, provider.maxCharacterCount, provider.opts.type)
-      expect(result).toEqual(chunks)
     })
   })
 
@@ -373,29 +354,6 @@ describe('AWS provider', () => {
         expect(err).toEqual(new Error('write stream error'))
         done()
       })
-    })
-  })
-
-  describe('generateSpeech()', () => {
-    it('should call generateAll()', async () => {
-      const task = {}
-      await provider.generateSpeech(chunks, task)
-      expect(generateAllStub).toHaveBeenCalledWith([{
-        task,
-        tempfile: jasmine.any(String),
-        text: chunks[0],
-        send: jasmine.any(Function)
-      }], provider.opts.limit, jasmine.any(Function), task)
-    })
-
-    it('should call createManifest()', async () => {
-      await provider.generateSpeech(chunks, {})
-      expect(createManifestStub).toHaveBeenCalledWith(parts)
-    })
-
-    it('should return the manifest file', async () => {
-      const result = await provider.generateSpeech(chunks, {})
-      expect(result).toBe(manifestFile)
     })
   })
 })
