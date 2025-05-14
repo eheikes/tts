@@ -1,6 +1,7 @@
 const proxyquire = require('proxyquire')
 
 describe('CLI', () => {
+  const inputFile = 'input-file'
   const manifestFile = 'manifest file'
   const outputFile = 'output-file'
   const parts = ['part1', 'part2']
@@ -11,12 +12,14 @@ describe('CLI', () => {
   let mocks
   let minimist
   let cleanup
+  let readText
   let createProvider
 
   beforeEach(() => {
-    args = { _: [outputFile] }
+    args = { _: [inputFile, outputFile] }
     minimist = jasmine.createSpy('minimist').and.callFake(() => args)
     cleanup = jasmine.createSpy('cleanup')
+    readText = jasmine.createSpy('readText').and.returnValue('test text')
     createProvider = jasmine.createSpy('createProvider').and.returnValue({
       combineAudio: () => {
         return Promise.resolve(tempFile)
@@ -36,7 +39,8 @@ describe('CLI', () => {
       '../tts-lib/lib/cleanup': { cleanup },
       '../tts-lib/lib/provider': {
         createProvider
-      }
+      },
+      './lib/read-text': { readText }
     }
     cli = proxyquire('../tts', mocks)
   })
@@ -50,11 +54,6 @@ describe('CLI', () => {
 
   it('should pass the CLI arguments to Listr', () => {
     expect(cli.context.args).toBe(args)
-  })
-
-  it('should pass the process object to Listr', () => {
-    expect(cli.context.process).toEqual(jasmine.any(Object))
-    expect(cli.context.process.argv).toEqual(jasmine.any(Array))
   })
 
   describe('when 2 arguments are given', () => {
@@ -195,6 +194,14 @@ describe('CLI', () => {
     cli = proxyquire('../tts', mocks)
     const opts = createProvider.calls.mostRecent().args[1]
     expect(opts.privateKey).toBe('file contents')
+  })
+
+  it('should call readText() in the text-reading task', async () => {
+    args = { _: [outputFile] }
+    cli = proxyquire('../tts', mocks)
+    const context = {}
+    await cli.tasks[0].task(context)
+    expect(context.text).toBe('test text')
   })
 
   it('should call splitText() in the text-splitting task', async () => {

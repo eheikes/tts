@@ -5,9 +5,7 @@ const fs = require('fs-extra')
  * Read in the text from a file.
  * If no file is specified, read from stdin.
  */
-exports.readText = (ctx) => {
-  const inputFilename = ctx.input
-  const proc = ctx.process
+exports.readText = (inputFilename, proc) => {
   return new Promise((resolve, reject) => {
     if (inputFilename) {
       // Read from a file.
@@ -32,7 +30,5 @@ exports.readText = (ctx) => {
         resolve(data)
       })
     }
-  }).then(text => {
-    ctx.text = text
   })
 }

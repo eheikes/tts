@@ -5,7 +5,7 @@ describe('readText()', () => {
 
   let readText
   let fsSpy
-  let ctx, stdin
+  let stdin
 
   beforeEach(() => {
     fsSpy = jasmine.createSpyObj('fs', ['readFile', 'readFileSync'])
@@ -23,32 +23,26 @@ describe('readText()', () => {
       sentData = true
       return response
     })
-    ctx = {
-      input: null,
-      process: {
-        stdin
-      }
-    }
   })
 
   describe('when it succeeds', () => {
     it('should set the read text', done => {
-      readText(ctx).then(() => {
-        expect(ctx.text).toBe(testData)
+      readText(null, { stdin }).then((text) => {
+        expect(text).toBe(testData)
       }).then(done)
     })
   })
 
   describe('when no filename is specified', () => {
     it('should read data from stdin', done => {
-      readText(ctx).then(() => {
+      readText(null, { stdin }).then(() => {
         expect(stdin.on).toHaveBeenCalled()
         expect(stdin.read).toHaveBeenCalled()
       }).then(done)
     })
 
     it('should use UTF-8 encoding', done => {
-      readText(ctx).then(() => {
+      readText(null, { stdin }).then(() => {
         expect(stdin.setEncoding).toHaveBeenCalledWith('utf8')
       }).then(done)
     })
@@ -58,14 +52,13 @@ describe('readText()', () => {
     const testFilename = 'test.txt'
 
     beforeEach(() => {
-      ctx.input = testFilename
       fsSpy.readFile.and.callFake((filename, opts, callback) => {
         callback(null, testData)
       })
     })
 
     it('should read data from the file', done => {
-      readText(ctx).then(() => {
+      readText(testFilename, { stdin }).then(() => {
         expect(fsSpy.readFile).toHaveBeenCalledWith(
           testFilename,
           'utf8',
@@ -76,8 +69,8 @@ describe('readText()', () => {
 
     describe('and can read the file', () => {
       it('should set the file\'s data', done => {
-        readText(ctx).then(() => {
-          expect(ctx.text).toBe(testData)
+        readText(testFilename, { stdin }).then((text) => {
+          expect(text).toBe(testData)
         }).then(done)
       })
     })
@@ -88,7 +81,7 @@ describe('readText()', () => {
         fsSpy.readFile.and.callFake((filename, opts, callback) => {
           callback(testError)
         })
-        readText(ctx).catch(err => {
+        readText(testFilename, { stdin }).catch(err => {
           expect(err).toBe(testError)
         }).then(done)
       })

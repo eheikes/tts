@@ -72,7 +72,9 @@ const provider = createProvider(service, opts)
 // Define the tasks and options.
 const tasks = [{
   title: 'Reading text',
-  task: readText // TODO make more functional, no ctx
+  task: async (ctx) => {
+    ctx.text = await readText(input, process)
+  }
 }, {
   title: 'Splitting text',
   task: async (ctx) => {
@@ -99,9 +101,8 @@ const tasks = [{
 }]
 const context = {
   args,
-  input,
+  input, // only used for testing
   outputFilename,
-  process,
   service
 }
 
