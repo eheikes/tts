@@ -1,12 +1,19 @@
+const proxyquire = require('proxyquire')
+
 describe('moveTempFile()', () => {
   const sourceFile = 'source file'
   const destFile = 'destination file'
 
-  let moveTempFile, fs
+  let moveTempFile
+  let fsSpy
   let ctx, task
 
   beforeEach(() => {
-    ({ fs, moveTempFile } = require('./helpers').loadLib('move-temp-file'))
+    fsSpy = jasmine.createSpyObj('fs', ['move'])
+    fsSpy.move.and.callFake((src, dest, opts, callback) => { callback() })
+    ;({ moveTempFile } = proxyquire('../lib/move-temp-file', {
+      'fs-extra': fsSpy
+    }))
     ctx = {
       tempFile: sourceFile,
       outputFilename: destFile
@@ -16,7 +23,7 @@ describe('moveTempFile()', () => {
   })
 
   it('should overwrite the destination filename with the specified temp file', () => {
-    expect(fs.move).toHaveBeenCalledWith(
+    expect(fsSpy.move).toHaveBeenCalledWith(
       sourceFile,
       destFile,
       { overwrite: true },
@@ -29,7 +36,7 @@ describe('moveTempFile()', () => {
   })
 
   it('should return the error if the filesystem call fails', () => {
-    fs.move.and.callFake((src, dest, opts, callback) => callback(new Error('test error')))
+    fsSpy.move.and.callFake((src, dest, opts, callback) => callback(new Error('test error')))
     return moveTempFile(ctx, task).then(() => {
       throw new Error('should have thrown!')
     }).catch(err => {
