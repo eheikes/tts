@@ -1,23 +1,50 @@
+const proxyquire = require('proxyquire')
 const tempfile = require('tempfile')
 
 describe('combine()', () => {
   const testManifest = 'manifest.txt'
 
-  let combine, fs, spawn
+  let combine
+  let fsSpy
+  let spawnSpy
 
   beforeEach(() => {
-    const lib = require('./helpers').loadLib('combine-parts')
-    combine = lib.combine
-    fs = lib.fs
-    spawn = lib.spawn
+    fsSpy = jasmine.createSpyObj('fs', [
+      'appendFileSync',
+      'createFileSync',
+      'readFileSync',
+      'truncateSync'
+    ])
+    const spawnOnSpy = jasmine.createSpy('spawn.on').and.callFake((type, callback) => {
+      if (type === 'close') { callback() }
+    })
+    const spawnStderrOn = jasmine.createSpy('spawn.stderr.on')
+    spawnSpy = jasmine.createSpy('spawn').and.callFake(() => {
+      return {
+        on: spawnOnSpy,
+        stderr: {
+          on: spawnStderrOn
+        }
+      }
+    })
+    spawnSpy.on = spawnOnSpy
+    spawnSpy.stderr = {
+      on: spawnStderrOn
+    }
+    ;({ combine } = proxyquire('../lib/combine-parts', {
+      child_process: {
+        spawn: spawnSpy
+      },
+      'fs-extra': fsSpy
+    }))
   })
 
   describe('when the format is encoded audio', () => {
     it('should call combineEncodedAudio()', () => {
       return combine(testManifest, tempfile(), 'encoded', 'ffmpeg-test').then(() => {
         // We can't spy on combineEncodedAudio() directly, so look at its internals. // TODO is this true?
-        expect(spawn).toHaveBeenCalled()
-        expect(spawn.calls.mostRecent().args[0]).toBe('ffmpeg-test')
+        expect(spawnSpy).toHaveBeenCalled()
+        expect(spawnSpy.calls.mostRecent().args[0]).toBe('ffmpeg-test')
       })
     })
   })
@@ -26,7 +53,7 @@ describe('combine()', () => {
     it('should call combineRawAudio()', () => {
       return combine(testManifest, tempfile(), 'raw').then(() => {
         // We can't spy on combineRawAudio() directly, so look at its internals. // TODO is this true?
-        expect(fs.createFileSync).toHaveBeenCalled()
+        expect(fsSpy.createFileSync).toHaveBeenCalled()
       })
     })
   })
@@ -35,8 +62,8 @@ describe('combine()', () => {
     it('should call combineEncodedAudio()', () => {
       return combine(testManifest, tempfile()).then(() => {
         // We can't spy on combineEncodedAudio() directly, so look at its internals. // TODO is this true?
-        expect(spawn).toHaveBeenCalled()
-        expect(spawn.calls.mostRecent().args[0]).toBe('ffmpeg')
+        expect(spawnSpy).toHaveBeenCalled()
+        expect(spawnSpy.calls.mostRecent().args[0]).toBe('ffmpeg')
       })
     })
   })
@@ -58,7 +85,7 @@ describe('combine()', () => {
     let result
 
     beforeEach(() => {
-      spawn.on.and.callFake((type, callback) => {
+      spawnSpy.on.and.callFake((type, callback) => {
         if (type === 'error') { callback() }
       })
       return combine(testManifest, tempfile(), 'encoded').catch(response => {

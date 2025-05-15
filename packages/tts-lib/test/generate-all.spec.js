@@ -1,5 +1,9 @@
+const async = require('async')
+const proxyquire = require('proxyquire')
+
 describe('generateAll()', () => {
-  let async, generateAll, task
+  let generateAll, task
+  let asyncSpy
   let iteratorFunction
 
   const testLimit = 2
@@ -11,14 +15,16 @@ describe('generateAll()', () => {
     iteratorFunction = jasmine.createSpy('async iterator')
     iteratorFunction.and.callFake((data, i, callback) => { callback() })
     task = { title: '' }
-    const helpers = require('./helpers').loadLib('generate-speech')
-    async = helpers.async
-    generateAll = helpers.generateAll
+    asyncSpy = jasmine.createSpyObj('async', ['eachOfLimit'])
+    asyncSpy.eachOfLimit.and.callFake(async.eachOfLimit)
+    ;({ generateAll } = proxyquire('../lib/generate-speech', {
+      async: asyncSpy
+    }))
   })
 
   it('should asynchronously call the function for each of the parts', done => {
     generateAll(textParts, testLimit, iteratorFunction, task).then(() => {
-      const [parts] = async.eachOfLimit.calls.mostRecent().args
+      const [parts] = asyncSpy.eachOfLimit.calls.mostRecent().args
       expect(parts).toEqual(textParts)
       expect(parts.length).toBe(textParts.length)
       expect(iteratorFunction.calls.count()).toBe(textParts.length)
@@ -27,14 +33,14 @@ describe('generateAll()', () => {
 
   it('should limit the async calls according to the option', done => {
     generateAll(textParts, testLimit, iteratorFunction, task).then(() => {
-      const [, limit] = async.eachOfLimit.calls.mostRecent().args
+      const [, limit] = asyncSpy.eachOfLimit.calls.mostRecent().args
       expect(limit).toBe(testLimit)
     }).then(done)
   })
 
   describe('initial spinner', () => {
     beforeEach(done => {
-      async.eachOfLimit.and.callFake((parts, opts, func, callback) => {
+      asyncSpy.eachOfLimit.and.callFake((parts, opts, func, callback) => {
         callback(new Error('reject async'))
       })
       generateAll(textParts, 1, iteratorFunction, task).catch(() => {

@@ -1,12 +1,8 @@
+const { splitText } = require('../lib/split-text')
+
 describe('splitText()', () => {
   const maxChars = 1000
   const testData = 'hello world'
-
-  let splitText
-
-  beforeEach(() => {
-    ({ splitText } = require('./helpers').loadLib('split-text'))
-  })
 
   it('should split the text into an array of parts', done => {
     splitText(testData, maxChars).then((parts) => {

@@ -1,19 +1,25 @@
+const proxyquire = require('proxyquire')
+
 describe('createManifest()', () => {
   const testParts = [
     { tempfile: 'foo.mp3' },
     { tempfile: 'bar.mp3' }
   ]
 
-  let createManifest, fs
+  let createManifest
+  let fsSpy
   let outputFilename, fileContents, options, lines, response
 
   beforeEach(() => {
-    ({ createManifest, fs } = require('./helpers').loadLib('generate-speech'))
+    fsSpy = jasmine.createSpyObj('fs', ['writeFileSync'])
+    ;({ createManifest } = proxyquire('../lib/generate-speech', {
+      'fs-extra': fsSpy
+    }))
   })
 
   beforeEach(() => {
     response = createManifest(testParts);
-    [outputFilename, fileContents, options] = fs.writeFileSync.calls.mostRecent().args
+    [outputFilename, fileContents, options] = fsSpy.writeFileSync.calls.mostRecent().args
     lines = fileContents.split('\n')
   })
 

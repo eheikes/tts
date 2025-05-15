@@ -8,21 +8,21 @@ describe('AWS provider', () => {
   const chunks = ['hello world']
 
   let combineStub
-  let fsStub
+  let fsSpy
   let splitTextStub
   let AwsProvider
   let provider
 
   beforeEach(() => {
     combineStub = jasmine.createSpy('combine')
-    fsStub = jasmine.createSpyObj('fs', ['createWriteStream'])
-    fsStub.createWriteStream.and.callFake(filename => {
+    fsSpy = jasmine.createSpyObj('fs', ['createWriteStream'])
+    fsSpy.createWriteStream.and.callFake(filename => {
       const stream = fs.createWriteStream(filename)
       return stream
     })
     splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
     ;({ AwsProvider } = proxyquire('../../lib/providers/aws', {
-      'fs-extra': fsStub,
+      'fs-extra': fsSpy,
       '../combine-parts': {
         combine: combineStub
       },
@@ -343,7 +343,7 @@ describe('AWS provider', () => {
     })
 
     it('should callback with an error if file saving fails', done => {
-      fsStub.createWriteStream.and.callFake(filename => {
+      fsSpy.createWriteStream.and.callFake(filename => {
         const stream = fs.createWriteStream(filename)
         stream.on('pipe', () => {
           stream.emit('error', new Error('write stream error'))
