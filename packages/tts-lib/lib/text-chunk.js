@@ -46,10 +46,12 @@ const chunkText = (text, maxLength) => {
           j++
         }
         safety3++
+        /* istanbul ignore next */
         if (safety3 > words.length + epsilon) { throw new Error('Infinite loop') }
       }
 
       // If there is an unfilled chunk remaining, add it to the list.
+      /* istanbul ignore else: I don't think this condition is ever false... */
       if (chunk !== '') {
         chunks.push(chunk)
       }
@@ -65,11 +67,13 @@ const chunkText = (text, maxLength) => {
         chunk += newChunk
         i++
         safety2++
+        /* istanbul ignore next */
         if (safety2 > sentences.length + epsilon) { throw new Error('Infinite loop') }
       }
       chunks.push(chunk)
     }
     safety++
+    /* istanbul ignore next */
     if (safety > sentences.length + epsilon) { throw new Error('Infinite loop') }
   }
 

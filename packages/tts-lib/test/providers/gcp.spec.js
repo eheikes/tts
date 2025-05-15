@@ -1,27 +1,69 @@
 const TextToSpeechClient = require('@google-cloud/text-to-speech').TextToSpeechClient
 const fs = require('fs')
 const path = require('path')
+const proxyquire = require('proxyquire')
 const tempfile = require('tempfile')
 
-describe('Google Cloud provider', () => {
+describe('GCP provider', () => {
+  const chunks = ['hello world']
+
+  let combineStub
   let fsStub
-  let create
-  let GoogleProvider
+  let splitTextStub
+  let GcpProvider
   let provider
 
   beforeEach(() => {
-    ({ fs: fsStub, create, GoogleProvider } = require('../helpers').loadLib('providers/gcp'))
-    provider = create({
+    combineStub = jasmine.createSpy('combine')
+    fsStub = jasmine.createSpyObj('fs', ['writeFile'])
+    fsStub.writeFile.and.callFake((dest, data, opts, callback) => { callback() })
+    splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
+    ;({ GcpProvider } = proxyquire('../../lib/providers/gcp', {
+      'fs-extra': fsStub,
+      '../combine-parts': {
+        combine: combineStub
+      },
+      '../split-text': {
+        splitText: splitTextStub
+      }
+    }))
+    provider = new GcpProvider({
       email: 'foo@example.com',
       privateKey: 'private key',
       projectFile: 'project-file.json',
-      projectId: 'project ID'
+      projectId: 'project ID',
+      format: 'mp3'
     })
   })
 
-  describe('create()', () => {
-    it('should create a provider instance', () => {
-      expect(provider).toEqual(jasmine.any(GoogleProvider))
+  describe('constructor', () => {
+    it('should allow for no options', () => {
+      expect(() => {
+        provider = new GcpProvider()
+      }).not.toThrow()
+    })
+
+    it('should set the name', () => {
+      expect(provider.name).toBe('GCP')
+    })
+
+    it('should set the max character count to 5000', () => {
+      expect(provider.maxCharacterCount).toBe(5000)
+    })
+
+    it('should set the language to "en-US" if not defined', () => {
+      expect(provider.opts.language).toBe('en-US')
+    })
+
+    it('should set the language', () => {
+      provider = new GcpProvider({
+        email: 'foo@example.com',
+        privateKey: 'private key',
+        projectFile: 'project-file.json',
+        projectId: 'project ID',
+        language: 'en-GB'
+      })
+      expect(provider.opts.language).toBe('en-GB')
     })
 
     it('should have an underlying Google Cloud object', () => {
@@ -43,7 +85,7 @@ describe('Google Cloud provider', () => {
     })
 
     it('should leave out the project file if not specified', () => {
-      provider = create({
+      provider = new GcpProvider({
         email: 'foo@example.com',
         'private-key': 'private key'
       })
@@ -57,7 +99,7 @@ describe('Google Cloud provider', () => {
     })
 
     it('should use the project file as-is if an absolute path', () => {
-      provider = create({
+      provider = new GcpProvider({
         email: 'foo@example.com',
         privateKey: 'fake key',
         projectFile: path.resolve('project-file.json')
@@ -75,16 +117,46 @@ describe('Google Cloud provider', () => {
       }
       fs.writeFileSync(filename, JSON.stringify(fakeProject), 'utf8')
       expect(() => {
-        create({ 'project-file': filename })
+        new GcpProvider({ 'project-file': filename }) // eslint-disable-line no-new
       }).not.toThrow()
     })
   })
 
-  describe('buildPart()', () => {
-    it('should return an object with a `synthesizer` property', () => {
-      expect(provider.buildPart()).toEqual({
+  describe('extensionFor()', () => {
+    it('should return "mp3" for the MP3 format', () => {
+      expect(provider.extensionFor('mp3')).toBe('mp3')
+    })
+
+    it('should return "ogg" for the Ogg format', () => {
+      expect(provider.extensionFor('ogg')).toBe('ogg')
+    })
+
+    it('should return "ogg" for the (deprecated) Ogg Vorbis format', () => {
+      expect(provider.extensionFor('ogg_vorbis')).toBe('ogg')
+    })
+
+    it('should return "wav" for the PCM format', () => {
+      expect(provider.extensionFor('pcm')).toBe('wav')
+    })
+
+    it('should throw an error for unknown formats', () => {
+      expect(() => {
+        provider.extensionFor('foo')
+      }).toThrow()
+    })
+  })
+
+  describe('buildInfo()', () => {
+    it('should return an object with the expected properties', () => {
+      const task = { foo: 1, bar: 2 }
+      const info = provider.buildInfo('hello world', task)
+      expect(info).toEqual({
+        task,
+        tempfile: jasmine.any(String),
+        text: 'hello world',
         synthesizer: jasmine.any(Function)
       })
+      expect(info.tempfile).toMatch(/\.mp3$/)
     })
   })
 

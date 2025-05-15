@@ -1,0 +1,32 @@
+const proxyquire = require('proxyquire')
+
+describe('cleanup()', () => {
+  const manifestFilename = 'manifest.txt'
+  const tempFilenames = ['foo.mp3', 'bar.mp3']
+
+  let cleanup
+  let fsSpy
+
+  beforeEach(() => {
+    fsSpy = jasmine.createSpyObj('fs', ['readFileSync', 'removeSync'])
+    ;({ cleanup } = proxyquire('../lib/cleanup', {
+      'fs-extra': fsSpy
+    }))
+  })
+
+  beforeEach(() => {
+    const manifestContents = tempFilenames.map(filename => `file '${filename}'`).join('\n')
+    fsSpy.readFileSync.and.callFake(() => manifestContents)
+    return cleanup(manifestFilename)
+  })
+
+  it('should delete the manifest file', () => {
+    expect(fsSpy.removeSync).toHaveBeenCalledWith(manifestFilename)
+  })
+
+  it('should delete the temporary audio files', () => {
+    tempFilenames.forEach(filename => {
+      expect(fsSpy.removeSync).toHaveBeenCalledWith(filename)
+    })
+  })
+})

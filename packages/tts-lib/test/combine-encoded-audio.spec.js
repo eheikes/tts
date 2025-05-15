@@ -1,12 +1,35 @@
+const proxyquire = require('proxyquire')
+
 describe('combineEncodedAudio()', () => {
   const binary = 'ffmpeg'
   const manifestFilename = 'manifest.txt'
   const tempFilename = 'foobar.mp3'
 
-  let combineEncodedAudio, spawn
+  let combineEncodedAudio
+  let spawnSpy
 
   beforeEach(() => {
-    ({ combineEncodedAudio, spawn } = require('./helpers').loadLib('combine-parts'))
+    const spawnOnSpy = jasmine.createSpy('spawn.on').and.callFake((type, callback) => {
+      if (type === 'close') { callback() }
+    })
+    const spawnStderrOn = jasmine.createSpy('spawn.stderr.on')
+    spawnSpy = jasmine.createSpy('spawn').and.callFake(() => {
+      return {
+        on: spawnOnSpy,
+        stderr: {
+          on: spawnStderrOn
+        }
+      }
+    })
+    spawnSpy.on = spawnOnSpy
+    spawnSpy.stderr = {
+      on: spawnStderrOn
+    }
+    ;({ combineEncodedAudio } = proxyquire('../lib/combine-parts', {
+      child_process: {
+        spawn: spawnSpy
+      }
+    }))
   })
 
   describe('process', () => {
@@ -14,7 +37,7 @@ describe('combineEncodedAudio()', () => {
 
     beforeEach(() => {
       combineEncodedAudio(binary, manifestFilename, tempFilename);
-      [cmd, args] = spawn.calls.mostRecent().args
+      [cmd, args] = spawnSpy.calls.mostRecent().args
       args = args.join(' ')
     })
 
@@ -45,7 +68,7 @@ describe('combineEncodedAudio()', () => {
 
   describe('when the process cannot be spawned', () => {
     beforeEach(() => {
-      spawn.on.and.callFake((type, callback) => {
+      spawnSpy.on.and.callFake((type, callback) => {
         if (type === 'error') { callback() }
       })
     })
@@ -62,10 +85,10 @@ describe('combineEncodedAudio()', () => {
     const errorOutput = 'foobar'
 
     beforeEach(() => {
-      spawn.on.and.callFake((type, callback) => {
+      spawnSpy.on.and.callFake((type, callback) => {
         if (type === 'close') { callback(errorCode) }
       })
-      spawn.stderr.on.and.callFake((type, callback) => {
+      spawnSpy.stderr.on.and.callFake((type, callback) => {
         if (type === 'data') { callback(errorOutput) }
       })
     })
