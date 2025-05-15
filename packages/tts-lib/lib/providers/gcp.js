@@ -61,7 +61,10 @@ class GcpProvider extends Provider {
    * Calls the Google Cloud API with the given info.
    */
   generate = function (info, i, callback) {
-    info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
+    /* istanbul ignore else: not a real-life scenario */
+    if (info.task.title.length < 1000) { // prevent regexp DoS
+      info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
+    }
 
     const request = {
       input: info.opts.type === 'ssml'

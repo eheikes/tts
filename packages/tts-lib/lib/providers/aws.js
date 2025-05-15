@@ -62,7 +62,10 @@ class AwsProvider extends Provider {
    * Calls the Polly API with the given info.
    */
   generate (info, i, callback) {
-    info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
+    /* istanbul ignore else: not a real-life scenario */
+    if (info.task.title.length < 1000) { // prevent regexp DoS
+      info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
+    }
 
     const command = new SynthesizeSpeechCommand({
       Engine: info.opts.engine,
