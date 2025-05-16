@@ -8,9 +8,9 @@ describe('readText()', () => {
   let stdin
 
   beforeEach(() => {
-    fsSpy = jasmine.createSpyObj('fs', ['readFile', 'readFileSync'])
+    fsSpy = jasmine.createSpyObj('fs', ['readFile'])
     ;({ readText } = proxyquire('../lib/read-text', {
-      'fs-extra': fsSpy
+      'fs/promises': fsSpy
     }))
   })
 
@@ -52,18 +52,12 @@ describe('readText()', () => {
     const testFilename = 'test.txt'
 
     beforeEach(() => {
-      fsSpy.readFile.and.callFake((filename, opts, callback) => {
-        callback(null, testData)
-      })
+      fsSpy.readFile.and.callFake((filename, opts) => Promise.resolve(testData))
     })
 
     it('should read data from the file', done => {
       readText(testFilename, { stdin }).then(() => {
-        expect(fsSpy.readFile).toHaveBeenCalledWith(
-          testFilename,
-          'utf8',
-          jasmine.any(Function)
-        )
+        expect(fsSpy.readFile).toHaveBeenCalledWith(testFilename, 'utf8')
       }).then(done)
     })
 
@@ -78,9 +72,7 @@ describe('readText()', () => {
     describe('and cannot read the file', () => {
       it('should reject with the error', done => {
         const testError = 'error object'
-        fsSpy.readFile.and.callFake((filename, opts, callback) => {
-          callback(testError)
-        })
+        fsSpy.readFile.and.callFake((filename, opts) => Promise.reject(testError))
         readText(testFilename, { stdin }).catch(err => {
           expect(err).toBe(testError)
         }).then(done)

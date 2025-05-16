@@ -8,39 +8,35 @@ describe('moveTempFile()', () => {
   let fsSpy
   let ctx, task
 
-  beforeEach(() => {
-    fsSpy = jasmine.createSpyObj('fs', ['move'])
-    fsSpy.move.and.callFake((src, dest, opts, callback) => { callback() })
+  beforeEach(async () => {
+    fsSpy = jasmine.createSpyObj('fs', ['rename'])
+    fsSpy.rename.and.callFake((src, dest) => Promise.resolve())
     ;({ moveTempFile } = proxyquire('../lib/move-temp-file', {
-      'fs-extra': fsSpy
+      'fs/promises': fsSpy
     }))
     ctx = {
       tempFile: sourceFile,
       outputFilename: destFile
     }
     task = { title: 'test task' }
-    return moveTempFile(ctx, task)
+    await moveTempFile(ctx, task)
   })
 
   it('should overwrite the destination filename with the specified temp file', () => {
-    expect(fsSpy.move).toHaveBeenCalledWith(
-      sourceFile,
-      destFile,
-      { overwrite: true },
-      jasmine.any(Function)
-    )
+    expect(fsSpy.rename).toHaveBeenCalledWith(sourceFile, destFile)
   })
 
   it('should update the task title', () => {
     expect(task.title).toContain('Done. Saved to')
   })
 
-  it('should return the error if the filesystem call fails', () => {
-    fsSpy.move.and.callFake((src, dest, opts, callback) => callback(new Error('test error')))
-    return moveTempFile(ctx, task).then(() => {
+  it('should return the error if the filesystem call fails', async () => {
+    fsSpy.rename.and.callFake((src, dest) => Promise.reject(new Error('test error')))
+    try {
+      await moveTempFile(ctx, task)
       throw new Error('should have thrown!')
-    }).catch(err => {
+    } catch(err) {
       expect(err.message).toBe('test error')
-    })
+    }
   })
 })

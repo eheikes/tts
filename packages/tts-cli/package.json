@@ -36,7 +36,6 @@
   "homepage": "https://github.com/eheikes/tts/tree/master/packages/tts-cli#readme",
   "dependencies": {
     "debug": "^3.1.0",
-    "fs-extra": "^2.0.0",
     "listr2": "^8.0.2",
     "minimist": "^1.2.0"
   },

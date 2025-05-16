@@ -1,18 +1,13 @@
 const debug = require('debug')('moveTempFile')
-const fs = require('fs-extra')
+const { rename } = require('fs/promises')
 
 /**
  * Moves the temporary file to the final destination.
  */
-exports.moveTempFile = (ctx, task) => {
+exports.moveTempFile = async (ctx, task) => {
   const tempFile = ctx.tempFile
   const outputFilename = ctx.outputFilename
   debug(`copying ${tempFile} to ${outputFilename}`)
-  return new Promise((resolve, reject) => {
-    fs.move(tempFile, outputFilename, { overwrite: true }, (err) => {
-      if (err) { return reject(err) }
-      task.title = `Done. Saved to ${outputFilename}`
-      resolve()
-    })
-  })
+  await rename(tempFile, outputFilename)
+  task.title = `Done. Saved to ${outputFilename}`
 }

@@ -4,7 +4,7 @@
  *   to convert it to an audio file.
  */
 const debug = require('debug')('tts-cli')
-const fs = require('fs-extra')
+const { readFileSync} = require('fs')
 const { createProvider } = require('../tts-lib/lib/provider')
 const { cleanup } = require('../tts-lib/lib/cleanup')
 
@@ -61,7 +61,7 @@ if (typeof opts.lexicon !== 'undefined' && !Array.isArray(opts.lexicon)) {
 }
 if (args['private-key-file']) {
   debug(`Reading private key from ${args['private-key-file']}`)
-  opts.privateKey = fs.readFileSync(args['private-key-file'], 'utf8')
+  opts.privateKey = readFileSync(args['private-key-file'], 'utf8')
 }
 debug(`Options: ${JSON.stringify(sanitizeOpts(opts))}`)
 
