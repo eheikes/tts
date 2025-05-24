@@ -1,5 +1,5 @@
 const debug = require('debug')
-const fs = require('fs-extra')
+const { writeFile } = require('fs')
 const path = require('path')
 const tempfile = require('tempfile')
 const GoogleClient = require('@google-cloud/text-to-speech').TextToSpeechClient
@@ -98,7 +98,7 @@ class GcpProvider extends Provider {
       }
 
       debug('generate')(`Writing audio content to ${info.tempfile}`)
-      fs.writeFile(info.tempfile, response.audioContent, 'binary', err => {
+      writeFile(info.tempfile, response.audioContent, 'binary', err => {
         if (err) {
           debug('generate')(`Error writing: ${err.message}`)
           return callback(err)

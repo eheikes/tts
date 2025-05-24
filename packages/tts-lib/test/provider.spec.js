@@ -16,7 +16,7 @@ describe('provider', () => {
 
     beforeEach(() => {
       combineStub = jasmine.createSpy('combine').and.returnValue(manifestFile)
-      createManifestStub = jasmine.createSpy('createManifest').and.returnValue(manifestFile)
+      createManifestStub = jasmine.createSpy('createManifest').and.returnValue(Promise.resolve(manifestFile))
       generateAllStub = jasmine.createSpy('generateAll').and.returnValue(Promise.resolve(parts))
       splitTextStub = jasmine.createSpy('generateAll').and.returnValue(chunks)
       ;({ Provider } = proxyquire('../lib/provider', {

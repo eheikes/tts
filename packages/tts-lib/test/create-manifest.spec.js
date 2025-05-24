@@ -11,15 +11,15 @@ describe('createManifest()', () => {
   let outputFilename, fileContents, options, lines, response
 
   beforeEach(() => {
-    fsSpy = jasmine.createSpyObj('fs', ['writeFileSync'])
+    fsSpy = jasmine.createSpyObj('fs', ['writeFile'])
     ;({ createManifest } = proxyquire('../lib/generate-speech', {
-      'fs-extra': fsSpy
+      'fs/promises': fsSpy
     }))
   })
 
-  beforeEach(() => {
-    response = createManifest(testParts);
-    [outputFilename, fileContents, options] = fsSpy.writeFileSync.calls.mostRecent().args
+  beforeEach(async () => {
+    response = await createManifest(testParts);
+    [outputFilename, fileContents, options] = fsSpy.writeFile.calls.mostRecent().args
     lines = fileContents.split('\n')
   })
 

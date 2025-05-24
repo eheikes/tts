@@ -8,25 +8,25 @@ describe('cleanup()', () => {
   let fsSpy
 
   beforeEach(() => {
-    fsSpy = jasmine.createSpyObj('fs', ['readFileSync', 'removeSync'])
+    fsSpy = jasmine.createSpyObj('fs', ['readFile', 'rm'])
     ;({ cleanup } = proxyquire('../lib/cleanup', {
-      'fs-extra': fsSpy
+      'fs/promises': fsSpy
     }))
   })
 
   beforeEach(() => {
     const manifestContents = tempFilenames.map(filename => `file '${filename}'`).join('\n')
-    fsSpy.readFileSync.and.callFake(() => manifestContents)
+    fsSpy.readFile.and.callFake(() => Promise.resolve(manifestContents))
     return cleanup(manifestFilename)
   })
 
   it('should delete the manifest file', () => {
-    expect(fsSpy.removeSync).toHaveBeenCalledWith(manifestFilename)
+    expect(fsSpy.rm).toHaveBeenCalledWith(manifestFilename, { force: true, recursive: true })
   })
 
   it('should delete the temporary audio files', () => {
     tempFilenames.forEach(filename => {
-      expect(fsSpy.removeSync).toHaveBeenCalledWith(filename)
+      expect(fsSpy.rm).toHaveBeenCalledWith(filename, { force: true, recursive: true })
     })
   })
 })

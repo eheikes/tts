@@ -19,7 +19,7 @@ describe('GCP provider', () => {
     fsStub.writeFile.and.callFake((dest, data, opts, callback) => { callback() })
     splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
     ;({ GcpProvider } = proxyquire('../../lib/providers/gcp', {
-      'fs-extra': fsStub,
+      fs: fsStub,
       '../combine-parts': {
         combine: combineStub
       },

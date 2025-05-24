@@ -1,6 +1,6 @@
 const spawn = require('child_process').spawn
 const debug = require('debug')
-const fs = require('fs-extra')
+const { appendFile, readFile, writeFile } = require('fs/promises')
 
 /**
  * Combines MP3 or OGG files into one file.
@@ -37,20 +37,18 @@ exports.combineEncodedAudio = (binary, manifestFile, outputFile) => {
 /**
  * Concatenates raw PCM audio into one file.
  */
-exports.combineRawAudio = (manifestFile, outputFile) => {
-  const manifest = fs.readFileSync(manifestFile, 'utf8')
+exports.combineRawAudio = async (manifestFile, outputFile) => {
+  const manifest = await readFile(manifestFile, 'utf8')
   debug('combineRawAudio')(`Manifest contains: ${manifest}`)
   const regexpState = /^file\s+'(.*)'$/gm
   debug('combineRawAudio')(`Creating file ${outputFile}`)
-  fs.createFileSync(outputFile)
-  debug('combineRawAudio')(`Truncating file ${outputFile}`)
-  fs.truncateSync(outputFile)
+  await writeFile(outputFile, '')
   let match
   while ((match = regexpState.exec(manifest)) !== null) {
     debug('combineRawAudio')(`Reading data from ${match[1]}`)
-    const dataBuffer = fs.readFileSync(match[1])
+    const dataBuffer = await readFile(match[1])
     debug('combineRawAudio')(`Appending data to ${outputFile}`)
-    fs.appendFileSync(outputFile, dataBuffer)
+    await appendFile(outputFile, dataBuffer)
   }
   return Promise.resolve()
 }

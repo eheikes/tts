@@ -1,6 +1,6 @@
 const { Polly, SynthesizeSpeechCommand } = require('@aws-sdk/client-polly')
 const debug = require('debug')
-const fs = require('fs-extra')
+const { createWriteStream } = require('fs')
 const tempfile = require('tempfile')
 const { combine } = require('../combine-parts')
 const { Provider } = require('../provider')
@@ -81,7 +81,7 @@ class AwsProvider extends Provider {
     debug('generate')('Making request to Amazon Web Services')
     info.send(command).then(response => {
       debug('generate')(`Writing audio content to ${info.tempfile}`)
-      const fileStream = fs.createWriteStream(info.tempfile)
+      const fileStream = createWriteStream(info.tempfile)
       response.AudioStream.pipe(fileStream)
       fileStream.on('finish', () => {
         fileStream.close()

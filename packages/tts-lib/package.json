@@ -32,7 +32,6 @@
     "@google-cloud/text-to-speech": "^5.0.1",
     "async": "^3.0.0",
     "debug": "^3.1.0",
-    "fs-extra": "^2.0.0",
     "sax": "^1.2.4",
     "sentence-splitter": "^5.0.0",
     "tempfile": "^1.1.1",
