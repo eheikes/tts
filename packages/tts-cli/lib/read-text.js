@@ -1,21 +1,20 @@
 const debug = require('debug')('readText')
-const fs = require('fs-extra')
+const { readFile } = require('fs/promises')
 
 /**
  * Read in the text from a file.
  * If no file is specified, read from stdin.
  */
-exports.readText = (ctx) => {
-  const inputFilename = ctx.input
-  const proc = ctx.process
+exports.readText = async (inputFilename, proc) => {
   return new Promise((resolve, reject) => {
     if (inputFilename) {
       // Read from a file.
       debug(`Reading from ${inputFilename}`)
-      fs.readFile(inputFilename, 'utf8', (err, data) => {
-        if (err) { return reject(err) }
+      readFile(inputFilename, 'utf8').then((data) => {
         debug(`Finished reading (${data.length} bytes)`)
         resolve(data)
+      }).catch((err) => {
+        reject(err)
       })
     } else {
       // Read from stdin.
@@ -32,7 +31,5 @@ exports.readText = (ctx) => {
         resolve(data)
       })
     }
-  }).then(text => {
-    ctx.text = text
   })
 }
