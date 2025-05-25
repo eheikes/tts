@@ -13,26 +13,23 @@ describe('combine()', () => {
   })
 
   describe('when the format is encoded audio', () => {
-    it('should call combineEncodedAudio()', () => {
-      return combine(testManifest, tempfile(), 'encoded', 'ffmpeg-test').then(() => {
-        expect(lib.combineEncodedAudio).toHaveBeenCalledWith('ffmpeg-test', 'manifest.txt', jasmine.any(String))
-      })
+    it('should call combineEncodedAudio()', async () => {
+      await combine(testManifest, tempfile(), 'encoded', 'ffmpeg-test')
+      expect(lib.combineEncodedAudio).toHaveBeenCalledWith('ffmpeg-test', 'manifest.txt', jasmine.any(String))
     })
   })
 
   describe('when the format is raw', () => {
-    it('should call combineRawAudio()', () => {
-      return combine(testManifest, tempfile(), 'raw').then(() => {
-        expect(lib.combineRawAudio).toHaveBeenCalledWith('manifest.txt', jasmine.any(String))
-      })
+    it('should call combineRawAudio()', async () => {
+      await combine(testManifest, tempfile(), 'raw')
+      expect(lib.combineRawAudio).toHaveBeenCalledWith('manifest.txt', jasmine.any(String))
     })
   })
 
   describe('default format', () => {
-    it('should call combineEncodedAudio()', () => {
-      return combine(testManifest, tempfile()).then(() => {
-        expect(lib.combineEncodedAudio).toHaveBeenCalledWith('ffmpeg', 'manifest.txt', jasmine.any(String))
-      })
+    it('should call combineEncodedAudio()', async () => {
+      await combine(testManifest, tempfile())
+      expect(lib.combineEncodedAudio).toHaveBeenCalledWith('ffmpeg', 'manifest.txt', jasmine.any(String))
     })
   })
 
