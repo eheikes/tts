@@ -78,10 +78,9 @@ describe('GCP provider', () => {
       expect(provider.instance.auth.jsonContent.private_key).toBe('private key')
     })
 
-    it('should use the project ID from the options', () => {
-      provider.instance.getProjectId().then(id => {
-        expect(id).toBe('project ID')
-      })
+    it('should use the project ID from the options', async () => {
+      const id = await provider.instance.getProjectId()
+      expect(id).toBe('project ID')
     })
 
     it('should leave out the project file if not specified', () => {
