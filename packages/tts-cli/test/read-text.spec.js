@@ -15,36 +15,34 @@ describe('readText()', () => {
   })
 
   beforeEach(() => {
-    let sentData = false
-    stdin = jasmine.createSpyObj('stdin', ['on', 'read', 'setEncoding'])
-    stdin.on.and.callFake((type, callback) => { callback() })
-    stdin.read.and.callFake(() => {
-      const response = sentData ? null : testData
-      sentData = true
-      return response
-    })
-  })
-
-  describe('when it succeeds', () => {
-    it('should set the read text', done => {
-      readText(null, { stdin }).then((text) => {
-        expect(text).toBe(testData)
-      }).then(done)
-    })
+    stdin = {
+      [Symbol.asyncIterator]() {
+        let allDone = false
+        return {
+          next() {
+            const done = allDone
+            const value = done ? undefined : testData
+            allDone = true
+            return Promise.resolve({ value, done })
+          },
+          return() {
+            return { done: true }
+          }
+        }
+      },
+      setEncoding: jasmine.createSpy('setEncoding')
+    }
   })
 
   describe('when no filename is specified', () => {
-    it('should read data from stdin', done => {
-      readText(null, { stdin }).then(() => {
-        expect(stdin.on).toHaveBeenCalled()
-        expect(stdin.read).toHaveBeenCalled()
-      }).then(done)
+    it('should read data from stdin', async () => {
+      const text = await readText(null, { stdin })
+      expect(text).toBe(testData)
     })
 
-    it('should use UTF-8 encoding', done => {
-      readText(null, { stdin }).then(() => {
-        expect(stdin.setEncoding).toHaveBeenCalledWith('utf8')
-      }).then(done)
+    it('should use UTF-8 encoding', async () => {
+      await readText(null, { stdin })
+      expect(stdin.setEncoding).toHaveBeenCalledWith('utf8')
     })
   })
 
@@ -55,27 +53,28 @@ describe('readText()', () => {
       fsSpy.readFile.and.callFake((filename, opts) => Promise.resolve(testData))
     })
 
-    it('should read data from the file', done => {
-      readText(testFilename, { stdin }).then(() => {
-        expect(fsSpy.readFile).toHaveBeenCalledWith(testFilename, 'utf8')
-      }).then(done)
+    it('should read data from the file', async () => {
+      await readText(testFilename, { stdin })
+      expect(fsSpy.readFile).toHaveBeenCalledWith(testFilename, 'utf8')
     })
 
     describe('and can read the file', () => {
-      it('should set the file\'s data', done => {
-        readText(testFilename, { stdin }).then((text) => {
-          expect(text).toBe(testData)
-        }).then(done)
+      it('should set the file\'s data', async () => {
+        const text = await readText(testFilename, { stdin })
+        expect(text).toBe(testData)
       })
     })
 
     describe('and cannot read the file', () => {
-      it('should reject with the error', done => {
+      it('should reject with the error', async () => {
         const testError = 'error object'
         fsSpy.readFile.and.callFake((filename, opts) => Promise.reject(testError))
-        readText(testFilename, { stdin }).catch(err => {
+        try {
+          await readText(testFilename, { stdin })
+          throw new Error('Expected readText to throw an error')
+        } catch (err) {
           expect(err).toBe(testError)
-        }).then(done)
+        }
       })
     })
   })
