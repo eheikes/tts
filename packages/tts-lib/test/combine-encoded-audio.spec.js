@@ -73,10 +73,13 @@ describe('combineEncodedAudio()', () => {
       })
     })
 
-    it('should return a rejected promise with an error', done => {
-      combineEncodedAudio(binary, manifestFilename, tempFilename).catch(err => {
+    it('should return a rejected promise with an error', async () => {
+      try {
+        await combineEncodedAudio(binary, manifestFilename, tempFilename)
+        throw new Error('Expected combineEncodedAudio to throw an error')
+      } catch (err) {
         expect(err.message).toMatch('Could not start ffmpeg process')
-      }).then(done)
+      }
     })
   })
 
@@ -93,11 +96,14 @@ describe('combineEncodedAudio()', () => {
       })
     })
 
-    it('should return a rejected promise with the stderr output', done => {
-      combineEncodedAudio(binary, manifestFilename, tempFilename).catch(err => {
+    it('should return a rejected promise with the stderr output', async () => {
+      try {
+        await combineEncodedAudio(binary, manifestFilename, tempFilename)
+        throw new Error('Expected combineEncodedAudio to throw an error')
+      } catch (err) {
         expect(err.message).toMatch(`(${errorCode})`)
         expect(err.message).toMatch(`(${errorOutput})`)
-      }).then(done)
+      }
     })
   })
 })
