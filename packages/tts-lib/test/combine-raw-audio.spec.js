@@ -19,10 +19,10 @@ describe('combineRawAudio()', () => {
     }))
   })
 
-  beforeEach(done => {
+  beforeEach(async () => {
     const manifestContents = tempFilenames.map(filename => `file '${filename}'`).join('\n')
     fsSpy.readFile.and.callFake(() => Promise.resolve(manifestContents))
-    combineRawAudio(manifestFilename, outputFilename).then(done)
+    await combineRawAudio(manifestFilename, outputFilename)
   })
 
   it('should create the output file and truncate it', () => {
