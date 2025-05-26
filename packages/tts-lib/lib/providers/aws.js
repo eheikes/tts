@@ -35,6 +35,7 @@ class AwsProvider extends Provider {
    */
   buildInfo (text, task) {
     return {
+      opts: this.opts,
       task,
       tempfile: tempfile(`.${this.extensionFor(this.opts.format)}`),
       text,

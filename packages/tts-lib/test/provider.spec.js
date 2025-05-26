@@ -60,6 +60,7 @@ describe('provider', () => {
         const task = {}
         const result = childProvider.buildInfo(text, task)
         expect(result).toEqual({
+          opts: { ffmpeg: 'ffmpeg-test', limit: 10 },
           task,
           tempfile: jasmine.any(String),
           text
@@ -103,10 +104,12 @@ describe('provider', () => {
         const task = {}
         await childProvider.generateSpeech(chunks, task)
         expect(generateAllStub).toHaveBeenCalledWith([{
+          opts: jasmine.any(Object),
           task,
           tempfile: jasmine.any(String),
           text: chunks[0]
         }, {
+          opts: jasmine.any(Object),
           task,
           tempfile: jasmine.any(String),
           text: chunks[1]

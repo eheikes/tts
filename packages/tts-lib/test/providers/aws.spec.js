@@ -153,6 +153,7 @@ describe('AWS provider', () => {
       const task = { foo: 1, bar: 2 }
       const info = provider.buildInfo('hello world', task)
       expect(info).toEqual({
+        opts: provider.opts,
         task,
         tempfile: jasmine.any(String),
         text: 'hello world',
