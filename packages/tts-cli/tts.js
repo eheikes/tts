@@ -5,7 +5,7 @@
  */
 const debug = require('debug')('tts-cli')
 const { readFileSync} = require('fs')
-const { createProvider } = require('../tts-lib/lib/provider')
+const { createProvider } = require('../tts-lib/lib/create-provider')
 const { cleanup } = require('../tts-lib/lib/cleanup')
 
 const { checkUsage } = require('./lib/check-usage')

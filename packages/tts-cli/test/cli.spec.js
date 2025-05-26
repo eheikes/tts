@@ -37,7 +37,7 @@ describe('CLI', () => {
       },
       minimist,
       '../tts-lib/lib/cleanup': { cleanup },
-      '../tts-lib/lib/provider': {
+      '../tts-lib/lib/create-provider': {
         createProvider
       },
       './lib/read-text': { readText }
