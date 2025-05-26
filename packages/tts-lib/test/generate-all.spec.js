@@ -38,8 +38,8 @@ describe('generateAll()', () => {
 
   describe('initial spinner', () => {
     beforeEach(async () => {
-      asyncSpy.eachOfLimit.and.callFake((parts, opts, func, callback) => {
-        callback(new Error('reject async'))
+      asyncSpy.eachOfLimit.and.callFake((parts, opts, func) => {
+        throw new Error('reject async')
       })
       try {
         await generateAll(textParts, 1, iteratorFunction, task)
@@ -77,8 +77,8 @@ describe('generateAll()', () => {
     const testError = 'test error'
 
     beforeEach(() => {
-      iteratorFunction.and.callFake((data, i, callback) => {
-        callback(new Error(testError))
+      iteratorFunction.and.callFake((data, i) => {
+        throw new Error(testError)
       })
     })
 

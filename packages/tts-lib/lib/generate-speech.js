@@ -21,23 +21,16 @@ exports.createManifest = async (parts) => {
 /**
  * Calls the API for each text part (throttled). Returns a Promise.
  */
-exports.generateAll = (parts, limit, func, task) => {
+exports.generateAll = async (parts, limit, func, task) => {
   const count = parts.length
   task.title = `Convert to audio (0/${count})`
-  return (new Promise((resolve, reject) => {
-    debug('generateAll')(`Requesting ${count} audio segments, ${limit} at a time`)
-    async.eachOfLimit(
-      parts,
-      limit,
-      func,
-      err => {
-        debug('generateAll')(`Requested all parts, with error ${err}`)
-        if (err) {
-          return reject(err)
-        }
-        task.title = task.title.replace(/\d+\//, `${count}/`)
-        resolve(parts)
-      }
-    )
-  }))
+  debug('generateAll')(`Requesting ${count} audio segments, ${limit} at a time`)
+  try {
+    await async.eachOfLimit(parts, limit, func)
+  } catch (err) {
+    debug('generateAll')(`Requested all parts, with error ${err}`)
+    throw err
+  }
+  task.title = task.title.replace(/\d+\//, `${count}/`)
+  return parts
 }
