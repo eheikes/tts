@@ -31,6 +31,9 @@ exports.generateAll = async (parts, limit, func, task) => {
     debug('generateAll')(`Requested all parts, with error ${err}`)
     throw err
   }
-  task.title = task.title.replace(/\d+\//, `${count}/`)
+  /* istanbul ignore else: not a real-life scenario */
+  if (task.title.length < 1000) { // prevent regexp DoS
+    task.title = task.title.replace(/\d+\//, `${count}/`)
+  }
   return parts
 }
