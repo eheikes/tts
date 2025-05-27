@@ -1,6 +1,7 @@
 const tempfile = require('tempfile')
 const { combine } = require('./combine')
-const { createManifest, generateAll } = require('./generate-all')
+const { createManifest } = require('./create-manifest')
+const { generateAll } = require('./generate-all')
 const { splitText } = require('./split-text')
 
 /**

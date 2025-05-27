@@ -23,8 +23,10 @@ describe('provider', () => {
         './combine': {
           combine: combineStub
         },
+        './create-manifest': {
+          createManifest: createManifestStub
+        },
         './generate-all': {
-          createManifest: createManifestStub,
           generateAll: generateAllStub
         },
         './split-text': {
