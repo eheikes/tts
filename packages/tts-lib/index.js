@@ -1,7 +1,7 @@
 const { AwsProvider } = require('./lib/providers/aws')
 const { GcpProvider } = require('./lib/providers/gcp')
 const { cleanup } = require('./lib/cleanup')
-const { combine } = require('./lib/combine-parts')
+const { combine } = require('./lib/combine')
 const { createProvider } = require('./lib/create-provider')
 const { createManifest, generateAll } = require('./lib/generate-speech')
 const { Provider } = require('./lib/provider')

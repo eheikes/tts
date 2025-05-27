@@ -14,7 +14,7 @@ describe('combineRawAudio()', () => {
       'readFile',
       'writeFile'
     ])
-    ;({ combineRawAudio } = proxyquire('../lib/combine-parts', {
+    ;({ combineRawAudio } = proxyquire('../lib/combine-raw-audio', {
       'fs/promises': fsSpy
     }))
   })

@@ -20,7 +20,7 @@ describe('GCP provider', () => {
     splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
     ;({ GcpProvider } = proxyquire('../../lib/providers/gcp', {
       'fs/promises': fsStub,
-      '../combine-parts': {
+      '../combine': {
         combine: combineStub
       },
       '../split-text': {

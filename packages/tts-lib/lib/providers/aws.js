@@ -3,7 +3,7 @@ const debug = require('debug')
 const { createWriteStream } = require('fs')
 const { pipeline } = require('stream/promises')
 const tempfile = require('tempfile')
-const { combine } = require('../combine-parts')
+const { combine } = require('../combine')
 const { Provider } = require('../provider')
 
 class AwsProvider extends Provider {

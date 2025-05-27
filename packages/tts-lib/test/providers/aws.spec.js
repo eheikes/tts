@@ -24,7 +24,7 @@ describe('AWS provider', () => {
     splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
     ;({ AwsProvider } = proxyquire('../../lib/providers/aws', {
       fs: fsSpy,
-      '../combine-parts': {
+      '../combine': {
         combine: combineStub
       },
       '../split-text': {

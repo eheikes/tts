@@ -1,5 +1,5 @@
 const tempfile = require('tempfile')
-const { combine } = require('./combine-parts')
+const { combine } = require('./combine')
 const { createManifest, generateAll } = require('./generate-speech')
 const { splitText } = require('./split-text')
 

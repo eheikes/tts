@@ -25,7 +25,7 @@ describe('combineEncodedAudio()', () => {
     spawnSpy.stderr = {
       on: spawnStderrOn
     }
-    ;({ combineEncodedAudio } = proxyquire('../lib/combine-parts', {
+    ;({ combineEncodedAudio } = proxyquire('../lib/combine-encoded-audio', {
       child_process: {
         spawn: spawnSpy
       }

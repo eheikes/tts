@@ -20,7 +20,7 @@ describe('provider', () => {
       generateAllStub = jasmine.createSpy('generateAll').and.returnValue(Promise.resolve(parts))
       splitTextStub = jasmine.createSpy('generateAll').and.returnValue(chunks)
       ;({ Provider } = proxyquire('../lib/provider', {
-        './combine-parts': {
+        './combine': {
           combine: combineStub
         },
         './generate-speech': {
