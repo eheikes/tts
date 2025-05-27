@@ -1,5 +1,5 @@
 const { Polly } = require('@aws-sdk/client-polly')
-const { constants: FILE, createWriteStream } = require('fs')
+const { createWriteStream } = require('fs')
 const { readFile, unlink } = require('fs/promises')
 const proxyquire = require('proxyquire')
 const { Readable } = require('stream')
