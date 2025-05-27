@@ -12,7 +12,7 @@ describe('createManifest()', () => {
 
   beforeEach(() => {
     fsSpy = jasmine.createSpyObj('fs', ['writeFile'])
-    ;({ createManifest } = proxyquire('../lib/generate-speech', {
+    ;({ createManifest } = proxyquire('../lib/create-manifest', {
       'fs/promises': fsSpy
     }))
   })
