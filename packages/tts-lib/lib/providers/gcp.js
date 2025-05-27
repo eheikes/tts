@@ -1,5 +1,6 @@
 const debug = require('debug')
-const { writeFile } = require('fs')
+const { writeFile } = require('fs/promises')
+const { promisify } = require('util')
 const path = require('path')
 const tempfile = require('tempfile')
 const GoogleClient = require('@google-cloud/text-to-speech').TextToSpeechClient
@@ -61,7 +62,7 @@ class GcpProvider extends Provider {
   /**
    * Calls the Google Cloud API with the given info.
    */
-  generate = function (info, i, callback) {
+  async generate (info, i) {
     /* istanbul ignore else: not a real-life scenario */
     if (info.task.title.length < 1000) { // prevent regexp DoS
       info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
@@ -91,22 +92,22 @@ class GcpProvider extends Provider {
       retry: null
     }
 
+    let response
     debug('generate')('Making request to Google Cloud Platform')
-    info.synthesizer(request, opts, (err, response) => {
-      if (err) {
-        debug('generate')(`Error during request: ${err.message}`)
-        return callback(err)
-      }
+    try {
+      response = await promisify(info.synthesizer)(request, opts)
+    } catch (err) {
+      debug('generate')(`Error during request: ${err.message}`)
+      throw err
+    }
 
-      debug('generate')(`Writing audio content to ${info.tempfile}`)
-      writeFile(info.tempfile, response.audioContent, 'binary', err => {
-        if (err) {
-          debug('generate')(`Error writing: ${err.message}`)
-          return callback(err)
-        }
-        callback()
-      })
-    })
+    debug('generate')(`Writing audio content to ${info.tempfile}`)
+    try {
+      await writeFile(info.tempfile, response.audioContent, 'binary')
+    } catch (err) {
+      debug('generate')(`Error writing: ${err.message}`)
+      throw err
+    }
   }
 }
 

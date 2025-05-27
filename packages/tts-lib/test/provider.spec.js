@@ -92,10 +92,13 @@ describe('provider', () => {
     })
 
     describe('generate()', () => {
-      it('should throw an error', () => {
-        expect(() => {
-          childProvider.generate()
-        }).toThrowError(/generate\(\) not implemented/)
+      it('should throw an error', async () => {
+        try {
+          await childProvider.generate()
+          throw new Error('generate() should ahve thrown error')
+        } catch (err) {
+          expect(err.message).toBe('generate() not implemented')
+        }
       })
     })
 

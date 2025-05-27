@@ -1,5 +1,6 @@
 const { Polly } = require('@aws-sdk/client-polly')
-const fs = require('fs')
+const { constants: FILE, createWriteStream } = require('fs')
+const { readFile, unlink } = require('fs/promises')
 const proxyquire = require('proxyquire')
 const { Readable } = require('stream')
 const tempfile = require('tempfile')
@@ -17,7 +18,7 @@ describe('AWS provider', () => {
     combineStub = jasmine.createSpy('combine')
     fsSpy = jasmine.createSpyObj('fs', ['createWriteStream'])
     fsSpy.createWriteStream.and.callFake(filename => {
-      const stream = fs.createWriteStream(filename)
+      const stream = createWriteStream(filename)
       return stream
     })
     splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
@@ -203,158 +204,133 @@ describe('AWS provider', () => {
       }
     })
 
-    afterEach(done => {
-      fs.access(testData.filename, fs.constants.F_OK, err => {
-        if (err) { return done() }
-        fs.unlink(testData.filename, done)
-      })
+    afterEach(async () => {
+      try {
+        await unlink(testData.filename)
+      } catch (_err) {
+        // Ignore errors.
+      }
     })
 
-    it('should update the task title', done => {
-      provider.generate(info, testData.index, () => {
-        expect(task.title).toMatch(`\\(${testData.index}/`)
-        done()
-      })
+    it('should update the task title', async () => {
+      await provider.generate(info, testData.index)
+      expect(task.title).toMatch(`\\(${testData.index}/`)
     })
 
-    it('should work with the MP3 format', done => {
+    it('should work with the MP3 format', async () => {
       testData.opts.format = 'mp3'
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.OutputFormat).toBe('mp3')
-        done()
-      })
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.OutputFormat).toBe('mp3')
     })
 
-    it('should work with the OGG format', done => {
+    it('should work with the OGG format', async () => {
       testData.opts.format = 'ogg'
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.OutputFormat).toBe('ogg_vorbis')
-        done()
-      })
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.OutputFormat).toBe('ogg_vorbis')
     })
 
-    it('should work with the PCM format', done => {
+    it('should work with the PCM format', async () => {
       testData.opts.format = 'pcm'
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.OutputFormat).toBe('pcm')
-        done()
-      })
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.OutputFormat).toBe('pcm')
     })
 
-    it('should use the given voice engine', done => {
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.Engine).toBe('neural')
-        done()
-      })
+    it('should use the given voice engine', async () => {
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.Engine).toBe('neural')
     })
 
-    it('should not use sample rate if not specified', done => {
+    it('should not use sample rate if not specified', async () => {
       delete info.opts.sampleRate
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.SampleRate).toBeUndefined()
-        done()
-      })
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.SampleRate).toBeUndefined()
     })
 
-    it('should use the (stringified) sample rate, when specified', done => {
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.SampleRate).toBe(String(testData.opts.sampleRate))
-        done()
-      })
+    it('should use the (stringified) sample rate, when specified', async () => {
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.SampleRate).toBe(String(testData.opts.sampleRate))
     })
 
-    it('should not use lexicon names if not specified', done => {
+    it('should not use lexicon names if not specified', async () => {
       delete info.opts.lexicon
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.LexiconNames).toBeUndefined()
-        done()
-      })
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.LexiconNames).toBeUndefined()
     })
 
-    it('should use the lexicon names, when specified', done => {
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.LexiconNames).toEqual(testData.opts.lexicon)
-        done()
-      })
+    it('should use the lexicon names, when specified', async () => {
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.LexiconNames).toEqual(testData.opts.lexicon)
     })
 
-    it('should use the given text type', done => {
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.TextType).toBe(testData.opts.type)
-        done()
-      })
+    it('should use the given text type', async () => {
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.TextType).toBe(testData.opts.type)
     })
 
-    it('should use the given text part', done => {
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.Text).toBe(testData.text)
-        done()
-      })
+    it('should use the given text part', async () => {
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.Text).toBe(testData.text)
     })
 
-    it('should not use a language if not specified', done => {
+    it('should not use a language if not specified', async () => {
       delete info.opts.language
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.LanguageCode).toBeUndefined()
-        done()
-      })
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.LanguageCode).toBeUndefined()
     })
 
-    it('should use the language, when specified', done => {
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.LanguageCode).toBe(testData.opts.language)
-        done()
-      })
+    it('should use the language, when specified', async () => {
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.LanguageCode).toBe(testData.opts.language)
     })
 
-    it('should use the given voice', done => {
-      provider.generate(info, 0, () => {
-        const command = send.calls.mostRecent().args[0]
-        expect(command.input.VoiceId).toBe(String(testData.opts.voice))
-        done()
-      })
+    it('should use the given voice', async () => {
+      await provider.generate(info, 0)
+      const command = send.calls.mostRecent().args[0]
+      expect(command.input.VoiceId).toBe(String(testData.opts.voice))
     })
 
-    it('should pipe the resulting stream into the file', done => {
-      provider.generate(info, 0, () => {
-        const contents = fs.readFileSync(testData.filename, 'utf-8')
-        expect(contents).toBe('testing')
-        done()
-      })
+    it('should pipe the resulting stream into the file', async () => {
+      await provider.generate(info, 0)
+      const contents = await readFile(testData.filename, 'utf-8')
+      expect(contents).toBe('testing')
     })
 
-    it('should callback with an error if send() fails', done => {
+    it('should callback with an error if send() fails', async () => {
       info.send = jasmine.createSpy('send').and.rejectWith(new Error('test error'))
-      provider.generate(info, 0, err => {
+      try {
+        await provider.generate(info, 0)
+        throw new Error('generate() should have thrown an error')
+      } catch (err) {
         expect(err).toEqual(new Error('test error'))
-        done()
-      })
+      }
     })
 
-    it('should callback with an error if file saving fails', done => {
+    it('should callback with an error if file saving fails', async () => {
       fsSpy.createWriteStream.and.callFake(filename => {
-        const stream = fs.createWriteStream(filename)
+        const stream = createWriteStream(filename)
         stream.on('pipe', () => {
           stream.emit('error', new Error('write stream error'))
         })
         return stream
       })
-      provider.generate(info, 0, err => {
+      try {
+        await provider.generate(info, 0)
+        throw new Error('generate() should have thrown error')
+      } catch (err) {
         expect(err).toEqual(new Error('write stream error'))
-        done()
-      })
+      }
     })
   })
 })

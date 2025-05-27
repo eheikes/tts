@@ -44,7 +44,7 @@ class Provider {
   /**
    * This should be overridden by subclasses.
    */
-  generate (_info, _i, _callback) {
+  async generate (_info, _i) {
     throw new Error('generate() not implemented')
   }
 

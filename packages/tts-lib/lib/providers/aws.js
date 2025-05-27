@@ -1,6 +1,7 @@
 const { Polly, SynthesizeSpeechCommand } = require('@aws-sdk/client-polly')
 const debug = require('debug')
 const { createWriteStream } = require('fs')
+const { pipeline } = require('stream/promises')
 const tempfile = require('tempfile')
 const { combine } = require('../combine-parts')
 const { Provider } = require('../provider')
@@ -62,7 +63,7 @@ class AwsProvider extends Provider {
   /**
    * Calls the Polly API with the given info.
    */
-  generate (info, i, callback) {
+  async generate (info, i, callback) {
     /* istanbul ignore else: not a real-life scenario */
     if (info.task.title.length < 1000) { // prevent regexp DoS
       info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
@@ -80,22 +81,23 @@ class AwsProvider extends Provider {
     })
 
     debug('generate')('Making request to Amazon Web Services')
-    info.send(command).then(response => {
-      debug('generate')(`Writing audio content to ${info.tempfile}`)
-      const fileStream = createWriteStream(info.tempfile)
-      response.AudioStream.pipe(fileStream)
-      fileStream.on('finish', () => {
-        fileStream.close()
-        callback()
-      })
-      fileStream.on('error', err => {
-        debug('generate')(`Error writing: ${err.message}`)
-        return callback(err)
-      })
-    }, err => {
+    let response
+    try {
+      response = await info.send(command)
+    } catch (err) {
       debug('generate')(`Error during request: ${err.message}`)
-      return callback(err)
-    })
+      throw err
+    }
+
+    debug('generate')(`Writing audio content to ${info.tempfile}`)
+    try {
+      const fileStream = createWriteStream(info.tempfile)
+      await pipeline(response.AudioStream, fileStream)
+      fileStream.close()
+    } catch (err) {
+      debug('generate')(`Error writing: ${err.message}`)
+      throw err
+    }
   }
 }
 
