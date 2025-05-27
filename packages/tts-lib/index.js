@@ -4,7 +4,7 @@ const { cleanup } = require('./lib/cleanup')
 const { combine } = require('./lib/combine')
 const { createManifest } = require('./lib/create-manifest')
 const { createProvider } = require('./lib/create-provider')
-const { generateAll } = require('./lib/generate-speech')
+const { generateAll } = require('./lib/generate-all')
 const { Provider } = require('./lib/provider')
 const { splitText } = require('./lib/split-text')
 

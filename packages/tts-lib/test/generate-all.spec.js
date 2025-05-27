@@ -17,7 +17,7 @@ describe('generateAll()', () => {
     task = { title: '' }
     asyncSpy = jasmine.createSpyObj('async', ['eachOfLimit'])
     asyncSpy.eachOfLimit.and.callFake(async.eachOfLimit)
-    ;({ generateAll } = proxyquire('../lib/generate-speech', {
+    ;({ generateAll } = proxyquire('../lib/generate-all', {
       async: asyncSpy
     }))
   })

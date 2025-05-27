@@ -23,7 +23,7 @@ describe('provider', () => {
         './combine': {
           combine: combineStub
         },
-        './generate-speech': {
+        './generate-all': {
           createManifest: createManifestStub,
           generateAll: generateAllStub
         },
