@@ -36,10 +36,7 @@ describe('CLI', () => {
         readFileSync: () => 'file contents'
       },
       minimist,
-      '../tts-lib/lib/cleanup': { cleanup },
-      '../tts-lib/lib/create-provider': {
-        createProvider
-      },
+      '../tts-lib': { cleanup, createProvider },
       './lib/read-text': { readText }
     }
     cli = proxyquire('../tts', mocks)
