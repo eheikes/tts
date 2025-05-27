@@ -4,7 +4,7 @@
  *   to convert it to an audio file.
  */
 const debug = require('debug')('tts-cli')
-const { readFileSync} = require('fs')
+const { readFileSync } = require('fs')
 const { createProvider } = require('../tts-lib/lib/create-provider')
 const { cleanup } = require('../tts-lib/lib/cleanup')
 
