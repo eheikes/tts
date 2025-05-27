@@ -16,16 +16,16 @@ describe('readText()', () => {
 
   beforeEach(() => {
     stdin = {
-      [Symbol.asyncIterator]() {
+      [Symbol.asyncIterator] () {
         let allDone = false
         return {
-          next() {
+          next () {
             const done = allDone
             const value = done ? undefined : testData
             allDone = true
             return Promise.resolve({ value, done })
           },
-          return() {
+          return () {
             return { done: true }
           }
         }

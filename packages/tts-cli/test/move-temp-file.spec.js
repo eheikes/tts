@@ -35,7 +35,7 @@ describe('moveTempFile()', () => {
     try {
       await moveTempFile(ctx, task)
       throw new Error('should have thrown!')
-    } catch(err) {
+    } catch (err) {
       expect(err.message).toBe('test error')
     }
   })

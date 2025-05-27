@@ -32,7 +32,7 @@ describe('CLI', () => {
       }
     })
     mocks = {
-      'fs': {
+      fs: {
         readFileSync: () => 'file contents'
       },
       minimist,
