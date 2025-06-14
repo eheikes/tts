@@ -4,18 +4,15 @@
  *   to convert it to an audio file.
  */
 const debug = require('debug')('tts-cli')
-const { readFileSync } = require('fs')
 const { cleanup, createProvider } = require('../tts-lib')
 
-const { checkUsage } = require('./lib/check-usage')
+const { program } = require('./lib/program')
 const { moveTempFile } = require('./lib/move-temp-file')
 const { readText } = require('./lib/read-text')
 const { sanitizeOpts } = require('./lib/sanitize-opts')
 
-const args = require('minimist')(process.argv.slice(2))
-debug('called with arguments', JSON.stringify(sanitizeOpts(args)))
-
-let [input, outputFilename] = args._
+program.parse()
+let [input, outputFilename] = program.args
 
 // If only 1 argument was given, use that for the output filename.
 if (!outputFilename) {
@@ -25,48 +22,12 @@ if (!outputFilename) {
 debug('input:', input)
 debug('output:', outputFilename)
 
-// Check the usage.
-checkUsage(args, process)
-
 // Set the options.
-const opts = Object.assign({}, {
-  accessKey: args['access-key'],
-  effect: args.effect,
-  email: args.email,
-  engine: args.engine,
-  ffmpeg: args.ffmpeg || 'ffmpeg',
-  format: args.format || 'mp3',
-  gain: args.gain ? parseFloat(args.gain) : undefined,
-  gender: args.gender,
-  language: args.language,
-  lexicon: args.lexicon,
-  limit: Number(args.throttle) || 5, // eslint-disable-line no-magic-numbers
-  pitch: args.pitch ? parseFloat(args.pitch) : undefined,
-  privateKey: args['private-key'],
-  projectFile: args['project-file'],
-  projectId: args['project-id'],
-  region: args.region || 'us-east-1',
-  sampleRate: args['sample-rate'] ? Number(args['sample-rate']) : undefined,
-  secretKey: args['secret-key'],
-  speed: args.speed ? parseFloat(args.speed) : undefined,
-  type: args.type || 'text',
-  voice: args.voice
-})
-if (typeof opts.effect !== 'undefined' && !Array.isArray(opts.effect)) {
-  opts.effect = [opts.effect]
-}
-if (typeof opts.lexicon !== 'undefined' && !Array.isArray(opts.lexicon)) {
-  opts.lexicon = [opts.lexicon]
-}
-if (args['private-key-file']) {
-  debug(`Reading private key from ${args['private-key-file']}`)
-  opts.privateKey = readFileSync(args['private-key-file'], 'utf8')
-}
+const opts = program.opts()
 debug(`Options: ${JSON.stringify(sanitizeOpts(opts))}`)
 
 // Create the service provider.
-const service = args.service || 'aws'
-const provider = createProvider(service, opts)
+const provider = createProvider(opts.service, opts)
 
 // Define the tasks and options.
 const tasks = [{
@@ -99,10 +60,9 @@ const tasks = [{
   task: moveTempFile
 }]
 const context = {
-  args,
   input, // only used for testing
   outputFilename,
-  service
+  service: opts.service // only used for testing
 }
 
 // Run the tasks.

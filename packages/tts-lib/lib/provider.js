@@ -1,3 +1,5 @@
+const debug = require('debug')('provider')
+const { readFileSync } = require('fs')
 const tempfile = require('tempfile')
 const { combine } = require('./combine')
 const { createManifest } = require('./create-manifest')
@@ -13,8 +15,16 @@ class Provider {
     this.name = '[Base Provider]'
     this.maxCharacterCount = 1500
     this.opts = opts
+
+    // Prevent instantiation of the abstract class.
     if (this.constructor === Provider) {
       throw new Error('Can\'t instantiate abstract class')
+    }
+
+    // Load the private key from a file if specified.
+    if (this.opts.privateKeyFile) {
+      debug(`Reading private key from ${this.opts.privateKeyFile}`)
+      this.opts.privateKey = readFileSync(this.opts.privateKeyFile, 'utf8')
     }
   }
 
@@ -55,7 +65,7 @@ class Provider {
   async generateSpeech (strParts, task) {
     // Compile the text parts and options together in a packet.
     const parts = strParts.map(part => this.buildInfo(part, task))
-    const updatedParts = await generateAll(parts, this.opts.limit, this.generate.bind(this), task)
+    const updatedParts = await generateAll(parts, this.opts.throttle, this.generate.bind(this), task)
     return createManifest(updatedParts)
   }
 

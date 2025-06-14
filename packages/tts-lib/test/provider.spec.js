@@ -1,4 +1,6 @@
+const { writeFile } = require('fs/promises')
 const proxyquire = require('proxyquire')
+const tempfile = require('tempfile')
 
 describe('provider', () => {
   describe('base class', () => {
@@ -8,6 +10,7 @@ describe('provider', () => {
     const text = 'hello world'
 
     let Provider
+    let ChildProvider
     let childProvider
     let combineStub
     let createManifestStub
@@ -33,14 +36,14 @@ describe('provider', () => {
           splitText: splitTextStub
         }
       }))
-      class ChildProvider extends Provider {
+      ChildProvider = class extends Provider {
         constructor (opts = {}) {
           super(opts)
         }
       }
       childProvider = new ChildProvider({
         ffmpeg: 'ffmpeg-test',
-        limit: 10
+        throttle: 10
       })
     })
 
@@ -55,6 +58,15 @@ describe('provider', () => {
         expect(childProvider.name).toBe('[Base Provider]')
         expect(childProvider.maxCharacterCount).toBe(1500)
       })
+
+      it('should read the private key if privateKeyFile is specified', async () => {
+        const keyFile = tempfile()
+        await writeFile(keyFile, 'private-key-content', 'utf8')
+        childProvider = new ChildProvider({
+          privateKeyFile: keyFile
+        })
+        expect(childProvider.opts.privateKey).toBe('private-key-content')
+      })
     })
 
     describe('buildInfo()', () => {
@@ -62,7 +74,7 @@ describe('provider', () => {
         const task = {}
         const result = childProvider.buildInfo(text, task)
         expect(result).toEqual({
-          opts: { ffmpeg: 'ffmpeg-test', limit: 10 },
+          opts: { ffmpeg: 'ffmpeg-test', throttle: 10 },
           task,
           tempfile: jasmine.any(String),
           text
@@ -118,7 +130,7 @@ describe('provider', () => {
           task,
           tempfile: jasmine.any(String),
           text: chunks[1]
-        }], childProvider.opts.limit, jasmine.any(Function), task)
+        }], childProvider.opts.throttle, jasmine.any(Function), task)
       })
 
       it('should call createManifest()', async () => {
