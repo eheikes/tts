@@ -5,9 +5,7 @@ class TestEmitter extends EventEmitter {}
 
 describe('CLI', () => {
   const inputFile = 'input-file'
-  const manifestFile = 'manifest file'
   const outputFile = 'output-file'
-  const parts = ['part1', 'part2']
   const tempFile = 'temp file'
 
   let cli
