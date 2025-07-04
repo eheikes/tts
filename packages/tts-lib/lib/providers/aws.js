@@ -31,21 +31,7 @@ class AwsProvider extends Provider {
     })
   }
 
-  /**
-   * Creates an object containing all the data.
-   */
-  buildInfo (text, task) {
-    return {
-      opts: this.opts,
-      task,
-      tempfile: tempfile(`.${this.extensionFor(this.opts.format)}`),
-      text,
-      send: this.instance.send.bind(this.instance)
-    }
-  }
-
-  combineAudio (manifestFile) {
-    const newFile = tempfile(`.${this.extensionFor(this.opts.format)}`)
+  async combine (manifestFile, newFile) {
     return combine(manifestFile, newFile, this.opts.format === 'pcm' ? 'raw' : 'encoded', this.opts.ffmpeg)
   }
 
@@ -61,43 +47,40 @@ class AwsProvider extends Provider {
   }
 
   /**
-   * Calls the Polly API with the given info.
+   * Calls the Polly API with the given text.
    */
-  async generate (info, i, callback) {
-    /* istanbul ignore else: not a real-life scenario */
-    if (info.task.title.length < 1000) { // prevent regexp DoS
-      info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
-    }
-
+  async generate (str) {
+    const filename = tempfile(`.${this.extensionFor(this.opts.format)}`)
     const command = new SynthesizeSpeechCommand({
-      Engine: info.opts.engine,
-      LanguageCode: info.opts.language,
-      LexiconNames: info.opts.lexicon,
-      OutputFormat: info.opts.format === 'ogg' ? 'ogg_vorbis' : info.opts.format,
-      SampleRate: info.opts.sampleRate ? String(info.opts.sampleRate) : undefined,
-      Text: info.text,
-      TextType: info.opts.type,
-      VoiceId: info.opts.voice
+      Engine: this.opts.engine,
+      LanguageCode: this.opts.language,
+      LexiconNames: this.opts.lexicon,
+      OutputFormat: this.opts.format === 'ogg' ? 'ogg_vorbis' : this.opts.format,
+      SampleRate: this.opts.sampleRate ? String(this.opts.sampleRate) : undefined,
+      Text: str,
+      TextType: this.opts.type,
+      VoiceId: this.opts.voice
     })
 
     debug('generate')('Making request to Amazon Web Services')
     let response
     try {
-      response = await info.send(command)
+      response = await this.instance.send(command)
     } catch (err) {
       debug('generate')(`Error during request: ${err.message}`)
       throw err
     }
 
-    debug('generate')(`Writing audio content to ${info.tempfile}`)
+    debug('generate')(`Writing audio content to ${filename}`)
     try {
-      const fileStream = createWriteStream(info.tempfile)
+      const fileStream = createWriteStream(filename)
       await pipeline(response.AudioStream, fileStream)
       fileStream.close()
     } catch (err) {
       debug('generate')(`Error writing: ${err.message}`)
       throw err
     }
+    return { tempfile: filename }
   }
 }
 

@@ -2,11 +2,14 @@ const { writeFile } = require('fs/promises')
 const proxyquire = require('proxyquire')
 const tempfile = require('tempfile')
 
+const { generateAll } = require('../lib/generate-all')
+
 describe('provider', () => {
   describe('base class', () => {
     const chunks = ['hello', 'world']
     const manifestFile = 'manifest.txt'
     const parts = ['foo.txt', 'bar.txt']
+    const tempFile = 'tempfile.mp3'
     const text = 'hello world'
 
     let Provider
@@ -14,15 +17,18 @@ describe('provider', () => {
     let childProvider
     let combineStub
     let createManifestStub
+    let fsSpy
     let generateAllStub
     let splitTextStub
 
     beforeEach(() => {
       combineStub = jasmine.createSpy('combine').and.returnValue(manifestFile)
       createManifestStub = jasmine.createSpy('createManifest').and.returnValue(Promise.resolve(manifestFile))
+      fsSpy = jasmine.createSpyObj('fs', ['readFile', 'rm'])
       generateAllStub = jasmine.createSpy('generateAll').and.returnValue(Promise.resolve(parts))
       splitTextStub = jasmine.createSpy('generateAll').and.returnValue(chunks)
       ;({ Provider } = proxyquire('../lib/provider', {
+        'fs/promises': fsSpy,
         './combine': {
           combine: combineStub
         },
@@ -59,6 +65,15 @@ describe('provider', () => {
         expect(childProvider.maxCharacterCount).toBe(1500)
       })
 
+      it('should create an event emitter', () => {
+        expect(childProvider.events).toBeDefined()
+        expect(childProvider.events.on).toEqual(jasmine.any(Function))
+      })
+
+      it('should create a default error handler', () => {
+        expect(childProvider.events.listenerCount('error')).toBe(1)
+      })
+
       it('should read the private key if privateKeyFile is specified', async () => {
         const keyFile = tempfile()
         await writeFile(keyFile, 'private-key-content', 'utf8')
@@ -69,32 +84,90 @@ describe('provider', () => {
       })
     })
 
-    describe('buildInfo()', () => {
-      it('should return an object with the text and a tempfile', () => {
-        const task = {}
-        const result = childProvider.buildInfo(text, task)
-        expect(result).toEqual({
-          opts: { ffmpeg: 'ffmpeg-test', throttle: 10 },
-          task,
-          tempfile: jasmine.any(String),
-          text
-        })
+    describe('cleanup()', () => {
+      const manifestFilename = 'manifest.txt'
+      const tempFilenames = ['foo.mp3', 'bar.mp3']
+
+      beforeEach(() => {
+        const manifestContents = tempFilenames.map(filename => `file '${filename}'`).join('\n')
+        fsSpy.readFile.and.callFake(() => Promise.resolve(manifestContents))
+      })
+
+      it('should delete the manifest file', async () => {
+        await childProvider.cleanup(manifestFile)
+        expect(fsSpy.rm).toHaveBeenCalledWith(manifestFilename, { force: true, recursive: true })
+      })
+
+      it('should delete the temporary audio files', async () => {
+        await childProvider.cleanup(manifestFile)
+        for (const filename of tempFilenames) {
+          expect(fsSpy.rm).toHaveBeenCalledWith(filename, { force: true, recursive: true })
+        }
+      })
+
+      it('should emit a "clean" event', async () => {
+        const cleanSpy = jasmine.createSpy('clean')
+        childProvider.events.on('clean', cleanSpy)
+        await childProvider.cleanup(manifestFile)
+        expect(cleanSpy).toHaveBeenCalled()
+      })
+    })
+
+    describe('combine()', () => {
+      it('should call combine() for the audio', async () => {
+        await childProvider.combine('manifest.txt', 'foo.mp3')
+        expect(combineStub).toHaveBeenCalledWith('manifest.txt', 'foo.mp3', 'encoded', 'ffmpeg-test')
       })
     })
 
     describe('combineAudio()', () => {
-      it('should call combine() for the audio', async () => {
+      it('should call combine()', async () => {
+        spyOn(childProvider, 'combine')
         await childProvider.combineAudio('foobar')
-        const args = combineStub.calls.mostRecent().args
-        expect(args[0]).toBe('foobar')
-        expect(args[1]).toMatch(/\.mp3$/)
-        expect(args[2]).toBe('encoded')
-        expect(args[3]).toBe('ffmpeg-test')
+        expect(childProvider.combine).toHaveBeenCalledWith('foobar', jasmine.any(String))
+      })
+
+      it('should emit a "save" event with the new filename', async () => {
+        const saveSpy = jasmine.createSpy('save')
+        childProvider.events.on('save', saveSpy)
+        await childProvider.combineAudio('foobar')
+        expect(saveSpy).toHaveBeenCalledWith({ filename: jasmine.any(String) })
       })
 
       it('should return the combine() result', async () => {
         const result = await childProvider.combineAudio('foobar')
-        expect(result).toBe(manifestFile)
+        expect(result).toEqual(jasmine.any(String))
+      })
+    })
+
+    describe('convert()', () => {
+      beforeEach(async () => {
+        spyOn(childProvider, 'splitText').and.returnValue(Promise.resolve(chunks))
+        spyOn(childProvider, 'generateSpeech').and.returnValue(Promise.resolve(manifestFile))
+        spyOn(childProvider, 'combineAudio').and.returnValue(Promise.resolve(tempFile))
+        spyOn(childProvider, 'cleanup')
+        await childProvider.convert(text)
+      })
+
+      it('should call splitText() with the text', async () => {
+        expect(childProvider.splitText).toHaveBeenCalledWith(text)
+      })
+
+      it('should call generateSpeech() with the text chunks', async () => {
+        expect(childProvider.generateSpeech).toHaveBeenCalledWith(chunks)
+      })
+
+      it('should call combineAudio() with the manifest file', async () => {
+        expect(childProvider.combineAudio).toHaveBeenCalledWith(manifestFile)
+      })
+
+      it('should call cleanup() with the manifest file', async () => {
+        expect(childProvider.cleanup).toHaveBeenCalledWith(manifestFile)
+      })
+
+      it('should return the final audio filename', async () => {
+        const result = await childProvider.convert(text)
+        expect(result).toBe(tempFile)
       })
     })
 
@@ -118,40 +191,72 @@ describe('provider', () => {
 
     describe('generateSpeech()', () => {
       it('should call generateAll()', async () => {
-        const task = {}
-        await childProvider.generateSpeech(chunks, task)
-        expect(generateAllStub).toHaveBeenCalledWith([{
-          opts: jasmine.any(Object),
-          task,
-          tempfile: jasmine.any(String),
-          text: chunks[0]
-        }, {
-          opts: jasmine.any(Object),
-          task,
-          tempfile: jasmine.any(String),
-          text: chunks[1]
-        }], childProvider.opts.throttle, jasmine.any(Function), task)
+        await childProvider.generateSpeech(chunks)
+        expect(generateAllStub).toHaveBeenCalledWith(chunks, childProvider.opts.throttle, jasmine.any(Function))
+      })
+
+      it('should call generate() for each chunk', async () => {
+        spyOn(childProvider, 'generate').and.returnValue(Promise.resolve({ tempfile: tempFile }))
+        generateAllStub.and.callFake((parts, limit, func) => generateAll(parts, limit, func))
+        await childProvider.generateSpeech(chunks)
+        expect(childProvider.generate.calls.count()).toBe(chunks.length)
+        for (const chunk of chunks) {
+          expect(childProvider.generate).toHaveBeenCalledWith(chunk)
+        }
+      })
+
+      it('should emit a "generate" event for each chunk', async () => {
+        spyOn(childProvider, 'generate').and.returnValue(Promise.resolve({ tempfile: tempFile }))
+        generateAllStub.and.callFake((parts, limit, func) => generateAll(parts, limit, func))
+        const generateEventHandler = jasmine.createSpy('generate')
+        childProvider.events.on('generate', generateEventHandler)
+        await childProvider.generateSpeech(chunks)
+        expect(generateEventHandler.calls.count()).toBe(chunks.length)
+        expect(generateEventHandler).toHaveBeenCalledWith({
+          count: 2,
+          complete: 1,
+          filename: tempFile
+        })
+        expect(generateEventHandler).toHaveBeenCalledWith({
+          count: 2,
+          complete: 2,
+          filename: tempFile
+        })
       })
 
       it('should call createManifest()', async () => {
-        await childProvider.generateSpeech(chunks, {})
+        await childProvider.generateSpeech(chunks)
         expect(createManifestStub).toHaveBeenCalledWith(parts)
       })
 
+      it('should emit a "manifest" event with the manifest filename', async () => {
+        const manifestSpy = jasmine.createSpy('manifest')
+        childProvider.events.on('manifest', manifestSpy)
+        await childProvider.generateSpeech(chunks)
+        expect(manifestSpy).toHaveBeenCalledWith({ filename: manifestFile })
+      })
+
       it('should return the manifest file', async () => {
-        const result = await childProvider.generateSpeech(chunks, {})
+        const result = await childProvider.generateSpeech(chunks)
         expect(result).toBe(manifestFile)
       })
     })
 
     describe('splitText()', () => {
-      it('should call the splitText routine with the correct parameters', () => {
-        childProvider.splitText(text)
+      it('should call the splitText routine with the correct parameters', async () => {
+        await childProvider.splitText(text)
         expect(splitTextStub).toHaveBeenCalledWith(text, childProvider.maxCharacterCount, childProvider.opts.type)
       })
 
-      it('should return the splitText() result', () => {
-        const result = childProvider.splitText(text)
+      it('should emit a "split" event with the text length and chunk count', async () => {
+        const splitSpy = jasmine.createSpy('split')
+        childProvider.events.on('split', splitSpy)
+        await childProvider.splitText(text)
+        expect(splitSpy).toHaveBeenCalledWith({ length: text.length, count: chunks.length })
+      })
+
+      it('should return the splitText() result', async () => {
+        const result = await childProvider.splitText(text)
         expect(result).toEqual(chunks)
       })
     })

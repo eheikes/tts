@@ -35,19 +35,6 @@ class GcpProvider extends Provider {
     }
   }
 
-  /**
-   * Creates an object containing all the data.
-   */
-  buildInfo = function (text, task) {
-    return {
-      opts: this.opts,
-      task,
-      tempfile: tempfile(`.${this.extensionFor(this.opts.format)}`),
-      text,
-      synthesizer: this.instance.synthesizeSpeech.bind(this.instance)
-    }
-  }
-
   extensionFor (format) {
     if (format === 'mp3') {
       return 'mp3'
@@ -60,32 +47,28 @@ class GcpProvider extends Provider {
   }
 
   /**
-   * Calls the Google Cloud API with the given info.
+   * Calls the Google Cloud API with the given text.
    */
-  async generate (info, i) {
-    /* istanbul ignore else: not a real-life scenario */
-    if (info.task.title.length < 1000) { // prevent regexp DoS
-      info.task.title = info.task.title.replace(/\d+\//, `${i}/`)
-    }
-
+  async generate (str) {
+    const filename = tempfile(`.${this.extensionFor(this.opts.format)}`)
     const request = {
-      input: info.opts.type === 'ssml'
-        ? { ssml: info.text }
-        : { text: info.text },
+      input: this.opts.type === 'ssml'
+        ? { ssml: str }
+        : { text: str },
       voice: {
-        ssmlGender: info.opts.gender ? String(info.opts.gender).toUpperCase() : undefined,
-        languageCode: info.opts.language,
-        name: info.opts.voice
+        ssmlGender: this.opts.gender ? String(this.opts.gender).toUpperCase() : undefined,
+        languageCode: this.opts.language,
+        name: this.opts.voice
       },
       audioConfig: {
-        audioEncoding: info.opts.format === 'pcm'
+        audioEncoding: this.opts.format === 'pcm'
           ? 'LINEAR16'
-          : info.opts.format === 'ogg' ? 'OGG_OPUS' : 'MP3',
-        effectsProfileId: info.opts.effect,
-        pitch: info.opts.pitch,
-        sampleRateHertz: info.opts.sampleRate,
-        speakingRate: info.opts.speed,
-        volumeGainDb: info.opts.gain
+          : this.opts.format === 'ogg' ? 'OGG_OPUS' : 'MP3',
+        effectsProfileId: this.opts.effect,
+        pitch: this.opts.pitch,
+        sampleRateHertz: this.opts.sampleRate,
+        speakingRate: this.opts.speed,
+        volumeGainDb: this.opts.gain
       }
     }
     const opts = {
@@ -95,19 +78,21 @@ class GcpProvider extends Provider {
     let response
     debug('generate')('Making request to Google Cloud Platform')
     try {
-      response = await promisify(info.synthesizer)(request, opts)
+      response = await promisify(this.instance.synthesizeSpeech.bind(this.instance))(request, opts)
     } catch (err) {
       debug('generate')(`Error during request: ${err.message}`)
       throw err
     }
 
-    debug('generate')(`Writing audio content to ${info.tempfile}`)
+    debug('generate')(`Writing audio content to ${filename}`)
     try {
-      await writeFile(info.tempfile, response.audioContent, 'binary')
+      await writeFile(filename, response.audioContent, 'binary')
     } catch (err) {
       debug('generate')(`Error writing: ${err.message}`)
       throw err
     }
+
+    return { tempfile: filename }
   }
 }
 

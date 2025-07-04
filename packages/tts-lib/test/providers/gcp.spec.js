@@ -5,38 +5,32 @@ const proxyquire = require('proxyquire')
 const tempfile = require('tempfile')
 
 describe('GCP provider', () => {
-  const chunks = ['hello world']
-
-  let combineStub
   let fsStub
-  let splitTextStub
   let GcpProvider
   let provider
 
   beforeEach(() => {
-    combineStub = jasmine.createSpy('combine')
     fsStub = jasmine.createSpyObj('fs', ['writeFile'])
-    fsStub.writeFile.and.callFake((dest, data, opts) => { Promise.resolve() })
-    splitTextStub = jasmine.createSpy('splitText').and.returnValue(chunks)
+    fsStub.writeFile.and.callFake((_dest, _data, _opts) => { Promise.resolve() })
     ;({ GcpProvider } = proxyquire('../../lib/providers/gcp', {
-      'fs/promises': fsStub,
-      '../combine': {
-        combine: combineStub
-      },
-      '../split-text': {
-        splitText: splitTextStub
-      }
+      'fs/promises': fsStub
     }))
     provider = new GcpProvider({
-      email: 'foo@example.com',
-      privateKey: 'private key',
-      projectFile: 'project-file.json',
       projectId: 'project ID',
       format: 'mp3'
     })
   })
 
   describe('constructor', () => {
+    beforeEach(() => {
+      provider = new GcpProvider({
+        email: 'foo@example.com',
+        privateKey: 'private key',
+        projectFile: 'project-file.json',
+        projectId: 'project ID',
+        format: 'mp3'
+      })
+    })
     it('should allow for no options', () => {
       expect(() => {
         provider = new GcpProvider()
@@ -145,208 +139,159 @@ describe('GCP provider', () => {
     })
   })
 
-  describe('buildInfo()', () => {
-    it('should return an object with the expected properties', () => {
-      const task = { foo: 1, bar: 2 }
-      const info = provider.buildInfo('hello world', task)
-      expect(info).toEqual({
-        opts: provider.opts,
-        task,
-        tempfile: jasmine.any(String),
-        text: 'hello world',
-        synthesizer: jasmine.any(Function)
-      })
-      expect(info.tempfile).toMatch(/\.mp3$/)
-    })
-  })
-
   describe('generate()', () => {
-    let task, testData, info, synthesizer
+    const text = 'hello world'
+    const response = 'fake audio data'
 
     beforeEach(() => {
-      task = {
-        title: 'Convert to audio (0/42)'
-      }
-      testData = {
-        filename: tempfile(),
-        index: 6,
-        opts: {
-          effect: ['effect1', 'effect2'],
-          gain: -1.2,
-          gender: 'neutral',
-          language: 'en-US',
-          pitch: -9.8,
-          sampleRate: 16000,
-          speed: 4.2,
-          type: 'text',
-          voice: 'John'
-        },
-        response: 'fake audio data',
-        text: 'hello world',
-        url: 'http://example.com/'
-      }
-      synthesizer = jasmine.createSpy('synthesizer')
-      info = {
-        opts: testData.opts,
-        task,
-        tempfile: testData.filename,
-        text: testData.text,
-        synthesizer
-      }
-    })
-
-    afterEach(async () => {
-      try {
-        await unlink(testData.filename)
-      } catch (_err) {
-        // Ignore any errors.
-      }
+      spyOn(provider.instance, 'synthesizeSpeech')
     })
 
     it('should call the synthesizer function', async () => {
-      synthesizer.and.callFake((_req, _opts, done) => done(null, {}))
-      await provider.generate(info, 0, () => {})
-      expect(synthesizer).toHaveBeenCalled()
+      provider.instance.synthesizeSpeech.and.callFake((_req, _opts, done) => done(null, {}))
+      await provider.generate(text)
+      expect(provider.instance.synthesizeSpeech).toHaveBeenCalled()
     })
 
     describe('when everything works', () => {
       beforeEach(() => {
-        synthesizer.and.callFake((req, opts, cb) => {
-          cb(null, { audioContent: testData.response })
+        provider.instance.synthesizeSpeech.and.callFake((_req, _opts, cb) => {
+          cb(null, { audioContent: response })
         })
       })
 
-      it('should update the task title', async () => {
-        await provider.generate(info, testData.index)
-        expect(task.title).toMatch(`\\(${testData.index}/`)
-      })
-
       it('should work with the MP3 format', async () => {
-        testData.opts.format = 'mp3'
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
+        provider.opts.format = 'mp3'
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
         expect(opts.audioConfig.audioEncoding).toBe('MP3')
       })
 
       it('should work with the OGG format', async () => {
-        testData.opts.format = 'ogg'
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
+        provider.opts.format = 'ogg'
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
         expect(opts.audioConfig.audioEncoding).toBe('OGG_OPUS')
       })
 
       it('should work with the PCM format', async () => {
-        testData.opts.format = 'pcm'
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
+        provider.opts.format = 'pcm'
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
         expect(opts.audioConfig.audioEncoding).toBe('LINEAR16')
       })
 
       it('should not use sample rate if not specified', async () => {
-        delete info.opts.sampleRate
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
+        delete provider.opts.sampleRate
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
         expect(opts.audioConfig.sampleRateHertz).toBeUndefined()
       })
 
       it('should use the sample rate, when specified', async () => {
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.audioConfig.sampleRateHertz).toBe(testData.opts.sampleRate)
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.audioConfig.sampleRateHertz).toBe(provider.opts.sampleRate)
       })
 
       it('should use the given (plain) text', async () => {
-        testData.opts.type = 'text'
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.input.text).toBe(testData.text)
+        provider.opts.type = 'text'
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.input.text).toBe(text)
         expect(opts.input.ssml).toBeUndefined()
       })
 
       it('should use the given (SSML) text', async () => {
-        testData.opts.type = 'ssml'
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.input.ssml).toBe(testData.text)
+        provider.opts.type = 'ssml'
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.input.ssml).toBe(text)
         expect(opts.input.text).toBeUndefined()
       })
 
       it('should not use effects if not specified', async () => {
-        delete info.opts.effect
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
+        delete provider.opts.effect
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
         expect(opts.audioConfig.effectsProfileId).toBeUndefined()
       })
 
       it('should use the effects, when specified', async () => {
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.audioConfig.effectsProfileId).toEqual(testData.opts.effect)
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.audioConfig.effectsProfileId).toEqual(provider.opts.effect)
       })
 
       it('should use the given volume gain', async () => {
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.audioConfig.volumeGainDb).toBe(testData.opts.gain)
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.audioConfig.volumeGainDb).toBe(provider.opts.gain)
       })
 
       it('should use the given gender', async () => {
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.voice.ssmlGender).toBe(testData.opts.gender.toUpperCase())
+        provider.opts.gender = 'female'
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.voice.ssmlGender).toBe(provider.opts.gender.toUpperCase())
       })
 
       it('should leave out gender if not specified', async () => {
-        delete testData.opts.gender
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
+        delete provider.opts.gender
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
         expect(opts.voice.ssmlGender).toBeUndefined()
       })
 
       it('should use the given language', async () => {
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.voice.languageCode).toBe(testData.opts.language)
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.voice.languageCode).toBe(provider.opts.language)
       })
 
       it('should use the given pitch', async () => {
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.audioConfig.pitch).toBe(testData.opts.pitch)
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.audioConfig.pitch).toBe(provider.opts.pitch)
       })
 
       it('should use the given speed', async () => {
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.audioConfig.speakingRate).toBe(testData.opts.speed)
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.audioConfig.speakingRate).toBe(provider.opts.speed)
       })
 
       it('should use the given voice', async () => {
-        await provider.generate(info, 0)
-        const opts = synthesizer.calls.mostRecent().args[0]
-        expect(opts.voice.name).toBe(testData.opts.voice)
+        await provider.generate(text)
+        const opts = provider.instance.synthesizeSpeech.calls.mostRecent().args[0]
+        expect(opts.voice.name).toBe(provider.opts.voice)
       })
 
       it('should write the GCP response to the temp file', async () => {
-        await provider.generate(info, 0)
+        await provider.generate(text)
         expect(fsStub.writeFile).toHaveBeenCalledWith(
-          testData.filename,
-          testData.response,
+          jasmine.any(String),
+          response,
           'binary'
         )
+      })
+
+      it('should return the filename', async () => {
+        const result = await provider.generate(text)
+        expect(result.tempfile).toEqual(jasmine.any(String))
       })
     })
 
     describe('when GCP returns an error', () => {
       beforeEach(() => {
-        synthesizer.and.callFake((req, opts, cb) => {
+        provider.instance.synthesizeSpeech.and.callFake((_req, _opts, cb) => {
           cb(new Error('testing GCP error'))
         })
       })
 
       it('should call back with the error', async () => {
         try {
-          await provider.generate(info, 0)
+          await provider.generate(text)
           throw new Error('generate() should have thrown an error')
         } catch (err) {
           expect(err.message).toBe('testing GCP error')
@@ -356,17 +301,17 @@ describe('GCP provider', () => {
 
     describe('when file writing fails', () => {
       beforeEach(() => {
-        synthesizer.and.callFake((req, opts, cb) => {
-          cb(null, { audioContent: testData.response })
+        provider.instance.synthesizeSpeech.and.callFake((_req, _opts, cb) => {
+          cb(null, { audioContent: response })
         })
-        fsStub.writeFile.and.callFake((dest, data, opts) => {
+        fsStub.writeFile.and.callFake((_dest, _data, _opts) => {
           throw new Error('testing write error')
         })
       })
 
       it('should call back with the error', async () => {
         try {
-          await provider.generate(info, 0)
+          await provider.generate(text)
           throw new Error('generate() should have thrown an error')
         } catch (err) {
           expect(err.message).toBe('testing write error')

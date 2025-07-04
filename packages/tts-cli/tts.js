@@ -4,7 +4,7 @@
  *   to convert it to an audio file.
  */
 const debug = require('debug')('tts-cli')
-const { cleanup, createProvider } = require('../tts-lib')
+const { createProvider } = require('../tts-lib')
 
 const { program } = require('./lib/program')
 const { moveTempFile } = require('./lib/move-temp-file')
@@ -29,32 +29,52 @@ debug(`Options: ${JSON.stringify(sanitizeOpts(opts))}`)
 // Create the service provider.
 const provider = createProvider(opts.service, opts)
 
-// Define the tasks and options.
+// Define the tasks and event listeners.
+const doneSplitting = new Promise((resolve) => {
+  debug('Listening for "split" event')
+  provider.events.on('split', (info) => resolve(info.count))
+})
+const doneConverting = new Promise((resolve) => {
+  debug('Listening for "manifest" event')
+  provider.events.on('manifest', resolve)
+})
+const doneCombining = new Promise((resolve) => {
+  debug('Listening for "save" event')
+  provider.events.on('save', (info) => resolve(info.filename))
+})
+const doneCleaning = new Promise((resolve) => {
+  debug('Listening for "clean" event')
+  provider.events.on('clean', resolve)
+})
 const tasks = [{
   title: 'Reading text',
-  task: async (ctx) => {
-    ctx.text = await readText(input, process)
+  task: async () => {
+    const text = await readText(input, process)
+    provider.convert(text) // kick off the conversion process
   }
 }, {
   title: 'Splitting text',
-  task: async (ctx) => {
-    ctx.parts = await provider.splitText(ctx.text)
-  }
+  task: (ctx) => doneSplitting.then((count) => {
+    ctx.count = count
+  })
 }, {
   title: 'Convert to audio',
-  task: async (ctx, task) => {
-    ctx.manifestFile = await provider.generateSpeech(ctx.parts, task)
+  task: (ctx, task) => {
+    task.title = `Convert to audio (0/${ctx.count})`
+    debug('Listening for "generate" event')
+    provider.events.on('generate', (info) => {
+      task.title = `Convert to audio (${info.complete}/${info.count})`
+    })
+    return doneConverting
   }
 }, {
   title: 'Combine audio',
-  task: async (ctx) => {
-    ctx.tempFile = await provider.combineAudio(ctx.manifestFile)
-  }
+  task: (ctx) => doneCombining.then((tempFile) => {
+    ctx.tempFile = tempFile
+  })
 }, {
   title: 'Clean up',
-  task: async (ctx) => {
-    await cleanup(ctx.manifestFile)
-  }
+  task: () => doneCleaning
 }, {
   title: 'Saving file',
   task: moveTempFile
