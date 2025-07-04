@@ -1,5 +1,5 @@
 const TextToSpeechClient = require('@google-cloud/text-to-speech').TextToSpeechClient
-const { unlink, writeFile } = require('fs/promises')
+const { writeFile } = require('fs/promises')
 const path = require('path')
 const proxyquire = require('proxyquire')
 const tempfile = require('tempfile')

@@ -151,48 +151,12 @@ describe('AWS provider', () => {
 
   describe('generate()', () => {
     const text = 'hello world'
-
-    let task, testData, info, send
-    let filename = tempfile()
+    const filename = tempfile()
 
     beforeEach(() => {
-      task = {
-        title: 'Convert to audio (0/42)'
-      }
-      testData = {
-        filename: tempfile(),
-        index: 6,
-        opts: {
-          engine: 'neural',
-          format: 'ogg',
-          language: 'en-US',
-          lexicon: ['lexicon1', 'lexicon2'],
-          sampleRate: 16000,
-          type: 'ssml',
-          voice: 'John'
-        },
-        text: 'hello world',
-        url: 'http://example.com/'
-      }
-      const inStream = new Readable({
-        read () {
-          this.push('testing')
-          this.push(null)
-        }
-      })
       spyOn(provider.instance, 'send').and.resolveTo({
         AudioStream: Readable.from('testing')
       })
-      send = jasmine.createSpy('send').and.resolveTo({
-        AudioStream: inStream
-      })
-      info = {
-        opts: testData.opts,
-        task,
-        tempfile: testData.filename,
-        text: testData.text,
-        send
-      }
     })
 
     afterEach(async () => {
