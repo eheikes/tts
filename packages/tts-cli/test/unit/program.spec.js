@@ -1,5 +1,5 @@
 const proxyquire = require('proxyquire')
-const { program: originalProgram } = require('../lib/program')
+const { program: originalProgram } = require('../../lib/program')
 
 class FakeOption {
   argParser () { return this }
@@ -28,7 +28,7 @@ describe('program', () => {
       action: (func) => { actionFunc = func },
       addOption: () => {}
     })
-    proxyquire('../lib/program', {
+    proxyquire('../../lib/program', {
       commander: {
         Command: commandSpy,
         Option: FakeOption

@@ -11,7 +11,7 @@ describe('moveTempFile()', () => {
   beforeEach(async () => {
     fsSpy = jasmine.createSpyObj('fs', ['rename'])
     fsSpy.rename.and.callFake((src, dest) => Promise.resolve())
-    ;({ moveTempFile } = proxyquire('../lib/move-temp-file', {
+    ;({ moveTempFile } = proxyquire('../../lib/move-temp-file', {
       'fs/promises': fsSpy
     }))
     ctx = {

@@ -33,7 +33,7 @@ describe('CLI', () => {
       '../tts-lib': { cleanup, createProvider },
       './lib/read-text': { readText }
     }
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
   })
 
   it('should construct an array of tasks', () => {
@@ -48,7 +48,7 @@ describe('CLI', () => {
 
     beforeEach(() => {
       process.argv = ['node', 'tts.js', inputFile, outputFile]
-      cli = proxyquire('../tts', mocks)
+      cli = proxyquire('../../tts', mocks)
     })
 
     it('should use the first argument for the input filename', () => {
@@ -63,7 +63,7 @@ describe('CLI', () => {
   describe('when only 1 argument is given', () => {
     beforeEach(() => {
       process.argv = ['node', 'tts.js', outputFile]
-      cli = proxyquire('../tts', mocks)
+      cli = proxyquire('../../tts', mocks)
     })
 
     it('should use null for the input filename', () => {
@@ -77,19 +77,19 @@ describe('CLI', () => {
 
   it('should create an AWS service', () => {
     process.argv = ['node', 'tts.js', outputFile, '--service', 'aws']
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     expect(cli.context.service).toBe('aws')
   })
 
   it('should create a GCP service', () => {
     process.argv = ['node', 'tts.js', outputFile, '--service', 'gcp']
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     expect(cli.context.service).toBe('gcp')
   })
 
   it('should create a default service', () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     expect(cli.context.service).toBe('aws')
   })
 
@@ -122,7 +122,7 @@ describe('CLI', () => {
       '--type', 'text',
       '--voice', 'test voice'
     ]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     expect(createProvider).toHaveBeenCalledWith('aws', {
       accessKey: 'test access key',
       effect: ['test effect'],
@@ -151,7 +151,7 @@ describe('CLI', () => {
 
   it('should create the service with default options', () => {
     process.argv = ['node', 'tts.js', inputFile, outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     expect(createProvider).toHaveBeenCalledWith('aws', {
       ffmpeg: 'ffmpeg',
       format: 'mp3',
@@ -164,21 +164,21 @@ describe('CLI', () => {
 
   it('should call readText() in the text-reading task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     await cli.tasks[0].task()
     expect(readText).toHaveBeenCalledWith(null, process)
   })
 
   it('should call convert() in the text-reading task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     await cli.tasks[0].task()
     expect(convert).toHaveBeenCalledWith('test text')
   })
 
   it('should listen for the "split" event in the text-splitting task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     const context = {}
     emitter.emit('split', { count: 6 })
     await cli.tasks[1].task(context) // will timeout with no split event
@@ -186,7 +186,7 @@ describe('CLI', () => {
 
   it('should set "count" in the context in the text-splitting task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     const context = {}
     emitter.emit('split', { count: 6 })
     await cli.tasks[1].task(context)
@@ -195,7 +195,7 @@ describe('CLI', () => {
 
   it('should listen for the "manifest" event in the speech-generation task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     const context = { count: 6 }
     const task = {}
     emitter.emit('manifest', { complete: 2, count: 6 })
@@ -204,7 +204,7 @@ describe('CLI', () => {
 
   it('should set the initial task title in the speech-generation task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     const context = { count: 6 }
     const task = {}
     emitter.emit('manifest')
@@ -214,7 +214,7 @@ describe('CLI', () => {
 
   it('should update the task title on "generate" events', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     const context = { count: 6 }
     const task = {}
     const doneWithTask = cli.tasks[2].task(context, task)
@@ -226,7 +226,7 @@ describe('CLI', () => {
 
   it('should listen for the "save" event in the combine-audio task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     const context = {}
     emitter.emit('save', { filename: outputFile })
     await cli.tasks[3].task(context) // will timeout with no save event
@@ -234,7 +234,7 @@ describe('CLI', () => {
 
   it('should set "tempFile" in the context in the combine-audio task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     const context = {}
     emitter.emit('save', { filename: outputFile })
     await cli.tasks[3].task(context)
@@ -243,7 +243,7 @@ describe('CLI', () => {
 
   it('should listen for the "clean" event in the cleanup task', async () => {
     process.argv = ['node', 'tts.js', outputFile]
-    cli = proxyquire('../tts', mocks)
+    cli = proxyquire('../../tts', mocks)
     emitter.emit('clean')
     await cli.tasks[4].task() // will timeout with no clean event
   })

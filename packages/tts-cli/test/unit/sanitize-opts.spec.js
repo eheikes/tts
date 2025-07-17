@@ -1,4 +1,4 @@
-const { sanitizeOpts } = require('../lib/sanitize-opts')
+const { sanitizeOpts } = require('../../lib/sanitize-opts')
 describe('sanitizeOpts()', () => {
   const exampleOpts = {
     foo: 1,

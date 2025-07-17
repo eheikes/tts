@@ -14,7 +14,9 @@
   "scripts": {
     "lint": "standard --env jasmine --fix --verbose",
     "report-coverage": "codecov",
-    "test": "cross-env JASMINE_CONFIG_PATH=test/jasmine.json nyc jasmine"
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:e2e": "cross-env JASMINE_CONFIG_PATH=test/e2e.json jasmine",
+    "test:unit": "cross-env JASMINE_CONFIG_PATH=test/unit.json nyc jasmine"
   },
   "repository": {
     "type": "git",

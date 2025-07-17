@@ -9,7 +9,7 @@ describe('readText()', () => {
 
   beforeEach(() => {
     fsSpy = jasmine.createSpyObj('fs', ['readFile'])
-    ;({ readText } = proxyquire('../lib/read-text', {
+    ;({ readText } = proxyquire('../../lib/read-text', {
       'fs/promises': fsSpy
     }))
   })
