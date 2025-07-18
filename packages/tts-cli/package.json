@@ -44,6 +44,7 @@
   "devDependencies": {
     "codecov": "^3.6.5",
     "cross-env": "^5.2.0",
+    "execa": "^9.6.0",
     "jasmine": "^3.5.0",
     "nyc": "^15.0.1",
     "proxyquire": "^2.1.3",

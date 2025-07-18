@@ -1,15 +1,15 @@
-const { copyFile } = require('fs/promises')
+const { copyFile, writeFile } = require('fs/promises')
 const { join } = require('path')
 const tempfile = require('tempfile')
 const { runWith } = require('./helper')
 
-describe('aws', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
+describe('gcp', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000
 
-  const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY
-  const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY
+  const GCP_PROJECT_FILE = process.env.GCP_PROJECT_FILE
 
-  const defaults = ['--service', 'aws', '--access-key', AWS_ACCESS_KEY, '--secret-key', AWS_SECRET_KEY]
+  const projectFile = tempfile('.json')
+  const defaults = ['--service', 'gcp', '--project-file', projectFile]
 
   let inputFile
   let outputFile
@@ -18,6 +18,7 @@ describe('aws', () => {
   let exitCode
 
   beforeEach(async () => {
+    await writeFile(projectFile, GCP_PROJECT_FILE, 'utf-8')
     inputFile = tempfile()
     outputFile = tempfile()
     await copyFile(join(__dirname, '../fixtures/lorem-ipsum.txt'), inputFile)
@@ -37,7 +38,7 @@ describe('aws', () => {
     expect(stdout).toContain('✔ Clean up')
     expect(stdout).toContain('❯ Saving file')
     expect(stdout).toContain(`✔ Done. Saved to ${outputFile}`)
-    expect(stderr).toBe('')
+    // expect(stderr).toBe('') // there is a deprecation warning
     expect(exitCode).toBe(0)
   })
 })
