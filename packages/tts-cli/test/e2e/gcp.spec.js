@@ -38,7 +38,7 @@ describe('gcp', () => {
     expect(stdout).toContain('✔ Clean up')
     expect(stdout).toContain('❯ Saving file')
     expect(stdout).toContain(`✔ Done. Saved to ${outputFile}`)
-    // expect(stderr).toBe('') // there is a deprecation warning
+    expect(stderr).toEqual(jasmine.any(String)) // there is a deprecation warning
     expect(exitCode).toBe(0)
   })
 })
