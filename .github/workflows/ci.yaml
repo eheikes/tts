@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - run: npm run lint
-      - run: npm run
+      - run: npm run test
         env:
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
