@@ -8,8 +8,14 @@ describe('aws', () => {
 
   const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY
   const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY
+  const ffmpegBinary = join(__dirname, '../fixtures/ffmpeg-mock.sh')
 
-  const defaults = ['--service', 'aws', '--access-key', AWS_ACCESS_KEY, '--secret-key', AWS_SECRET_KEY]
+  const defaults = [
+    '--service', 'aws',
+    '--ffmpeg', ffmpegBinary,
+    '--access-key', AWS_ACCESS_KEY,
+    '--secret-key', AWS_SECRET_KEY
+  ]
 
   let inputFile
   let outputFile

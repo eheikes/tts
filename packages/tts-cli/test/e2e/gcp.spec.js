@@ -7,9 +7,14 @@ describe('gcp', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000
 
   const GCP_PROJECT_FILE = process.env.GCP_PROJECT_FILE
+  const ffmpegBinary = join(__dirname, '../fixtures/ffmpeg-mock.sh')
 
   const projectFile = tempfile('.json')
-  const defaults = ['--service', 'gcp', '--project-file', projectFile]
+  const defaults = [
+    '--service', 'gcp',
+    '--ffmpeg', ffmpegBinary,
+    '--project-file', projectFile
+  ]
 
   let inputFile
   let outputFile
