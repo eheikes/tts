@@ -29,8 +29,10 @@ describe('aws', () => {
     await copyFile(join(__dirname, '../fixtures/lorem-ipsum.txt'), inputFile)
   })
 
-  it('should succeed', async () => {
+  fit('should succeed', async () => {
     ({ exitCode, stdout, stderr } = await runWith(inputFile, outputFile, ...defaults))
+    console.log('**stdout:', Buffer.from(stdout))
+    console.log('**comparison:', Buffer.from('❯ Reading text'))
     expect(stdout).toContain('❯ Reading text')
     expect(stdout).toContain('✔ Reading text')
     expect(stdout).toContain('❯ Splitting text')
