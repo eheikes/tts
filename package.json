@@ -29,14 +29,10 @@
     "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
-    "cross-env": "^5.2.0",
-    "jasmine": "^3.5.0",
-    "nyc": "^15.0.1",
-    "proxyquire": "^1.8.0",
-    "standard": "^17.1.0"
   },
   "dependencies": {
-    "tts-cli": "file:packages/tts-cli"
+    "tts-cli": "file:packages/tts-cli",
+    "tts-lib": "file:packages/tts-lib"
   },
   "resolutions": {
     "**/@grpc/grpc-js": ">=1.1.8",

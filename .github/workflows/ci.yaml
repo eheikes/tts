@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 21.x, 22.x, 23.x]
+        node-version: [18.x, 20.x, 21.x, 22.x, 23.x, 24.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -25,5 +25,9 @@ jobs:
         run: npm install
       - run: npm run lint
       - run: npm run test
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          GCP_PROJECT_FILE: ${{ secrets.GCP_PROJECT_FILE }}
       - name: Upload coverage report
         uses: codecov/codecov-action@v2

@@ -1,22 +1,18 @@
 #!/usr/bin/env node
 /**
- * Takes a text file and calls the AWS Polly API
+ * Takes a text file and calls the appropriate TTS API
  *   to convert it to an audio file.
  */
 const debug = require('debug')('tts-cli')
-const { checkUsage } = require('./lib/check-usage')
-const { cleanup } = require('./lib/cleanup')
-const { combine } = require('./lib/combine-parts')
-const { generateSpeech } = require('./lib/generate-speech')
+const { createProvider } = require('../tts-lib')
+
+const { program } = require('./lib/program')
 const { moveTempFile } = require('./lib/move-temp-file')
 const { readText } = require('./lib/read-text')
 const { sanitizeOpts } = require('./lib/sanitize-opts')
-const { splitText } = require('./lib/split-text')
 
-const args = require('minimist')(process.argv.slice(2))
-debug('called with arguments', JSON.stringify(sanitizeOpts(args)))
-
-let [input, outputFilename] = args._
+program.parse()
+let [input, outputFilename] = program.args
 
 // If only 1 argument was given, use that for the output filename.
 if (!outputFilename) {
@@ -26,41 +22,72 @@ if (!outputFilename) {
 debug('input:', input)
 debug('output:', outputFilename)
 
-// Check the usage.
-checkUsage(args, process)
+// Set the options.
+const opts = program.opts()
+debug(`Options: ${JSON.stringify(sanitizeOpts(opts))}`)
 
-// Define the tasks and options.
+// Create the service provider.
+const provider = createProvider(opts.service, opts)
+
+// Define the tasks and event listeners.
+const doneSplitting = new Promise((resolve) => {
+  debug('Listening for "split" event')
+  provider.events.on('split', (info) => resolve(info.count))
+})
+const doneConverting = new Promise((resolve) => {
+  debug('Listening for "manifest" event')
+  provider.events.on('manifest', resolve)
+})
+const doneCombining = new Promise((resolve) => {
+  debug('Listening for "save" event')
+  provider.events.on('save', (info) => resolve(info.filename))
+})
+const doneCleaning = new Promise((resolve) => {
+  debug('Listening for "clean" event')
+  provider.events.on('clean', resolve)
+})
 const tasks = [{
   title: 'Reading text',
-  task: readText
+  task: async () => {
+    const text = await readText(input, process)
+    provider.convert(text) // kick off the conversion process
+  }
 }, {
   title: 'Splitting text',
-  task: splitText
+  task: (ctx) => doneSplitting.then((count) => {
+    ctx.count = count
+  })
 }, {
   title: 'Convert to audio',
-  task: generateSpeech
+  task: (ctx, task) => {
+    task.title = `Convert to audio (0/${ctx.count})`
+    debug('Listening for "generate" event')
+    provider.events.on('generate', (info) => {
+      task.title = `Convert to audio (${info.complete}/${info.count})`
+    })
+    return doneConverting
+  }
 }, {
   title: 'Combine audio',
-  task: combine
+  task: (ctx) => doneCombining.then((tempFile) => {
+    ctx.tempFile = tempFile
+  })
 }, {
   title: 'Clean up',
-  task: cleanup
+  task: () => doneCleaning
 }, {
   title: 'Saving file',
   task: moveTempFile
 }]
-const service = args.service || 'aws'
 const context = {
-  args,
-  input,
-  maxCharacterCount: service === 'gcp' ? 5000 : 1500,
+  input, // only used for testing
   outputFilename,
-  process,
-  service
+  service: opts.service // only used for testing
 }
 
 // Run the tasks.
-if (require.main === module) /* istanbul ignore next */{
+/* istanbul ignore next */
+if (require.main === module) {
   const { Listr } = require('listr2')
   const list = new Listr(tasks, {
     renderer: debug.enabled ? 'silent' : 'default'
