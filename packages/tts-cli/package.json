@@ -12,6 +12,7 @@
     "yarn.lock"
   ],
   "scripts": {
+    "prepare": "husky",
     "lint": "standard --env jasmine --fix --verbose",
     "report-coverage": "codecov",
     "test": "npm run test:unit && npm run test:e2e",
@@ -45,6 +46,7 @@
     "codecov": "^3.6.5",
     "cross-env": "^5.2.0",
     "execa": "^9.6.0",
+    "husky": "^9.1.7",
     "jasmine": "^3.5.0",
     "nyc": "^15.0.1",
     "proxyquire": "^2.1.3",
