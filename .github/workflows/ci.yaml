@@ -17,12 +17,12 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 21.x, 22.x, 23.x]
+        node-version: [18.x, 20.x, 21.x, 22.x, 23.x, 24.x, 25.x]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@7c12f8017d5436eb855f1ed4399f037a36fbd9e8
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
@@ -30,4 +30,4 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - name: Upload coverage report
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@f32b3a3741e1053eb607407145bc9619351dc93b
