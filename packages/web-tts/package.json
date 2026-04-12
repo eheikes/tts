@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "execa": "^4.0.3",
-    "js-yaml": "^3.14.0",
+    "js-yaml": "^4.1.1",
     "minimist": "^1.2.5",
     "puppeteer": "^24.22.3",
     "tempy": "^0.6.0",
