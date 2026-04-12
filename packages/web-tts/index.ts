@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import execa = require('execa')
 import { promises as fs } from 'fs'
-import { safeLoad } from 'js-yaml'
+import { load } from 'js-yaml'
 import minimist = require('minimist')
 import puppeteer = require('puppeteer')
 import * as tempy from 'tempy'
@@ -220,7 +220,7 @@ const doAction = async (action: Command) => {
   }
 
   const input = await readFile(commandsFile, 'utf8')
-  const actions = safeLoad(input) as Command[]
+  const actions = load(input) as Command[]
 
   const browser = await puppeteer.launch({
     headless: args.headless,
