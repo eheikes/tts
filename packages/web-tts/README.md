@@ -5,7 +5,7 @@ Command-line tool to convert webpages of any size to speech. Uses [`tts-cli`](..
 
 ## Requirements / Installation
 
-* [Node.js/npm](https://nodejs.org) v10+
+* [Node.js/npm](https://nodejs.org) v20+
 * Please see the [`tts-cli` docs](../tts-cli) for installing and configuring the TTS tool.
 
 You can then install the package globally:
