@@ -24,6 +24,5 @@
     "url": "https://github.com/eheikes/tts/issues"
   },
   "devDependencies": {
-    "codecov": "^3.8.3"
   }
 }

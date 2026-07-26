@@ -25,7 +25,6 @@
   "homepage": "https://github.com/eheikes/tts#readme",
   "scripts": {
     "lint": "npm run lint --workspaces --if-present",
-    "report-coverage": "npm run report-coverage --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
