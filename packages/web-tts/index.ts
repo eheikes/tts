@@ -82,7 +82,7 @@ const doAction = async (action: Command) => {
     console.log(`Getting selectors matching "${opts.selector}...`)
     const results = await page.evaluate((selector, prop) => {
       const matches = Array.from(document.querySelectorAll(selector))
-      return matches.map((el) => String(el[prop]))
+      return matches.map((el) => String((el as unknown as Record<string, unknown>)[prop]))
     }, opts.selector, opts.property)
     console.log(`  ${results.length} matches found. Storing into "${opts.saveAs}".`)
     vars[opts.saveAs] = results
@@ -91,7 +91,7 @@ const doAction = async (action: Command) => {
     console.log(`Getting selector matching "${opts.selector}...`)
     const result = await page.evaluate((selector, prop) => {
       const el = document.querySelector(selector)
-      return el && String(el[prop])
+      return el ? String((el as unknown as Record<string, unknown>)[prop]) : ''
     }, opts.selector, opts.property)
     console.log(`  ${result ? '1' : 'No'} match found. Storing into "${opts.saveAs}".`)
     vars[opts.saveAs] = result
@@ -106,7 +106,7 @@ const doAction = async (action: Command) => {
     if (opts.test === 'contains') {
       isTrue = await page.evaluate((selector, text) => {
         const el = document.querySelector(selector)
-        return el && el.textContent && el.textContent.includes(text)
+        return Boolean(el && el.textContent && el.textContent.includes(text))
       }, opts.selector, opts.value)
     }
     if (opts.negate) { isTrue = !isTrue }
