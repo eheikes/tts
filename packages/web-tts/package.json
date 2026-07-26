@@ -38,7 +38,7 @@
     "minimist": "^1.2.8",
     "puppeteer": "^24.43.1",
     "tempy": "^0.7.1",
-    "tts-cli": "^5.0.0"
+    "tts-cli": "^6.0.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.5",
