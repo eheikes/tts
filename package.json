@@ -29,11 +29,11 @@
     "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
-    "cross-env": "^5.2.0",
+    "cross-env": "^5.2.1",
     "jasmine": "^3.5.0",
     "nyc": "^15.0.1",
     "proxyquire": "^1.8.0",
-    "standard": "^17.1.0"
+    "standard": "^17.1.2"
   },
   "dependencies": {
     "tts-cli": "file:packages/tts-cli"
