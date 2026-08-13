@@ -34,14 +34,14 @@
   ],
   "dependencies": {
     "execa": "^4.1.0",
-    "js-yaml": "^4.3.0",
+    "js-yaml": "^4.3.1",
     "minimist": "^1.2.8",
     "puppeteer": "^24.43.1",
     "tempy": "^0.7.1",
     "tts-cli": "^6.0.0"
   },
   "devDependencies": {
-    "@types/js-yaml": "^3.12.5",
+    "@types/js-yaml": "^4.0.9",
     "@types/minimist": "^1.2.5",
     "npm-run-all": "^4.1.5",
     "nyc": "^18.0.0",
