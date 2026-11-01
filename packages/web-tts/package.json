@@ -36,7 +36,7 @@
     "execa": "^4.1.0",
     "js-yaml": "^4.3.0",
     "minimist": "^1.2.8",
-    "puppeteer": "^24.43.1",
+    "puppeteer": "^25.16.0",
     "tempy": "^0.7.1",
     "tts-cli": "^6.0.0"
   },
